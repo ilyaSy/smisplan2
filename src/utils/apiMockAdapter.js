@@ -36,9 +36,9 @@ export default function setMockAdapter() {
   // get basic information
   mock.onGet(`${urlApi}/user/`).reply(200, user);
 
-  mock.onGet(`${urlApi}/developers/`).reply(200, developers);
+  mock.onGet(`${urlApi}/developer/`).reply(200, developers);
 
-  mock.onGet(`${urlApi}/projects/`).reply(200, projects);
+  mock.onGet(`${urlApi}/project/`).reply(200, projects);
 
   // get meta data information
   mock.onGet(`${urlApi}/task-meta/`).reply(200, metaData.task);

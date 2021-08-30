@@ -1,100 +1,53 @@
-import Cookies from 'js-cookie';
 import storage from '../storages/commonStorage';
 import { metaData, dataTable, mainModes, filters, setDataTable } from '../config/data';
-import { urlApi } from '../config/.env.local.js';
-// import axios from 'axios';
-// import setMockAdapter from './serverApi';
-// if (TEST_MODE) {
-//   setMockAdapter();
-// }
-// axios.defaults.headers.get['Content-Type'] = 'application/json';
-// axios.defaults.headers.post['Content-Type'] = 'application/json';
-// axios.defaults.headers.patch['Content-Type'] = 'application/json';
-// if (TEST_MODE) {
-//   return res.data;
-// }
+import { urlApi } from '../config/constants';
+import axios from 'axios';
+import setMockAdapter from './apiMockAdapter';
 
-/* check authentication function */
-const _checkAuth = () => {
-  const authPeriod = 12 * 60 * 60;
+setMockAdapter();
 
-  if (window.location.host !== 'localhost:3000') {
-    const timeCookie = Cookies.get('smistime');
-    const cidCookie = Cookies.get('cidsmis');
+axios.defaults.headers.get['Content-Type'] = 'application/json';
+axios.defaults.headers.post['Content-Type'] = 'application/json';
+axios.defaults.headers.patch['Content-Type'] = 'application/json';
 
-    // timeout reload
-    if (typeof timeCookie !== 'undefined') {
-      const timeNow = Math.round(Date.now() / 1000);
-      if (timeNow - timeCookie > authPeriod) {
-        // window.location.reload(true);
-        window.location.href = '/login/login.pl?mode=show&from=' + encodeURI(document.location.pathname) + "&code=6";
-      }
-    }
-    // no cookie reload
-    if (
-      typeof timeCookie === 'undefined' || timeCookie === '' || !timeCookie ||
-      typeof cidCookie === 'undefined' || cidCookie === '' || !cidCookie ) {
-      // window.location.reload(true);
-      window.location.href = '/login/login.pl?mode=show&from=' + encodeURI(document.location.pathname) + "&code=6";
-    }
+class Api {
+  static async getUser() {
+    return axios.get(`${urlApi}/user/`).then(Api._handleApiResult.bind(null, 'getUser'));
   }
-};
 
-/* get data function */
-const _getData = async (url) => {
-  // try {
-  //   let response = await axios.get(url);
+  static async getProjectDeveloper(mode) {
+    return axios.get(`${urlApi}/${mode}/`).then(Api._handleApiResult.bind(null, 'getProjectDeveloper'));
+  }
 
-  //   if (response && response.status === 200) {
-  //     if (response.data.status === 'OK') {
-  //       return response.data.data;
-  //     } else if (response.data.error) {
-  //       storage.alert.dispatch({ type: 'SHOW_ALERT', status: 'fail', message: 'Ошибка' });
-  //       console.error(`Ошибка запроса: ${response.data.error}`);
-  //     }
-  //   } else {
-  //     storage.alert.dispatch({ type: 'SHOW_ALERT', status: 'fail', message: 'Ошибка' });
-  //     console.error(`Ошибка HTTP:  + ${response.status}`);
-  //   }
-  // } catch (err) {
-  //   storage.alert.dispatch({ type: 'SHOW_ALERT', status: 'fail', message: 'Ошибка' });
-  //   console.error(`Unexpected error ${err}`); // Failed to fetch
-  // }
+  static async getMetaData(mode) {
+    return axios.get(`${urlApi}/${mode}/`).then(Api._handleApiResult.bind(null, 'getMetaData'));
+  }
 
-  try {
-    let response = await fetch(url);
+  static async getData(mode) {
+    return axios.get(`${urlApi}/${mode}/`).then(Api._handleApiResult.bind(null, 'getData'));
+  }
 
-    if (response && response.ok) {
-      let json = await response.json();
-
-      if (json.status === 'OK') {
-        return json.data;
-      } else if (json.error) {
-        storage.alert.dispatch({ type: 'SHOW_ALERT', status: 'fail', message: 'Ошибка' });
-        console.error(`Ошибка запроса: ${json.error}`);
-      }
-    } else {
+  static _handleApiResult(fnName, res) {
+    if (res.data.status !== 'OK') {
       storage.alert.dispatch({ type: 'SHOW_ALERT', status: 'fail', message: 'Ошибка' });
-      console.error(`Ошибка HTTP:  + ${response.status}`);
+      console.error(`Ошибка запроса: ${res.data.error}`);
     }
-  } catch (err) {
-    storage.alert.dispatch({ type: 'SHOW_ALERT', status: 'fail', message: 'Ошибка' });
-    console.error(`Unexpected error ${err}`); // Failed to fetch
-  }
-};
 
-/*const wait = (ms) => {
-    let start = new Date().getTime();
-    let end = start;
-    while(end < start + ms) {
-        end = new Date().getTime();
+    if (!['OK', 'Created', 'No Content'].includes(res.statusText)) {
+      storage.alert.dispatch({ type: 'SHOW_ALERT', status: 'fail', message: 'Ошибка' });
+      console.error(`Ошибка HTTP:  + ${res.statusText}`);
     }
-}*/
+
+    return res.data;
+
+    return ['OK', 'Created', 'No Content'].includes(res.statusText)
+      ? res.data
+      : Error(`Ошибка получения результата в ${fnName}: ${res.status} ${res.statusText}`);
+  }
+}
 
 /* get meta/data etc function */
 export const getData = async (mode, type = 'initialize', filter = {}) => {
-  _checkAuth();
-
   let urlParam = ['method=get', `feature=${mode}`];
 
   if (Object.keys(filter).length > 0) {
@@ -102,7 +55,8 @@ export const getData = async (mode, type = 'initialize', filter = {}) => {
   }
 
   if (mode === 'user') {
-    let result = _getData(urlApi + '?' + urlParam.join('&'));
+    // let result = await _getData(`${urlApi}/${mode}/`);
+    const result = await Api.getUser();
     if (result !== 'ERROR') {
       metaData.user = result;
       metaData.login = result.login;
@@ -112,7 +66,8 @@ export const getData = async (mode, type = 'initialize', filter = {}) => {
   }
 
   if (mode === 'project' || mode === 'developer') {
-    let result = await _getData(urlApi + '?' + urlParam.join('&'));
+    // let result = await _getData(`${urlApi}/${mode}/`);
+    const result = await Api.getProjectDeveloper(mode);
 
     if (result !== 'ERROR') {
       metaData[`${mode}List`] = {};
@@ -126,72 +81,11 @@ export const getData = async (mode, type = 'initialize', filter = {}) => {
     }
   }
 
-  if (mode === 'all_meta'){
-    let result = await _getData(urlApi + '?' + urlParam.join('&'));
-
-    if (result !== 'ERROR') {
-      for (const metaMode of ['task', 'taskgroup', 'event', 'spec_notes', 'discussion']) {
-        metaData.tables[metaMode] = {};
-        metaData.tables[metaMode].dataTable = {};
-
-        for (let infoR of result[metaMode]) {
-          let infoKey = Object.keys(infoR)[0];
-          let info = Object.values(infoR)[0];
-
-          //fix json 'true','false' to boolean
-          for (let key in info) {
-            if (metaData.mobile && typeof info.showInTableMobile !== 'undefined')
-              info.showInTable = info.showInTableMobile;
-
-            if (info[key] === 'true') info[key] = true;
-            if (info[key] === 'false') info[key] = false;
-          }
-
-          if (infoKey === 'specificParameters') {
-            metaData.tables[metaMode][infoKey] = info;
-          } else if (typeof info.validValues !== 'undefined' && info.validValues !== '') {
-            metaData.tables[metaMode][`${info.id}List`] = info.validValues;
-          } else if (
-            (typeof info.validValues === 'undefined' || info.validValues === '') &&
-            (info.type === 'select' || info.type === 'multi-select') &&
-            info.vocabulary &&
-            metaData[`${info.vocabulary}List`]
-          ) {
-            metaData.tables[metaMode][`${info.id}List`] = metaData[`${info.vocabulary}List`];
-          }
-
-          if (infoKey !== 'specificParameters') {
-            metaData.tables[metaMode].dataTable[info.id] = info;
-          }
-        }
-
-        if (metaData.tables[metaMode] && metaMode === metaData.dataTableName) {
-          for (let key in metaData.tables[metaMode]) {
-            metaData[key] = metaData.tables[metaMode][key];
-          }
-          setDataTable([]);
-        }
-
-        for (let prop in metaData.dataTable) {
-          let propInfo = metaData.dataTable[prop];
-          if (
-            (propInfo.type === 'select' || propInfo.type === 'multi-select') &&
-            !metaData[`${prop}List`] &&
-            propInfo.vocabulary &&
-            metaData[`${propInfo.vocabulary}List`]
-          ) {
-            metaData[`${prop}List`] = metaData[`${propInfo.vocabulary}List`];
-          }
-        }
-
-        filters.setKeys(metaData.dataTable);
-      }
-    }
-  }
-
-  if ( mainModes.map(m => `${m}_meta`).indexOf(mode) !== -1) {
+  if ( mainModes.map(m => `${m}_meta`).includes(mode)) {
     if (!metaData.tables[mode]) {
-      let result = await _getData(urlApi + '?' + urlParam.join('&'));
+      // let result = await _getData(`${urlApi}/${mode}/`);
+      const result = await Api.getMetaData(mode);
+
       if (result !== 'ERROR') {
         metaData.tables[mode] = {};
         metaData.tables[mode].dataTable = {};
@@ -251,8 +145,10 @@ export const getData = async (mode, type = 'initialize', filter = {}) => {
   }
 
   let data = [];
-  if (mainModes.indexOf(mode) !== -1) {
-    let result = await _getData(urlApi + '?' + urlParam.join('&'));
+  if (mainModes.includes(mode)) {
+    // let result = await _getData(`${urlApi}/${mode}/`);
+    const result = await Api.getData(mode);
+
     if (result !== 'ERROR') {
       if (type === 'initialize') setDataTable([]);
 
@@ -282,8 +178,6 @@ export const getData = async (mode, type = 'initialize', filter = {}) => {
 
 /* put/delete/patch data */
 export const doData = async (mode, data, id, feature) => {
-  _checkAuth();
-
   if (!feature) feature = 'task';
   let json = {};
   let urlParam = [`feature=${feature}`, `method=${mode}`];
