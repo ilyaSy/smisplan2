@@ -26,7 +26,7 @@ class Api {
   }
 
   static async getMetaData(mode) {
-    return axios.get(`${urlApi}/${mode}/`).then(Api._handleApiResult.bind(null, 'getMetaData'));
+    return axios.get(`${urlApi}/${mode.replace('_', '-')}/`).then(Api._handleApiResult.bind(null, 'getMetaData'));
   }
 
   static async getData(mode) {
@@ -50,6 +50,7 @@ class Api {
   }
 
   static _handleApiResult(fnName, res) {
+    console.log(res);
     return res.data.data;
 
     if (res.data.status !== 'OK') {

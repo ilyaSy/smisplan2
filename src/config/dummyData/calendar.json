@@ -1,18 +1,18 @@
 {
   "data": [
     {
-      "responsible": "matveev",
+      "responsible": "pushkin",
       "status": "done",
       "time": "14:30:00",
-      "date": "2021-07-22",
-      "description": "Композиты КМСС",
-      "participants": "matveev,plotnikov,kolbudaev,andry,evgeny",
-      "type": "iki",
+      "date": "2021-08-30",
+      "description": "Написание стихов в текущем году",
+      "participants": "pushkin,tsvetaeva,akhmatova",
+      "type": "zoom",
       "id": "559",
-      "mainTable": "taskgroup",
-      "idTask": "8",
-      "theme": "Композиты КМСС",
-      "result": "\nhttp://smis.iki.rssi.ru/smisplan-docs/file20210722190006.docx"
+      "mainTable": "task",
+      "idTask": "1",
+      "theme": "Написание стихов",
+      "result": ""
     }
   ]
 }
