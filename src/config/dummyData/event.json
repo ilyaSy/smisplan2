@@ -3,15 +3,15 @@
     {
       "project": null,
       "dt": "2021-08-29 19:26:30",
-      "event": "upd",
-      "task_id": "633",
-      "developer": "evgeny",
-      "change_all": "Изменения: \n Дата: 2021-08-31 → 2021-09-01 \n ID: 626 → 633 \n",
+      "event": "put",
+      "task_id": "1",
+      "developer": "pushkin",
+      "change_all": "Изменения: \n Дата: 2021-08-31 → 2021-09-01 \n",
       "status_old": "new",
       "status_new": "new",
-      "id": "2858",
-      "mainTable": "discussion",
-      "theme": "Работы для Рослесозащиты"
+      "id": "1",
+      "mainTable": "task",
+      "theme": "Написание стихов"
     }
   ]
 }

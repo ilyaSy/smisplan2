@@ -1377,7 +1377,7 @@ ${date.format('DD MMMM')}`;
             <TableRow>
               <TableCell colSpan={fullColsNum}>
                 {metaData.specificParameters?.tableName
-                  ? `${metaData.specificParameters?.tableName}: отсутствуют}`
+                  ? `${metaData.specificParameters?.tableName}: отсутствуют`
                   : 'Данные загружаются...'}
               </TableCell>
             </TableRow>
