@@ -42,7 +42,7 @@ class Api {
   }
 
   static async deleteData(mode) {
-    return axios.patch(`${urlApi}/${mode}/`).then(Api._handleApiResult.bind(null, 'deleteData'));
+    return axios.delete(`${urlApi}/${mode}/`).then(Api._handleApiResult.bind(null, 'deleteData'));
   }
 
   static async postData(mode) {
@@ -214,7 +214,7 @@ export const doData = async (mode, data, id, feature) => {
       if (mode === 'delete') result = await Api.deleteData(body);
       if (mode === 'notify') result = await Api.postData({...body, method: mode});
 
-      json = result !== "ERROR" ? result.data : {error: "ERROR"};
+      json = result !== "ERROR" ? result.data : result;
     } catch (err) {
       console.log(`Unexpected error ${err}`); // Failed to fetch
     }
