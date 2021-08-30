@@ -8,15 +8,21 @@ setMockAdapter();
 
 axios.defaults.headers.get['Content-Type'] = 'application/json';
 axios.defaults.headers.post['Content-Type'] = 'application/json';
+axios.defaults.headers.put['Content-Type'] = 'application/json';
 axios.defaults.headers.patch['Content-Type'] = 'application/json';
+axios.defaults.headers.delete['Content-Type'] = 'application/json';
 
 class Api {
   static async getUser() {
     return axios.get(`${urlApi}/user/`).then(Api._handleApiResult.bind(null, 'getUser'));
   }
 
-  static async getProjectDeveloper(mode) {
-    return axios.get(`${urlApi}/${mode}/`).then(Api._handleApiResult.bind(null, 'getProjectDeveloper'));
+  static async getProject() {
+    return axios.get(`${urlApi}/project/`).then(Api._handleApiResult.bind(null, 'getProject'));
+  }
+
+  static async getDeveloper() {
+    return axios.get(`${urlApi}/developer/`).then(Api._handleApiResult.bind(null, 'getDeveloper'));
   }
 
   static async getMetaData(mode) {
@@ -25,6 +31,22 @@ class Api {
 
   static async getData(mode) {
     return axios.get(`${urlApi}/${mode}/`).then(Api._handleApiResult.bind(null, 'getData'));
+  }
+
+  static async putData(mode) {
+    return axios.put(`${urlApi}/${mode}/`).then(Api._handleApiResult.bind(null, 'putData'));
+  }
+
+  static async patchData(mode) {
+    return axios.patch(`${urlApi}/${mode}/`).then(Api._handleApiResult.bind(null, 'patchData'));
+  }
+
+  static async deleteData(mode) {
+    return axios.patch(`${urlApi}/${mode}/`).then(Api._handleApiResult.bind(null, 'deleteData'));
+  }
+
+  static async postData(mode) {
+    return axios.post(`${urlApi}/${mode}/`).then(Api._handleApiResult.bind(null, 'postData'));
   }
 
   static _handleApiResult(fnName, res) {
@@ -48,14 +70,7 @@ class Api {
 
 /* get meta/data etc function */
 export const getData = async (mode, type = 'initialize', filter = {}) => {
-  let urlParam = ['method=get', `feature=${mode}`];
-
-  if (Object.keys(filter).length > 0) {
-    urlParam.push('data=' + JSON.stringify(filter));
-  }
-
   if (mode === 'user') {
-    // let result = await _getData(`${urlApi}/${mode}/`);
     const result = await Api.getUser();
     if (result !== 'ERROR') {
       metaData.user = result;
@@ -66,8 +81,9 @@ export const getData = async (mode, type = 'initialize', filter = {}) => {
   }
 
   if (mode === 'project' || mode === 'developer') {
-    // let result = await _getData(`${urlApi}/${mode}/`);
-    const result = await Api.getProjectDeveloper(mode);
+    let result;
+    if (mode === 'project') result = await Api.getProject();
+    if (mode === 'developer') result = await Api.getDeveloper();
 
     if (result !== 'ERROR') {
       metaData[`${mode}List`] = {};
@@ -83,7 +99,6 @@ export const getData = async (mode, type = 'initialize', filter = {}) => {
 
   if ( mainModes.map(m => `${m}_meta`).includes(mode)) {
     if (!metaData.tables[mode]) {
-      // let result = await _getData(`${urlApi}/${mode}/`);
       const result = await Api.getMetaData(mode);
 
       if (result !== 'ERROR') {
@@ -146,7 +161,6 @@ export const getData = async (mode, type = 'initialize', filter = {}) => {
 
   let data = [];
   if (mainModes.includes(mode)) {
-    // let result = await _getData(`${urlApi}/${mode}/`);
     const result = await Api.getData(mode);
 
     if (result !== 'ERROR') {
@@ -180,39 +194,27 @@ export const getData = async (mode, type = 'initialize', filter = {}) => {
 export const doData = async (mode, data, id, feature) => {
   if (!feature) feature = 'task';
   let json = {};
-  let urlParam = [`feature=${feature}`, `method=${mode}`];
   let error = true;
 
-  if (mode !== 'put' && mode !== 'delete' && mode !== 'patch' && mode !== 'notify') {
-    console.error(`Mode [${mode}] is not correctly defined`);
+  if (!['put', 'delete', 'patch', 'notify'].includes(mode)) {
+    console.error(`Mode [${mode}] is not available`);
   } else {
     try {
       let body = {
         feature: feature,
-        method: mode,
         data: {
           data: data,
           id: id,
         },
       };
-      // let response = axios.post(urlApi + '?' + urlParam.join('&'), {body});
-      // let response = await fetch(urlApi, {
-      let response = await fetch(urlApi + '?' + urlParam.join('&'), {
-        method: 'POST',
-        body: JSON.stringify(body),
-      });
 
-      if (response && response.ok) {
-        json = await response.json();
+      let result;
+      if (mode === 'put') result = await Api.putData(body);
+      if (mode === 'patch') result = await Api.patchData(body);
+      if (mode === 'delete') result = await Api.deleteData(body);
+      if (mode === 'notify') result = await Api.postData({...body, method: mode});
 
-        if (json.status === 'OK') {
-          error = false;
-        } else if (json.error) {
-          console.log(`Ошибка запроса: ${json.error}`);
-        }
-      } else {
-        console.log(`Ошибка HTTP:  + ${response.status}`);
-      }
+      json = result !== "ERROR" ? result.data : {error: "ERROR"};
     } catch (err) {
       console.log(`Unexpected error ${err}`); // Failed to fetch
     }

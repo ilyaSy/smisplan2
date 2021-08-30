@@ -57,4 +57,24 @@ export default function setMockAdapter() {
   mock.onGet(`${urlApi}/calendar/`).reply(200, data.calendar);
 
   mock.onGet(`${urlApi}/event/`).reply(200, data.event);
+
+  // put data
+  mock.onPut(`${urlApi}/task/`).reply(200, {status: "OK", error: ""});
+
+  mock.onPut(`${urlApi}/discussion/`).reply(200, {status: "OK", error: ""});
+
+  // patch data
+  mock.onPatch(`${urlApi}/task/`).reply(200, {status: "OK", error: ""});
+
+  mock.onPatch(`${urlApi}/discussion/`).reply(200, {status: "OK", error: ""});
+
+  // delete data
+  mock.onDelete(`${urlApi}/task/`).reply(200, {status: "OK", error: ""});
+
+  mock.onDelete(`${urlApi}/discussion/`).reply(200, {status: "OK", error: ""});
+
+  // post data
+  mock.onPost(`${urlApi}/task/`).reply(200, {status: "OK", error: ""});
+
+  mock.onPost(`${urlApi}/discussion/`).reply(200, {status: "OK", error: ""});
 }
