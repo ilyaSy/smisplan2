@@ -31,24 +31,7 @@ function HeaderModes({ reloadDataTable }) {
     const mode = getMode(newValue);
 
     filters.perm = [];
-    switch (mode) {
-      case 'spec_notes':
-        reloadDataTable(mode, () => {
-          filters.setValue('perm', '_authorORdeveloper', metaData.user.login);
-        });
-        break;
-      case 'daily':
-        reloadDataTable('task', () => {
-          let today = new Date();
-          filters.setValue('data', 'dateEnd', today.toISOString().replace(/(.+)T(.+)\..+/, '$1'));
-          filters.setValue('data', 'status', 'done');
-          setValue(newValue);
-        });
-        break;
-      default:
-        reloadDataTable(mode);
-        break;
-    }
+    reloadDataTable(mode);
   };
 
   React.useEffect(() => {

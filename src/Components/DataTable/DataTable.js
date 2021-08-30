@@ -8,14 +8,10 @@ import 'moment/locale/ru';
 import { dataTable, metaData, filters, filterTasks } from '../../config/data';
 import { doData, getData } from '../../utils/api';
 import storage from '../../storages/commonStorage';
-// import TblActionMenu from '../TblActionMenu/TblActionMenu';
 import TblHeadEnhanced from '../TblHeadEnhanced/TblHeadEnhanced';
-// import PopupEditFullText from '../PopupEditFullText/PopupEditFullText';
 import CustomIcon from '../../SharedComponents/CustomIcon';
 import TblHeaderSearch from '../TblHeaderSearch/TblHeaderSearch';
 import TblHeaderPagination from '../TblHeaderPagination/TblHeaderPagination';
-// import TblFullTextRow from '../TblFullTextRow/TblFullTextRow';
-// import TblSecondaryList from '../TblSecondaryList/TblSecondaryList';
 import TblGroupRow from '../TblGroupRow/TblGroupRow';
 import getDefaultValues from '../../utils/defaultData';
 import './DataTable.css';
@@ -542,7 +538,7 @@ export default class DataTable extends React.Component {
   };
 
   /* go to linked table (questions, discussion) for given task */
-  loadLinked = async (id, loadTableName = 'spec_notes') => {
+  loadLinked = async (id, loadTableName) => {
     let mainTable = metaData.dataTableName;
     storage.table.dispatch({ type: 'SET_TABLE', tableName: metaData.dataTableName });
 
@@ -550,14 +546,13 @@ export default class DataTable extends React.Component {
 
     this.props.reloadDataTable(loadTableName, () => {
       filters.data.idTask = id;
-      if (loadTableName === 'spec_notes') filters.perm.idTask = id;
       filters.perm.mainTable = mainTable;
 
       this.setState({ titleRow: `${data[0].id} - ${data[0].value}` });
     });
   };
 
-  /* show taskgroup results */
+  /* show results */
   showResults = async (id, loadTableName = 'discussion') => {
     let data = await getData(loadTableName, 'direct', {
       idTask: id,
@@ -664,10 +659,6 @@ export default class DataTable extends React.Component {
     }
   };
 
-  menuActionLoadQuestions = (id) => {
-    return this.loadLinked(id, 'spec_notes');
-  };
-
   menuActionLoadDiscussions = (id) => {
     return this.loadLinked(id, 'discussion');
   };
@@ -735,20 +726,7 @@ export default class DataTable extends React.Component {
   actionMenuList = () => {
     let menuList = [];
     if (metaData.specificParameters.hasQuestions) {
-      let action = {
-        id: 'spec_notes',
-        value: 'Связанные вопросы',
-        action: this.menuActionLoadQuestions,
-      };
-      menuList.push(action);
-      action = {
-        id: 'question',
-        value: 'Задать вопрос',
-        type: 'spec_notes',
-        action: this.addLinkedData,
-      };
-      menuList.push(action);
-      menuList.push({ id: 'divider' });
+
     }
     if (metaData.specificParameters.haveDiscussion) {
       let action = {

@@ -70,7 +70,6 @@ function CustomIcon(props) {
             {props.class === "icn_cancel"          && <CancelIcon fontSize={fontSize}/>}
             {props.class === "icn_filterOff"       && <VisibilityIcon fontSize={fontSize}/>}
             {props.class === "icn_print"           && <PrintIcon fontSize={fontSize}/>}
-            {props.class === "icn_tasks_daily"     && <FormatListNumberedIcon fontSize={fontSize}/>}
             {props.class === "icn_arrow_right"     && <ArrowRightIcon fontSize={fontSize}/>}
             {props.class === "icn_arrow_left"      && <ArrowLeftIcon fontSize={fontSize}/>}
             {props.class === "icn_arrow_down"      && <ArrowDropDownIcon fontSize={fontSize}/>}
@@ -81,7 +80,6 @@ function CustomIcon(props) {
             {props.class === "icn_comment"         && <CommentIcon fontSize={fontSize}/>}
             {props.class === "icn_settings"        && <SettingsIcon fontSize={fontSize}/>}
             {props.class === "icn_menu"            && <MenuIcon fontSize={fontSize}/>}
-            {props.class === "icn_spec_notes"      && <SpeakerNotesIcon fontSize={fontSize}/>}
             {props.class === "icn_group"           && <FormatIndentDecreaseIcon fontSize={fontSize}/>}
             {props.class === "icn_secDataList"     && <AccountTreeIcon fontSize={fontSize}/>}
             {props.class === "icn_secDataListCollapse" && <ArrowDropUpIcon fontSize={fontSize}/>}

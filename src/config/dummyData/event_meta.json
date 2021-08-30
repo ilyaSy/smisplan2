@@ -94,14 +94,6 @@
         "isInlineEditable": "false",
         "isEditable": "false",
         "validValues": {
-          "spec_notes": {
-            "value": "Вопросы",
-            "id": "spec_notes"
-          },
-          "taskgroup": {
-            "value": "Темы",
-            "id": "taskgroup"
-          },
           "task": {
             "value": "Задачи",
             "id": "task"

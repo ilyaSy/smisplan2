@@ -105,30 +105,7 @@ const textToDoc = (task, tasksList) => {
   return rows;
 };
 
-const getTasks = async (task) => {
-  let dataListName = 'task';
-  let id = task.idTask;
-  if (metaData.dataTableName === 'taskgroup') id = task.id;
-  let field = 'taskgroup';
-
-  let tasksList = [];
-
-  let data = await getData(dataListName, 'direct', { [field]: id });
-  data
-    .filter((t) => {
-      return parseInt(t[field]) === parseInt(id) && t.status !== 'done';
-    })
-    .sort((a, b) => {
-      return a.value <= b.value ? -1 : 1;
-    })
-    .map((info) => {
-      return tasksList.push(info.value);
-    });
-
-  return tasksList;
-};
-
-//Standart dialog: full edit current task / taskgroup (anything loaded as main table)
+//Standart dialog: full edit current task (anything loaded as main table)
 export default class PopupEdit extends React.Component {
   constructor(props) {
     super(props);
@@ -185,15 +162,6 @@ export default class PopupEdit extends React.Component {
     this.setState({ open });
 
     if (open) {
-      if (
-        metaData.dataTableName === 'taskgroup' ||
-        (metaData.dataTableName === 'discussion' && this.task.mainTable === 'taskgroup')
-      ) {
-        getTasks(this.task).then((data) => {
-          this.setState({ tasksList: data });
-        });
-      }
-
       for (let property in metaData.dataTable) {
         if (
           !metaData.dataTable[property].isEditable ||
@@ -604,17 +572,6 @@ export default class PopupEdit extends React.Component {
               </div>
             );
           })}
-          {this.state.printPDF &&
-            (metaData.dataTableName === 'taskgroup' ||
-              (metaData.dataTableName === 'discussion' &&
-                this.task.mainTable === 'taskgroup')) && (
-              <div className="popup-edit__open-tasks">
-                <div>Незакрытые задачи:</div>
-                {this.state.tasksList.map((text, index) => {
-                  return <div key={`pdf-task-${index}`}>{text}</div>;
-                })}
-              </div>
-            )}
         </DialogContent>
         <DialogActions className="popup-edit__actions">
           <Button

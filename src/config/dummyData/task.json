@@ -2,16 +2,15 @@
   "data": [
     {
       "priority": "simple",
-      "status": "done",
+      "status": "work",
       "project": "project1",
-      "value": "Написание стихов",
+      "value": "Будущие стихи",
       "dateEnd": "2021-04-01",
       "description": "Написание стихов в следующем году году",
-      "taskgroup": "",
       "developer": "pushkin",
       "dateStart": "2021-04-01",
       "id": "2",
-      "title": "Написание стихов",
+      "title": "Будущие стихи",
       "result": null
     },
     {
@@ -21,7 +20,6 @@
       "value": "Написание стихов",
       "dateEnd": "2021-04-01",
       "description": "Написание стихов в текущем году",
-      "taskgroup": "",
       "developer": "pushkin",
       "dateStart": "2021-04-01",
       "id": "1",
