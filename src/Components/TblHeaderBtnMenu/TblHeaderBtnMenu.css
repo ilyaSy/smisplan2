@@ -1,0 +1,10 @@
+.tbl-header-btn-menu {
+  margin-left: 25px !important;
+  margin-top: 15px !important;
+}
+
+.tbl-header-btn-menu__datepicker {
+  width: 0px;
+  margin: 0px;
+  margin-left: -18px;
+}

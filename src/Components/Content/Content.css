@@ -1,0 +1,15 @@
+.content {
+    width: calc(100% - var(--width-left-side-bottom));
+    font-size: var(--font-size-table) !important;
+  }
+
+.content__table {
+    height: calc(100% - 32px);
+    overflow-y: scroll;
+}
+
+.content__calendar {
+    height: calc(100% - 32px);
+    overflow-y: scroll;
+    overflow-y: unset;
+  }

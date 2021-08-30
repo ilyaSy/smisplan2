@@ -1,0 +1,185 @@
+{
+  "responsible": {
+    "isInlineEditable": false,
+    "showInTable": true,
+    "isEditable": true,
+    "value": "Ответственный",
+    "validValues": "",
+    "isFilter": true,
+    "tableIndex": 7,
+    "id": "responsible",
+    "type": "select",
+    "defaultValue": "",
+    "vocabulary": "developer"
+  },
+  "status": {
+    "isInlineEditable": false,
+    "showInTable": true,
+    "isEditable": true,
+    "value": "Статус",
+    "validValues": {
+      "postponed": {
+        "value": "Перенесено",
+        "id": "postponed"
+      },
+      "done": {
+        "value": "Проведено",
+        "id": "done"
+      },
+      "rejected": {
+        "value": "Отменено",
+        "id": "rejected"
+      },
+      "new": {
+        "value": "Запланировано",
+        "id": "new"
+      }
+    },
+    "isFilter": true,
+    "showInTableMobile": false,
+    "tableIndex": 10,
+    "id": "status",
+    "type": "select",
+    "defaultValue": "new"
+  },
+  "time": {
+    "isInlineEditable": false,
+    "showInTable": true,
+    "isEditable": true,
+    "value": "Время",
+    "validValues": "",
+    "isFilter": false,
+    "tableIndex": 3,
+    "id": "time",
+    "type": "time",
+    "defaultValue": ""
+  },
+  "date": {
+    "isInlineEditable": false,
+    "showInTable": true,
+    "isEditable": true,
+    "value": "Дата",
+    "validValues": "",
+    "isFilter": true,
+    "isGroup": true,
+    "tableIndex": 2,
+    "id": "date",
+    "type": "date",
+    "defaultValue": ""
+  },
+  "participants": {
+    "isInlineEditable": false,
+    "showInTable": true,
+    "isEditable": true,
+    "initialValue": "object:data,field:developer",
+    "value": "Участники",
+    "validValues": "",
+    "isFilter": false,
+    "tableIndex": 8,
+    "id": "participants",
+    "type": "multi-select",
+    "defaultValue": "",
+    "vocabulary": "developer"
+  },
+  "type": {
+    "isInlineEditable": false,
+    "showInTable": true,
+    "isEditable": true,
+    "value": "Формат",
+    "validValues": {
+      "iki": {
+        "value": "ИКИ",
+        "id": "iki"
+      },
+      "offline": {
+        "value": "Заочное",
+        "id": "offline"
+      }
+    },
+    "isFilter": true,
+    "showInTableMobile": false,
+    "tableIndex": 11,
+    "id": "type",
+    "type": "select",
+    "defaultValue": "iki"
+  },
+  "mainTable": {
+    "isInlineEditable": false,
+    "showInTable": false,
+    "isEditable": false,
+    "value": "Основная таблица",
+    "validValues": "",
+    "isFilter": false,
+    "tableIndex": 9,
+    "id": "mainTable",
+    "type": "string",
+    "defaultValue": "object:meta,field:dataTableName"
+  },
+  "id": {
+    "isInlineEditable": false,
+    "showInTable": false,
+    "isEditable": false,
+    "value": "ID",
+    "validValues": "",
+    "isFilter": false,
+    "tableIndex": 1,
+    "id": "id",
+    "type": "int",
+    "defaultValue": ""
+  },
+  "idTask": {
+    "isInlineEditable": false,
+    "showInTable": false,
+    "isEditable": false,
+    "value": "ID задачи",
+    "validValues": "",
+    "isFilter": false,
+    "tableIndex": 4,
+    "id": "idTask",
+    "type": "int",
+    "defaultValue": "object:data,field:id"
+  },
+  "theme": {
+    "isInlineEditable": true,
+    "showInTable": true,
+    "isEditable": true,
+    "value": "Тема",
+    "validValues": "",
+    "isFilter": false,
+    "hasFullTextLink": true,
+    "tableIndex": 5,
+    "id": "theme",
+    "type": "string",
+    "defaultValue": "object:data,field:value"
+  },
+  "result": {
+    "isInlineEditable": false,
+    "showInTable": false,
+    "isEditable": true,
+    "value": "Результат",
+    "validValues": "",
+    "isFilter": false,
+    "hasFileUploader": true,
+    "tableIndex": 6,
+    "id": "result",
+    "type": "fulltext",
+    "defaultValue": "empty"
+  },
+  "specificParameters": {
+    "tableName": "Обсуждения",
+    "mainValue": "theme",
+    "hasTitleRow": "false",
+    "hasQuestions": "false",
+    "hasSublistData": "true",
+    "hasEditMenu": "true",
+    "hasEditMenuSaveAsNew": "true",
+    "hasDeleteButton": "true",
+    "hasDoneButton": "false",
+    "hasAddMenu": "false",
+    "defaultSortDirection": "desc,asc,asc",
+    "defaultSortField": "week,date,time",
+    "defaultGroupField": "week",
+    "hasNotificationButton": "true",
+    "hasSetStatusMenu": "true"
+  }
+}

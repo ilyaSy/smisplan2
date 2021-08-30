@@ -1,0 +1,378 @@
+/*ADDITIONAL FONTS*/
+@font-face {
+  font-family: "Open Sans";
+  src: url("./OpenSans/OpenSans-Regular.ttf") format("opentype");
+}
+@font-face {
+  font-family: "Roboto Mono";
+  src: url("./RobotoMono/RobotoMono-Regular.ttf") format("opentype");
+}
+/*fonts*/
+/*rows  */
+/*filters for colors*/
+/*developers colors gradient*/
+/*main widths and heights*/
+/*
+@width-left-side: 230px;
+@width-left-side-bottom: 230px;
+*/
+/*SET VARIABLES*/
+:root {
+  /*main color scheme*/
+  --color-dark: #878788;
+  --color-active: #6AA3FB;
+  --color-tbl-border: #bababb;
+  --color-font-active: #6AA3FB;
+  /*fonts*/
+  --font-main: "Open Sans";
+  --font-description: "Roboto Mono";
+  --font-color-disabled: #a1a1a1;
+}
+@media only screen and (max-width: 1400px) {
+  :root {
+    --font-size-table: 12px !important;
+    --width-left-side: 185px;
+    --width-left-side-bottom: 185px;
+  }
+}
+@media only screen and (min-width: 1400px) {
+  :root {
+    --font-size-table: 14px !important;
+    --width-left-side: 230px;
+    --width-left-side-bottom: 230px;
+  }
+}
+body {
+  background-color: #FEFEFE;
+  margin: 5px;
+  font-family: "Open Sans";
+  font-size: 11px;
+  color: #5C5C5C;
+}
+/*icons*/
+.icn:hover,
+.icn_ok:hover,
+.icn_cancel:hover,
+.icn_arrow_left_fill:hover,
+.icn_arrow_right_fill:hover,
+.icn_tasks_add:hover,
+.icn_tasks_edit:hover,
+.icn_tasks_delete:hover,
+.icn_tasks_complete:hover,
+.icn_tasks_daily:hover,
+.icn_print:hover,
+.icn_options:hover,
+.icn_filter:hover,
+.icn_filterOff:hover,
+.icn_comment:hover {
+  filter: grayscale(0) opacity(1);
+}
+.icn {
+  filter: grayscale(1) opacity(0.5);
+}
+
+.visible {
+  visibility: visible;
+}
+
+.invisible {
+  visibility: hidden;
+}
+
+/*tasks colors*/
+.task {
+  /*&_good	{ background-color: spin(@color-tasks-red, 240); }*/
+}
+.task_bad {
+  background-color: #FFC4C2;
+}
+.task_alert {
+  background-color: #fdffc2;
+}
+.task_good {
+  background-color: #c2ffc4;
+}
+/*alert tips colors*/
+.alertFail {
+  background-color: #f50057 !important;
+}
+.alertWarn {
+  color: black !important;
+  background-color: #f59e00 !important;
+}
+.alertSuccess {
+  color: black !important;
+  background-color: #57f500 !important;
+}
+.divBottom {
+  height: calc(100% - 70px);
+}
+/*TOP LEFT MENU*/
+/*top left menu (total)*/
+.divLoginInfo {
+  width: var(--width-left-side);
+  height: 70px;
+  border-right: 1px solid #d4d4d4;
+}
+.divLoginInfo > div:nth-child(1) {
+  width: 100%;
+  height: 40px;
+}
+/*top left menu (login part)*/
+.loginName {
+  height: calc(100% - 40px);
+  width: 100%;
+  padding-left: 5px;
+  display: flex;
+  align-self: center;
+  font-size: 14px;
+  align-items: flex-end;
+}
+/*TOP MENU*/
+.divProjectModesList {
+  width: calc(100% - 15px - var(--width-left-side));
+  height: 70px;
+}
+/*top menu (projects)*/
+.topMenuModes {
+  min-width: 50px !important;
+  padding: 0px 7px 0px 7px !important;
+}
+.mainProjectList {
+  background-color: white !important;
+  padding-left: 7px;
+  height: 100%;
+}
+.divProjectList,
+.divProjectList > div > header > div {
+  height: calc(70px/2);
+}
+.divProjectList > div > header > div > div,
+.divProjectList > div > header > div > div > div > div > button {
+  min-height: 20px;
+}
+.divProjectList > div > header > div > div > div {
+  margin-top: 5px;
+}
+.tab {
+  min-width: 50px !important;
+  height: 40px !important;
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+}
+/*MAIN DATA PART*/
+.divDataTable {
+  width: calc(100% - var(--width-left-side-bottom));
+  font-size: var(--font-size-table) !important;
+}
+/*table*/
+.tableTasksList {
+  height: calc(100% - 32px);
+  overflow-y: scroll;
+}
+.tableHead {
+  font-size: 14px !important;
+  white-space: nowrap;
+  background-color: #ededee;
+}
+.tableRowTitle {
+  font-size: var(--font-size-table) !important;
+}
+.paginationToolbar {
+  min-height: 25px !important;
+}
+.paginationSelect {
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+}
+.calendarDiv {
+  overflow-y: unset;
+}
+/*main data (footer to add)*/
+.divAddTasks {
+  /* width:calc(100% - var(--width-left-side-bottom)); */
+  width: 100%;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #ededee;
+  /* position: fixed;
+  bottom: 0; */
+}
+.divSpacingBottom {
+  width: 0px;
+  height: 100%;
+  display: flex;
+}
+/*LEFT PANEL*/
+.leftPanel {
+  position: inherit !important;
+  top: 0px !important;
+  border-right: 1px solid #d4d4d4 !important;
+  overflow-y: unset !important;
+  background-color: unset !important;
+  width: var(--width-left-side-bottom);
+  background: linear-gradient(90deg, #ffffff 50%, #ededee 100%);
+}
+.leftPanel:before {
+  width: var(--width-left-side-bottom);
+  height: 1px;
+  content: '';
+  position: absolute;
+  background: linear-gradient(90deg, #ededee 50%, #d4d4d4 100%);
+}
+.uploadButton {
+  margin-top: 5px !important;
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+  width: 170px !important;
+}
+.leftSideList {
+  margin-top: 0px  !important;
+  margin-bottom: 0px  !important;
+  font-size: 14px !important;
+}
+/* show icons on row hover */
+tr.mainTableRow td.mainTableCell div.showHoverIcon {
+  display: none;
+}
+tr.mainTableRow:hover td.mainTableCell div.showHoverIcon {
+  display: flex;
+}
+
+.dialog-edit {
+  overflow-y: visible !important;
+}
+
+.dialog-linked-data {
+  overflow: visible !important;
+}
+
+/* -------------------------------------- */
+/* -------------------------------------- */
+.MuiButton-outlinedDefault:hover {
+  background-color: #bababb !important;
+  color: white !important;
+}
+.MuiButton-outlinedPrimary:hover {
+  background-color: #0551c7 !important;
+  color: white !important;
+}
+.MuiButton-outlinedOk {
+  border-color: #57f500 !important;
+  color: #57f500 !important;
+}
+.MuiButton-outlinedOk:hover {
+  border-color: #57f500 !important;
+  background-color: #57f500 !important;
+  color: white !important;
+}
+.MuiButton-outlinedSecondary:hover {
+  background-color: #f50057 !important;
+  color: white !important;
+}
+.MuiTabs-flexContainer > a {
+  display: block;
+}
+.MuiDialog-paperWidthSm {
+  max-width: 700px !important;
+  /* overflow-y: scroll !important; */
+}
+
+.MuiTablePagination-spacer {
+  flex: unset !important;
+}
+.MuiTablePagination-caption {
+  font-size: var(--font-size-table) !important;
+}
+.MuiTab-textColorPrimary {
+  color: #000000 !important;
+}
+.MuiTab-textColorPrimary.Mui-disabled {
+  color: #a1a1a1 !important;
+}
+.MuiFormControl-marginNormal {
+  margin-top: 0px !important;
+}
+/* full calendar */
+td.fc-daygrid-day.fc-day.fc-day-mon.fc-day-past.fc-day-other,
+td.fc-daygrid-day.fc-day.fc-day-tue.fc-day-past.fc-day-other,
+td.fc-daygrid-day.fc-day.fc-day-wen.fc-day-past.fc-day-other,
+td.fc-daygrid-day.fc-day.fc-day-thu.fc-day-past.fc-day-other,
+td.fc-daygrid-day.fc-day.fc-day-fri.fc-day-past.fc-day-other,
+td.fc-daygrid-day.fc-day.fc-day-sat.fc-day-past.fc-day-other,
+td.fc-daygrid-day.fc-day.fc-day-sun.fc-day-past.fc-day-other {
+  height: 16.6%;
+}
+.fc-header-toolbar {
+  border-top: 1px solid #d4d4d4;
+  border-bottom: 1px solid #d4d4d4;
+  background-color: #ededee;
+  height: 48px;
+}
+.fc-scroller {
+  overflow: unset !important;
+}
+.fc-view-harness {
+  padding-bottom: 0px !important;
+}
+.fc-media-screen,
+.fc-scrollgrid {
+  height: 100% !important;
+}
+.fc-scrollgrid-sync-table {
+  height: 0px;
+}
+.fc-daygrid-day-top {
+  font-size: 22px !important;
+}
+.fc-event-title,
+.fc-event-time {
+  font-size: 12px !important;
+}
+/* material-ui dialog - fix of not displaying top of Select */
+.MuiDialogContent-root {
+  overflow: visible !important;
+}
+/* .dialog-select .MuiDialog-paper {
+  overflow-y: scroll !important;
+} */
+/* .MuiDialog-paper {
+  overflow-y: visible !important;;
+} */
+.DragHandle {
+  flex: 0 0 16px;
+  z-index: 2;
+  cursor: col-resize;
+  color: #3884fa;
+  margin-right: 10px;
+  margin-left: -12px;
+}
+.DragHandleActive,
+.DragHandleActive:hover {
+  color: #065be0;
+  z-index: 3;
+}
+.DragHandle:hover {
+  background-color: #e1e1e1;
+}
+
+/*Developers: scrollbar*/
+.leftPanel .MuiList-padding {
+  direction: rtl;
+  overflow-y: auto;
+  scrollbar-width: thin; /*for firefox*/
+}
+
+/*for other browsers*/
+.leftPanel .MuiList-padding::-webkit-scrollbar{
+  width: 7px;
+  background-color: lightgrey;
+}
+
+/* Handle */
+.leftPanel .MuiList-padding::-webkit-scrollbar-thumb {
+  background-color: #878788;
+}
+

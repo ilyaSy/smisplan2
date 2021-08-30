@@ -1,0 +1,167 @@
+{
+    "priority": {
+        "isInlineEditable": false,
+        "showInTable": true,
+        "isEditable": true,
+        "value": "Приоритет",
+        "validValues": {
+            "simple": {
+                "value": "Обычный",
+                "id": "simple"
+            },
+            "medium": {
+                "value": "Средний",
+                "id": "medium"
+            },
+            "hard": {
+                "value": "Высокий",
+                "id": "hard"
+            }
+        },
+        "isFilter": true,
+        "hasFullTextLink": false,
+        "showInTableMobile": false,
+        "tableIndex": 5,
+        "id": "priority",
+        "type": "select",
+        "defaultValue": "simple"
+    },
+    "status": {
+        "isInlineEditable": false,
+        "showInTable": true,
+        "isEditable": true,
+        "value": "Статус",
+        "validValues": {
+            "done": {
+                "value": "Выполнена",
+                "id": "done"
+            },
+            "new": {
+                "value": "Не согласована",
+                "id": "new"
+            },
+            "work": {
+                "value": "В работе",
+                "id": "work"
+            }
+        },
+        "isFilter": true,
+        "hasFullTextLink": false,
+        "showInTableMobile": false,
+        "tableIndex": 6,
+        "id": "status",
+        "type": "select",
+        "defaultValue": "new"
+    },
+    "project": {
+        "isInlineEditable": false,
+        "showInTable": true,
+        "isEditable": true,
+        "value": "Проект",
+        "validValues": "",
+        "isFilter": false,
+        "hasFullTextLink": false,
+        "isGroup": true,
+        "tableIndex": 2,
+        "id": "project",
+        "type": "select",
+        "defaultValue": "56otdel"
+    },
+    "dateEnd": {
+        "isInlineEditable": false,
+        "showInTable": true,
+        "isEditable": true,
+        "value": "Срок",
+        "validValues": "",
+        "isFilter": true,
+        "hasFullTextLink": false,
+        "tableIndex": 9,
+        "id": "dateEnd",
+        "type": "date",
+        "defaultValue": ""
+    },
+    "description": {
+        "isInlineEditable": false,
+        "showInTable": false,
+        "isEditable": true,
+        "value": "Описание",
+        "validValues": "",
+        "isFilter": false,
+        "hasFullTextLink": false,
+        "tableIndex": 4,
+        "id": "description",
+        "type": "fulltext",
+        "defaultValue": ""
+    },
+    "developer": {
+        "isInlineEditable": false,
+        "showInTable": true,
+        "isEditable": true,
+        "value": "Ответственный",
+        "validValues": "",
+        "isFilter": false,
+        "hasFullTextLink": false,
+        "isGroup": true,
+        "addMenuIndex": "2",
+        "tableIndex": 7,
+        "id": "developer",
+        "type": "select",
+        "defaultValue": ""
+    },
+    "dateStart": {
+        "isInlineEditable": false,
+        "showInTable": false,
+        "isEditable": true,
+        "value": "Начало работы",
+        "validValues": "",
+        "isFilter": true,
+        "hasFullTextLink": false,
+        "tableIndex": 8,
+        "id": "dateStart",
+        "type": "date",
+        "defaultValue": "date"
+    },
+    "id": {
+        "isInlineEditable": false,
+        "showInTable": true,
+        "isEditable": false,
+        "value": "ID",
+        "validValues": "",
+        "isFilter": false,
+        "hasFullTextLink": false,
+        "tableIndex": 1,
+        "id": "id",
+        "type": "int",
+        "defaultValue": ""
+    },
+    "theme": {
+        "isInlineEditable": true,
+        "showInTable": true,
+        "isEditable": true,
+        "value": "Тема",
+        "validValues": "",
+        "isFilter": false,
+        "hasFullTextLink": true,
+        "isGroup": false,
+        "addMenuIndex": "1",
+        "tableIndex": 3,
+        "id": "theme",
+        "type": "string",
+        "defaultValue": ""
+    },
+    "specificParameters": {
+        "hasEditMenu": true,
+        "hasDeleteButton": true,
+        "defaultSortField": "id",
+        "defaultSortDirection": "desc",
+        "hasQuestions": true,
+        "hasTitleRow": false,
+        "addMenuTitle": "Новая тема",
+        "hasAddMenu": true,
+        "tableName": "Темы",
+        "hasSublistData": true,
+        "hasDoneButton": true,
+        "haveDiscussion": true,
+        "mainValue": "theme"
+    }
+}

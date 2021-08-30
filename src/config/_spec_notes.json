@@ -1,0 +1,159 @@
+{
+    "status": {
+        "isInlineEditable": false,
+        "showInTable": true,
+        "isEditable": true,
+        "value": "Статус",
+        "validValues": {
+            "done": {
+                "value": "Решён",
+                "id": "done"
+            },
+            "new": {
+                "value": "Активный",
+                "id": "new"
+            }
+        },
+        "isFilter": true,
+        "hasFullTextLink": false,
+        "showInTableMobile": false,
+        "tableIndex": 6,
+        "id": "status",
+        "type": "select",
+        "defaultValue": "new"
+    },
+    "answer": {
+        "isInlineEditable": false,
+        "showInTable": false,
+        "isEditable": true,
+        "value": "Ответ",
+        "validValues": "",
+        "isFilter": false,
+        "hasFullTextLink": false,
+        "tableIndex": 5,
+        "id": "answer",
+        "type": "fulltext",
+        "defaultValue": "empty"
+    },
+    "author": {
+        "isInlineEditable": false,
+        "showInTable": true,
+        "isEditable": false,
+        "value": "Автор",
+        "validValues": "",
+        "isFilter": false,
+        "hasFullTextLink": false,
+        "tableIndex": 7,
+        "id": "author",
+        "type": "select",
+        "defaultValue": "object:meta,field:login",
+        "vocabulary": "developer"
+    },
+    "question": {
+        "isInlineEditable": true,
+        "showInTable": true,
+        "isEditable": true,
+        "value": "Вопрос",
+        "validValues": "",
+        "isFilter": false,
+        "hasFullTextLink": true,
+        "addMenuIndex": "1",
+        "tableIndex": 4,
+        "id": "question",
+        "type": "string",
+        "defaultValue": ""
+    },
+    "dtUpdate": {
+        "isInlineEditable": false,
+        "showInTable": true,
+        "isEditable": false,
+        "value": "Время обновления",
+        "validValues": "",
+        "isFilter": false,
+        "hasFullTextLink": false,
+        "showInTableMobile": false,
+        "tableIndex": 9,
+        "id": "dtUpdate",
+        "type": "datetime",
+        "defaultValue": "datetime"
+    },
+    "developer": {
+        "isInlineEditable": false,
+        "showInTable": true,
+        "isEditable": true,
+        "value": "Ответственный",
+        "validValues": "",
+        "isFilter": false,
+        "hasFullTextLink": false,
+        "addMenuIndex": "2",
+        "tableIndex": 8,
+        "id": "developer",
+        "type": "select",
+        "defaultValue": "object:data,field:developer"
+    },
+    "mainTable": {
+        "isInlineEditable": false,
+        "showInTable": false,
+        "isEditable": false,
+        "value": "Основная таблица",
+        "validValues": "",
+        "isFilter": false,
+        "hasFullTextLink": false,
+        "tableIndex": 10,
+        "id": "mainTable",
+        "type": "string",
+        "defaultValue": "object:meta,field:dataTableName"
+    },
+    "id": {
+        "isInlineEditable": false,
+        "showInTable": true,
+        "isEditable": false,
+        "value": "ID",
+        "validValues": "",
+        "isFilter": false,
+        "hasFullTextLink": false,
+        "tableIndex": 1,
+        "id": "id",
+        "type": "int",
+        "defaultValue": ""
+    },
+    "idTask": {
+        "isInlineEditable": false,
+        "showInTable": true,
+        "isEditable": false,
+        "value": "ID задачи",
+        "validValues": "",
+        "isFilter": false,
+        "hasFullTextLink": false,
+        "tableIndex": 2,
+        "id": "idTask",
+        "type": "int",
+        "defaultValue": "object:data,field:id"
+    },
+    "theme": {
+        "isInlineEditable": false,
+        "showInTable": false,
+        "isEditable": false,
+        "value": "Тема",
+        "validValues": "",
+        "isFilter": false,
+        "hasFullTextLink": false,
+        "tableIndex": 3,
+        "id": "theme",
+        "type": "string",
+        "defaultValue": "object:data,field:value"
+    },
+    "specificParameters": {
+        "hasEditMenu": true,
+        "hasDeleteButton": true,
+        "defaultSortField": "dtUpdate",
+        "defaultSortDirection": "desc",
+        "hasQuestions": false,
+        "hasTitleRow": true,
+        "addMenuTitle": "Новый вопрос",
+        "tableName": "Вопросы",
+        "hasDoneButton": false,
+        "hasAddMenu": true,
+        "mainValue": "question"
+    }
+}

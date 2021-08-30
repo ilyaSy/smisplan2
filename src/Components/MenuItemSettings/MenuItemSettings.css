@@ -1,0 +1,19 @@
+.menu-item-settings {
+    margin-left: 25px !important;
+    margin-top: 15px !important;
+}
+
+.menu-item-settings__item {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: space-between !important;
+}
+
+.menu-item-settings__item-menu {
+    margin-left: 180px !important;
+}
+
+.menu-item-settings__menu-checkbox {
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+}

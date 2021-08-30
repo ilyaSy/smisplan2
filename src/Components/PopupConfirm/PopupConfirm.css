@@ -1,0 +1,21 @@
+.popup-confirm__actions {
+  margin-top: 20px !important;
+  display: flex !important;
+  justify-content: space-between !important;
+}
+
+.popup-confirm__content {
+  font-size: 14px;
+  margin-bottom: 30px;
+}
+
+.MuiButton-outlinedOk {
+  border-color: #57f500 !important;
+  color: #57f500 !important;
+}
+
+.MuiButton-outlinedOk:hover {
+  border-color: #57f500 !important;
+  background-color: #57f500 !important;
+  color: white !important;
+}

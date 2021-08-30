@@ -1,0 +1,31 @@
+.left-side-bar {
+    position: inherit !important;
+    top: 0px !important;
+    border-right: 1px solid #d4d4d4 !important;
+    overflow-y: unset !important;
+    background-color: unset !important;
+    width: var(--width-left-side-bottom);
+    background: linear-gradient(90deg, #ffffff 50%, #ededee 100%);
+  }
+
+  .left-side-bar:before {
+    width: var(--width-left-side-bottom);
+    height: 1px;
+    content: '';
+    position: absolute;
+    background: linear-gradient(90deg, #ededee 50%, #d4d4d4 100%);
+  }
+
+  .left-side-bar .MuiList-padding {
+    direction: rtl;
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+  .left-side-bar .MuiList-padding::-webkit-scrollbar{
+    width: 7px;
+    background-color: lightgrey;
+  }
+  
+  .left-side-bar .MuiList-padding::-webkit-scrollbar-thumb {
+    background-color: #878788;
+  }

@@ -1,0 +1,32 @@
+.header-modes-projects {
+  width: calc(100% - 15px - var(--width-left-side));
+  height: 70px;
+}
+
+.header-modes-projects__modes-item {
+  min-width: 50px !important;
+  padding: 0px 7px 0px 7px !important;
+}
+
+.header-modes-projects__bar {
+  background-color: white !important;
+  padding-left: 7px;
+  box-shadow: unset !important;
+}
+
+.header-modes-projects__bar > div {
+  height: calc(70px/2);
+}
+
+.tab {
+  min-width: 50px !important;
+  height: 40px !important;
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+}
+
+@media screen and (max-width: 768px) {
+  .header-modes-projects {
+    width: calc(100% - 15px);
+  }
+}

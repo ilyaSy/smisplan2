@@ -1,0 +1,34 @@
+.popup-add-linked-info__actions {
+    margin-top: 20px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+  }
+
+  .popup-add-linked-info__value {
+    width: 200px;
+    font-size: 14px;
+  }
+
+  .popup-add-linked-info__title {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .popup-add-linked-info__row {
+    display: flex;
+    align-items: center;
+  }
+
+  .popup-add-linked-info__err-no-data {
+    color: red;
+  }
+
+.MuiButton-outlinedOk {
+    border-color: #57f500 !important;
+    color: #57f500 !important;
+  }
+.MuiButton-outlinedOk:hover {
+    border-color: #57f500 !important;
+    background-color: #57f500 !important;
+    color: white !important;
+}

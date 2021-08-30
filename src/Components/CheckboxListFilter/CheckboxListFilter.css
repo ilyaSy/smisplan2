@@ -1,0 +1,19 @@
+.checkbox-list-filter {
+    padding-top: 3px !important;
+}
+
+.checkbox-list-filter__list-item {
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+}
+
+.checkbox-list-filter__checkbox {
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+}
+
+.checkbox-list-filter__text {
+    margin-top: 0px  !important;
+    margin-bottom: 0px  !important;
+    font-size: 14px !important;
+}
