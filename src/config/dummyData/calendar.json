@@ -1,0 +1,18 @@
+{
+  "data": [
+    {
+      "responsible": "matveev",
+      "status": "done",
+      "time": "14:30:00",
+      "date": "2021-07-22",
+      "description": "Композиты КМСС",
+      "participants": "matveev,plotnikov,kolbudaev,andry,evgeny",
+      "type": "iki",
+      "id": "559",
+      "mainTable": "taskgroup",
+      "idTask": "8",
+      "theme": "Композиты КМСС",
+      "result": "\nhttp://smis.iki.rssi.ru/smisplan-docs/file20210722190006.docx"
+    }
+  ]
+}

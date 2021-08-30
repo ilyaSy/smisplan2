@@ -1,0 +1,21 @@
+{
+  "data": [
+    {
+      "responsible": "diego",
+      "status": "done",
+      "value": "SMISplan",
+      "time": "16:55:00",
+      "week": "2020.3",
+      "date": "2020-07-21",
+      "mainQuestions": "",
+      "participants": "diego,ilya,evgeny",
+      "type": "iki",
+      "mainTable": "taskgroup",
+      "id": "1",
+      "idTask": "1",
+      "videoConf": "",
+      "result": "\nhttp://d902.iki.rssi.ru/smisplan-docs/file20210129134010.pptx\nhttp://d902.iki.rssi.ru/smisplan-docs/file20210324170300.jpg",
+      "theme": "SMISplan"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
-//import React from 'react';
 import { createStore, combineReducers } from 'redux';
 
+// reducers
 function ALERT(state = {}, action) {
   switch (action.type) {
     case 'SHOW_ALERT':

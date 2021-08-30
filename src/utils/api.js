@@ -1,8 +1,18 @@
 import Cookies from 'js-cookie';
 import storage from '../storages/commonStorage';
 import { metaData, dataTable, mainModes, filters, setDataTable } from '../config/data';
-import { localApiUrl, localApiUkey } from '../config/.env.local.js';
+import { urlApi } from '../config/.env.local.js';
 // import axios from 'axios';
+// import setMockAdapter from './serverApi';
+// if (TEST_MODE) {
+//   setMockAdapter();
+// }
+// axios.defaults.headers.get['Content-Type'] = 'application/json';
+// axios.defaults.headers.post['Content-Type'] = 'application/json';
+// axios.defaults.headers.patch['Content-Type'] = 'application/json';
+// if (TEST_MODE) {
+//   return res.data;
+// }
 
 /* check authentication function */
 const _checkAuth = () => {
@@ -85,12 +95,8 @@ const _getData = async (url) => {
 export const getData = async (mode, type = 'initialize', filter = {}) => {
   _checkAuth();
 
-  let urlApi = '/smisplan/cgi/api-smisplan-getInfo.pl';
   let urlParam = ['method=get', `feature=${mode}`];
-  if (window.location.href.search(/localhost:3000/) !== -1) {
-    urlApi = localApiUrl;
-    urlParam.push(`ukey=${localApiUkey}`);
-  }
+
   if (Object.keys(filter).length > 0) {
     urlParam.push('data=' + JSON.stringify(filter));
   }
@@ -280,12 +286,7 @@ export const doData = async (mode, data, id, feature) => {
 
   if (!feature) feature = 'task';
   let json = {};
-  let urlApi = '/smisplan/cgi/api-smisplan-getInfo.pl';
   let urlParam = [`feature=${feature}`, `method=${mode}`];
-  if (window.location.href.search(/localhost:3000/) !== -1) {
-    urlApi = localApiUrl;
-    urlParam.push(`ukey=${localApiUkey}`);
-  }
   let error = true;
 
   if (mode !== 'put' && mode !== 'delete' && mode !== 'patch' && mode !== 'notify') {
@@ -329,9 +330,6 @@ export const doData = async (mode, data, id, feature) => {
 /* file uploader function */
 export async function fileUpload(file) {
   let urlApi = '/smisplan/cgi/upload.pl';
-  if (window.location.host === 'localhost:3000') {
-    urlApi = localApiUrl;
-  }
   const formData = new FormData();
   formData.append('file', file);
 
