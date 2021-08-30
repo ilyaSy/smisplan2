@@ -2,7 +2,7 @@ import storage from '../storages/commonStorage';
 
 export const modes = [
   { id: 'task', value: 'Задачи', realData: true },
-  { id: 'discussion', value: 'Обсуждения', realData: true },
+  { id: 'discussion', value: 'Совещания', realData: true },
   { id: 'calendar', value: 'Календарь', realData: true },
   { id: 'event', value: 'Изменения', realData: true },
 ];

@@ -17,6 +17,17 @@
   --font-main: "Open Sans";
   --font-description: "Roboto Mono";
   --font-color-disabled: #a1a1a1;
+
+  /*filters for color sheme*/
+  --hover-filter: grayscale(0) opacity(1);
+  --hover-filter-standart: grayscale(0) opacity(1);
+  --hover-filter-red: invert(0.5) sepia(0.5) saturate(150);
+  --hover-filter-blue: invert(0.5) sepia(0.5) saturate(150) hue-rotate(-180deg) contrast(6.5);
+
+  --icons-filter: grayscale(1) opacity(0.5);
+  --icons-filter-standart: opacity(0.5);
+  --icons-filter-red: invert(0.5) sepia(0.5) saturate(150) opacity(0.65);
+  --icons-filter-blue: invert(0.5) sepia(0.5) saturate(150) hue-rotate(-180deg) contrast(6.5) brightness(1.9) opacity(0.8);
 }
 @media only screen and (max-width: 1400px) {
   :root {
@@ -73,10 +84,13 @@ body {
 .icn_comment:hover,
 .icn_zoom:hover,
 .icn_youtube:hover {
-  filter: grayscale(0) opacity(1);
+  /* filter: grayscale(0) opacity(1); */
+  filter: var(--hover-filter);
 }
+
 .icn {
-  filter: grayscale(1) opacity(0.5);
+  /* filter: grayscale(1) opacity(0.5); */
+	filter: var(--icons-filter);
 }
 
 .visible {
