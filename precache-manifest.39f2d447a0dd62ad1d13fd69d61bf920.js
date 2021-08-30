@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "861cd362f4e1da676d90b2f94c9720df",
+    "revision": "f31eaa518045785cff44229cccbe3aa2",
     "url": "/smisplan2/index.html"
   },
   {
@@ -20,8 +20,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/smisplan2/static/css/8.03f13c1a.chunk.css"
   },
   {
-    "revision": "df2ec48e68f21c3bfe49",
-    "url": "/smisplan2/static/css/main.c5947d66.chunk.css"
+    "revision": "b60ad7ac03824dcebbe5",
+    "url": "/smisplan2/static/css/main.d73cbe0e.chunk.css"
   },
   {
     "revision": "a391e85719ac4437b4e5",
@@ -80,8 +80,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/smisplan2/static/js/9.16cb8d6f.chunk.js"
   },
   {
-    "revision": "df2ec48e68f21c3bfe49",
-    "url": "/smisplan2/static/js/main.496029ec.chunk.js"
+    "revision": "b60ad7ac03824dcebbe5",
+    "url": "/smisplan2/static/js/main.bbed6c7b.chunk.js"
   },
   {
     "revision": "de69d340e21a7d9161ce",
