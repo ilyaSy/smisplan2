@@ -33,23 +33,25 @@ class Api {
     return axios.get(`${urlApi}/${mode}/`).then(Api._handleApiResult.bind(null, 'getData'));
   }
 
-  static async putData(mode) {
-    return axios.put(`${urlApi}/${mode}/`).then(Api._handleApiResult.bind(null, 'putData'));
+  static async putData(mode, body) {
+    return axios.put(`${urlApi}/${mode}/`, body).then(Api._handleApiResult.bind(null, 'putData'));
   }
 
-  static async patchData(mode) {
-    return axios.patch(`${urlApi}/${mode}/`).then(Api._handleApiResult.bind(null, 'patchData'));
+  static async patchData(mode, body) {
+    return axios.patch(`${urlApi}/${mode}/`, body).then(Api._handleApiResult.bind(null, 'patchData'));
   }
 
-  static async deleteData(mode) {
-    return axios.delete(`${urlApi}/${mode}/`).then(Api._handleApiResult.bind(null, 'deleteData'));
+  static async deleteData(mode, body) {
+    return axios.delete(`${urlApi}/${mode}/`, body).then(Api._handleApiResult.bind(null, 'deleteData'));
   }
 
-  static async postData(mode) {
-    return axios.post(`${urlApi}/${mode}/`).then(Api._handleApiResult.bind(null, 'postData'));
+  static async postData(mode, body) {
+    return axios.post(`${urlApi}/${mode}/`, body).then(Api._handleApiResult.bind(null, 'postData'));
   }
 
   static _handleApiResult(fnName, res) {
+    return res.data.data;
+
     if (res.data.status !== 'OK') {
       storage.alert.dispatch({ type: 'SHOW_ALERT', status: 'fail', message: 'Ошибка' });
       console.error(`Ошибка запроса: ${res.data.error}`);
@@ -59,8 +61,6 @@ class Api {
       storage.alert.dispatch({ type: 'SHOW_ALERT', status: 'fail', message: 'Ошибка' });
       console.error(`Ошибка HTTP:  + ${res.statusText}`);
     }
-
-    return res.data;
 
     return ['OK', 'Created', 'No Content'].includes(res.statusText)
       ? res.data
@@ -72,6 +72,7 @@ class Api {
 export const getData = async (mode, type = 'initialize', filter = {}) => {
   if (mode === 'user') {
     const result = await Api.getUser();
+
     if (result !== 'ERROR') {
       metaData.user = result;
       metaData.login = result.login;
@@ -209,10 +210,10 @@ export const doData = async (mode, data, id, feature) => {
       };
 
       let result;
-      if (mode === 'put') result = await Api.putData(body);
-      if (mode === 'patch') result = await Api.patchData(body);
-      if (mode === 'delete') result = await Api.deleteData(body);
-      if (mode === 'notify') result = await Api.postData({...body, method: mode});
+      if (mode === 'put') result = await Api.putData(feature, body);
+      if (mode === 'patch') result = await Api.patchData(feature, body);
+      if (mode === 'delete') result = await Api.deleteData(feature, body);
+      if (mode === 'notify') result = await Api.postData(feature, {...body, method: mode});
 
       json = result !== "ERROR" ? result.data : result;
     } catch (err) {

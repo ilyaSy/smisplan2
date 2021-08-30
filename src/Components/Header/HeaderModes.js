@@ -24,7 +24,7 @@ function HeaderModes({ reloadDataTable }) {
 
   const tableName = getMode(document.location.pathname);
 
-  const [value, setValue] = React.useState(`${hostpath && '/' + hostpath}/${mainModes.indexOf(tableName) !== -1 ? tableName : 'task'}`)
+  const [value, setValue] = React.useState(`${hostpath && '/' + hostpath}/${mainModes.includes(tableName) ? tableName : 'task'}`)
 
   const handleChange = (event, newValue) => {
     setValue(newValue);

@@ -3,8 +3,8 @@ import MockAdapter from 'axios-mock-adapter';
 import { urlApi } from '../config/constants';
 
 const user = require('../config/dummyData/user.json');
-const developers = require('../config/dummyData/user.json');
-const projects = require('../config/dummyData/user.json');
+const developers = require('../config/dummyData/developers.json');
+const projects = require('../config/dummyData/projects.json');
 
 const metaData = {
   task: null,

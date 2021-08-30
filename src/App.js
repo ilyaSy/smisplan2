@@ -11,7 +11,7 @@ import './App.css';
 
 const Hint = lazy(() => import('./SharedComponents/Hint'));
 
-export default function App(props) {
+export default function App() {
   const [developers, setDevelopers] = React.useState([]);
   const _divDataTable = React.useRef(null);
 
@@ -23,12 +23,8 @@ export default function App(props) {
     if (resetFilter) sessionStorage.removeItem('sort');
 
     Promise.all([getData(`${dataTableName}_meta`), getData(metaData.dataTableName)])
-      .then(() => {
-        if (typeof func === 'function') func();
-      })
-      .then(() => {
-        storage.state.dispatch({ type: 'SET_DATALOADING', stage: 'data' });
-      });
+      .then(() => { if (typeof func === 'function') func(); })
+      .then(() => { storage.state.dispatch({ type: 'SET_DATALOADING', stage: 'data' }); });
   };
 
   const pathname = document.location.pathname;
@@ -44,9 +40,7 @@ export default function App(props) {
     inputFilter.developer = pathArray[1];
   }
 
-  if (mainModes.indexOf(tableName) !== -1) {
-    metaData.dataTableName = tableName;
-  }
+  if (mainModes.includes(tableName)) metaData.dataTableName = tableName;
 
   if (
     navigator.userAgent.match(/Android/i) ||
@@ -58,9 +52,7 @@ export default function App(props) {
     navigator.userAgent.match(/Windows Phone/i)
   ) {
     metaData.mobile = true;
-  }
 
-  if (metaData.mobile) {
     let root = document.documentElement;
     root.style.setProperty('--font-size-table-title', '16px');
     root.style.setProperty('--font-size-table', '14px');
@@ -71,7 +63,6 @@ export default function App(props) {
       setDevelopers(metaData.developerList)
       Promise.all([ ...mainModes.map((mode) => getData(`${mode}_meta`)), getData(metaData.dataTableName) ])
         .then(() => { storage.state.dispatch({ type: 'SET_DATALOADING', stage: 'data' }); })
-        .then(() => { getData('taskgroup', 'meta') });
     });
   }, []);
 

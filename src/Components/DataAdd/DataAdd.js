@@ -84,43 +84,6 @@ export default class DataAdd extends React.PureComponent {
     }
 
     if (!emptyDataError) {
-      if (metaData.dataTableName === 'spec_notes') {
-        if (!filters.data.idTask) {
-          let selectDialogOptions = [];
-          if (Object.values(metaData.taskList).length > 0) {
-            selectDialogOptions.push({
-              id: 'task',
-              name: 'Задачи',
-              options: Object.values(metaData.taskList)
-                .sort((a, b) => {
-                  return a.value >= b.value ? 1 : -1;
-                })
-                .map((task) => {
-                  return { id: task.id, value: task.value };
-                }),
-            });
-          }
-          if (Object.values(metaData.taskgroupList).length > 0) {
-            selectDialogOptions.push({
-              id: 'taskgroup',
-              name: 'Темы',
-              options: Object.values(metaData.taskgroupList)
-                .sort((a, b) => {
-                  return a.value >= b.value ? 1 : -1;
-                })
-                .map((task) => {
-                  return { id: task.id, value: task.value };
-                }),
-            });
-          }
-          this.setState({ selectDialogOptions: selectDialogOptions });
-          this._dialogSelect.current.setState({ open: true });
-        }
-
-        task.idTask = filters.data.idTask;
-        task.theme = metaData.taskList[filters.data.idTask].value;
-      }
-
       if (metaData.dataTableName === 'discussion') {
         task.mainTable = 'task';
         task.idTask = 42;
