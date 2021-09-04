@@ -6,7 +6,7 @@ import { filters } from '../../utils/filters';
 import storage from '../../storages/commonStorage';
 import './CheckboxListFilter.css';
 
-export default function CheckboxListFilter(props) {
+function CheckboxListFilter(props) {
   const [checked, setChecked] = React.useState([]);
 
   const handleToggle = (value) => () => {
@@ -68,3 +68,5 @@ export default function CheckboxListFilter(props) {
     </List>
   );
 }
+
+export default React.memo(CheckboxListFilter);

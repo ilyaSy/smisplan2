@@ -5,36 +5,36 @@ import { metaData, dataTable } from '../../config/data';
 import { filters } from '../../utils/filters';
 import storage from '../../storages/commonStorage';
 
-function resortActive(developerList) {
-  const activeDevsList = [];
-  if (dataTable) {
-    dataTable.forEach((row) => {
-      if (row.author && row.author !== '' && !activeDevsList.includes(row.author)) {
-        activeDevsList.push(row.author);
-      }
-      if (row.developer && row.developer !== '' && !activeDevsList.includes(row.developer)) {
-        activeDevsList.push(row.developer);
-      }
-    });
-  }
-
-  const activeDevs = {};
-  const nonActiveDevs = {};
-  if (Object.keys(developerList).length > 0) {
-    Object.keys(developerList).forEach((dev) => {
-      if (activeDevsList.includes(dev)) {
-        activeDevs[dev] = developerList[dev];
-      } else {
-        nonActiveDevs[dev] = developerList[dev];
-      }
-    });
-  }
-
-  return [activeDevs, nonActiveDevs];
-}
-
 export default function DevelopersFilter(props) {
   const [developers, setDevelopers] = React.useState(Object.keys(metaData.developerList));
+
+  const resortActive = (developerList) => {
+    const activeDevsList = [];
+    if (dataTable) {
+      dataTable.forEach((row) => {
+        if (row.author && row.author !== '' && !activeDevsList.includes(row.author)) {
+          activeDevsList.push(row.author);
+        }
+        if (row.developer && row.developer !== '' && !activeDevsList.includes(row.developer)) {
+          activeDevsList.push(row.developer);
+        }
+      });
+    }
+
+    const activeDevs = {};
+    const nonActiveDevs = {};
+    if (Object.keys(developerList).length > 0) {
+      Object.keys(developerList).forEach((dev) => {
+        if (activeDevsList.includes(dev)) {
+          activeDevs[dev] = developerList[dev];
+        } else {
+          nonActiveDevs[dev] = developerList[dev];
+        }
+      });
+    }
+
+    return [activeDevs, nonActiveDevs];
+  };
 
   const resortDevelopers = (inputDevelopers = metaData.developerList) => {
     const sortedDevelopers = resortActive(inputDevelopers);

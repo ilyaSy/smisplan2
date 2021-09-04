@@ -4,81 +4,61 @@ import { Drawer } from '@material-ui/core';
 import CustomIcon from '../../SharedComponents/CustomIcon';
 import storage from '../../storages/commonStorage';
 import { metaData } from '../../config/data';
-// import CheckboxListFilter from '../CheckboxListFilter/CheckboxListFilter';
 import DevelopersFilter from '../DevelopersFilter/DevelopersFilter';
 import './MainLeftSide.css';
 
-/* *************************  Developers list  ******************************* */
-export default class MainLeftSide extends React.PureComponent {
-  constructor(props) {
-    super(props);
-    this.state = { open: true };
-  }
+function MainLeftSide(props) {
+  const [open, setOpen] = React.useState(true);
+  const { developers, developer } = props;
 
-  componentDidMount() {
-    this.unsubscribe = storage.state.subscribe(() => {
-      const { dataLoading } = storage.state.getState().STATE;
-      if (dataLoading && dataLoading === 'data') {
-        if (['discussion', 'calendar'].includes(metaData.dataTableName)) {
-          this.handleOpen(false);
-        } else {
-          this.handleOpen(true);
-        }
-      }
-    });
-  }
-
-  componentWillUnmount() {
-    this.unsubscribe();
-  }
-
-  setOpen = (open) => this.setState({ open });
-
-  handleOpen = (open) => {
+  const handleOpen = (isOpened) => {
     const root = document.documentElement;
 
     const widthDefault = getComputedStyle(root).getPropertyValue('--width-left-side');
-    root.style.setProperty('--width-left-side-bottom', !open ? '0px' : widthDefault);
+    root.style.setProperty('--width-left-side-bottom', !isOpened ? '0px' : widthDefault);
 
-    this.setOpen(open);
+    setOpen(isOpened);
   };
 
-  handleToggle = () => this.handleOpen(!this.state.open);
+  React.useEffect(() => {
+    const unsubscribe = storage.state.subscribe(() => {
+      const { dataLoading } = storage.state.getState().STATE;
+      if (dataLoading && dataLoading === 'data') {
+        if (['discussion', 'calendar'].includes(metaData.dataTableName)) {
+          handleOpen(false);
+        } else {
+          handleOpen(true);
+        }
+      }
+    });
 
-  render() {
-    const { developers, developer } = this.props;
-    const { open: isOpened } = this.state;
-    const list = Object.values(developers).map((d) => ({ id: d.id, value: d.value }));
+    return unsubscribe;
+  }, []);
 
-    return [
-      <Drawer
-        key="leftSideDrawer"
-        variant="persistent"
-        anchor="left"
-        open={isOpened}
-        classes={{ paper: 'left-side-bar' }}
-      >
-        <DevelopersFilter developer={developer} list={list} />
-      </Drawer>,
-      <div key="showHideButton" className="divSpacingBottom">
-        {isOpened ? (
-          <CustomIcon
-            class="icn_arrow_left_fill"
-            tip="Свернуть"
-            fontSize="large"
-            action={this.handleToggle}
-            style={{ borderRadius: '0px' }}
-          />
-        ) : (
-          <CustomIcon
-            class="icn_arrow_right_fill"
-            tip="Показать"
-            fontSize="large"
-            action={this.handleToggle}
-            style={{ borderRadius: '0px' }}
-          />
-        )}
-      </div>,
-    ];
-  }
+  const handleToggle = () => handleOpen(!open);
+
+  const list = Object.values(developers).map((d) => ({ id: d.id, value: d.value }));
+
+  return [
+    <Drawer
+      key="leftSideDrawer"
+      variant="persistent"
+      anchor="left"
+      open={open}
+      classes={{ paper: 'left-side-bar' }}
+    >
+      <DevelopersFilter developer={developer} list={list} />
+    </Drawer>,
+    <div key="showHideButton" className="divSpacingBottom">
+      <CustomIcon
+        class={`${open ? 'icn_arrow_left_fill' : 'icn_arrow_right_fill'}`}
+        tip={`${open ? 'Свернуть' : 'Показать'}`}
+        fontSize="large"
+        action={handleToggle}
+        style={{ borderRadius: '0px' }}
+      />
+    </div>,
+  ];
 }
+
+export default React.memo(MainLeftSide);
