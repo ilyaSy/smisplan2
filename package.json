@@ -1,14 +1,21 @@
 {
-  "_comment_dependencies_": {
-    "@date-io/date-fns": "^2.8.0",
-    "date-fns": "^2.15.0",
-    "react-calendar": "^3.1.0",
-    "react-contextmenu": "^2.14.0"
-  },
+  "author": "Ilya Sychugov",
   "name": "smisplan2",
   "homepage": "https://ilyasy.github.io/smisplan2/",
   "version": "1.0.0",
   "private": true,
+  "description": "Public SMISplan issue tracker repository",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ilyaSy/smisplan2.git"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
+  },
   "dependencies": {
     "@date-io/moment": "^1.3.13",
     "@fullcalendar/daygrid": "^5.2.0",
@@ -17,6 +24,7 @@
     "@fullcalendar/react": "^5.2.0",
     "@fullcalendar/timegrid": "^5.2.0",
     "@material-ui/core": "^4.11.0",
+    "@material-ui/icons": "^4.11.2",
     "@material-ui/pickers": "^3.2.10",
     "axios": "^0.21.1",
     "axios-mock-adapter": "^1.20.0",
@@ -36,16 +44,10 @@
     "react-router-config": "^5.1.1",
     "react-router-dom": "^5.2.0",
     "react-router-native": "^5.2.0",
-    "react-scripts": "^3.4.0",
+    "react-scripts": "^4.0.3",
     "react-select": "^4.3.1",
     "react-to-print": "^2.9.0",
     "redux": "^4.0.5"
-  },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
   },
   "browserslist": {
     "production": [
@@ -60,13 +62,11 @@
     ]
   },
   "devDependencies": {
+    "eslint-config-airbnb": "^18.2.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "prettier": "^2.3.2",
     "redux-devtools": "^3.6.0"
-  },
-  "description": "Public SMISplan issue tracker repository",
-  "main": "index.js",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ilyaSy/smisplan2.git"
   },
   "keywords": [
     "javascript",
@@ -79,9 +79,14 @@
     "axios-mock-adapter",
     "material-ui"
   ],
-  "author": "Ilya Sychugov",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/ilyaSy/smisplan2/issues"
+  },
+  "_comment_dependencies_": {
+    "@date-io/date-fns": "^2.8.0",
+    "date-fns": "^2.15.0",
+    "react-calendar": "^3.1.0",
+    "react-contextmenu": "^2.14.0"
   }
 }

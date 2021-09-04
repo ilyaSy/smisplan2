@@ -139,7 +139,7 @@
         "tableIndex": 5,
         "id": "project",
         "type": "select",
-        "defaultValue": "56otdel"
+        "defaultValue": "otdel"
       }
     },
     {

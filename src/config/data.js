@@ -7,10 +7,10 @@ export const modes = [
   { id: 'event', value: 'Изменения', realData: true },
 ];
 
-export const mainModes = modes.filter(e => e.realData).map(e => e.id);
+export const mainModes = modes.filter((e) => e.realData).map((e) => e.id);
 
-export let dataTable = [];
-export let metaData = {
+export const dataTable = [];
+export const metaData = {
   mobile: false,
   user: {},
   dataTableName: 'task',
@@ -20,19 +20,19 @@ export let metaData = {
   tables: {},
 };
 
-export const setDataTable = (data) => {
-  dataTable = data;
+export const resetDataTable = () => {
+  dataTable.splice(0);
 };
 
 /* main Filter class */
 class Filters {
-  constructor(props) {
+  constructor() {
     this.data = { developer: [], project: '' };
     this.perm = {};
 
-    let filtersStorageString = sessionStorage.getItem('filters');
+    const filtersStorageString = sessionStorage.getItem('filters');
     if (filtersStorageString && filtersStorageString !== '{}') {
-      let filtersStorage = JSON.parse(filtersStorageString);
+      const filtersStorage = JSON.parse(filtersStorageString);
       this.data = filtersStorage[metaData.dataTableName]?.data || {};
       this.perm = filtersStorage[metaData.dataTableName]?.perm || {};
 
@@ -52,7 +52,7 @@ class Filters {
 
   // clear all data
   clear = () => {
-    for (let key of this.getKeys()) {
+    this.getKeys().forEach((key) => {
       if (/^_.+/.test(key)) {
         delete this.data[key];
       } else if (typeof this.data[key] === 'string') {
@@ -60,14 +60,12 @@ class Filters {
       } else {
         this.data[key] = [];
       }
-    }
+    });
   };
 
   setKeys = (tbl) => {
     Object.values(tbl)
-      .filter((a) => {
-        return a.isFilter;
-      })
+      .filter((a) => a.isFilter)
       .forEach((value) => {
         if (typeof this.data[value.id] === 'undefined') this.data[value.id] = '';
       });
@@ -77,53 +75,53 @@ class Filters {
   setValue = (mode = 'data', field, value) => {
     this[mode][field] = value;
 
-    let vocFilter = [];
-    for (let f in metaData.dataTable) {
+    const vocFilter = [];
+    Object.keys(metaData.dataTable).forEach((f) => {
       if (metaData.dataTable[f].vocabulary === field) vocFilter.push(f);
-    }
+    });
 
     if (vocFilter.length > 0) {
       if (vocFilter.length === 1) {
         this[mode][vocFilter[0]] = value;
       } else {
-        this[mode]['_' + vocFilter.join('OR')] = value;
+        this[mode][`_${vocFilter.join('OR')}`] = value;
       }
     }
   };
 
   // get all keys
-  getKeys = (mode = 'data') => {
-    return Object.keys(this[mode]);
-  };
+  getKeys = (mode = 'data') => Object.keys(this[mode]);
 
   // check if field is filter
-  checkFilter = (f) => {
-    return this.getKeys().indexOf(f) > -1 ? true : false;
-  };
+  checkFilter = (f) => this.getKeys().includes(f);
 
   // check if row data is ok for filter
   checkValue = (task) => {
     let filter = true;
-    let filterData = {};
+    const filterData = {};
 
-    this.getKeys('data').map((key) => {
-      if (Array.isArray(filterData[key])) {
-        return filterData[key].includes(this.data[key])
-      }
-      return (filterData[key] = this.data[key]);
+    this.getKeys('data').forEach((key) => {
+      // if (Array.isArray(filterData[key])) {
+      //   return filterData[key].includes(this.data[key]);
+      // }
+      filterData[key] = this.data[key];
     });
-    this.getKeys('perm').map((key) => {
-      return (filterData[key] = this.perm[key]);
+    this.getKeys('perm').forEach((key) => {
+      filterData[key] = this.perm[key];
     });
 
-    for (let f in filterData) {
+    const filterDataKeys = Object.keys(filterData);
+    for (let i = 0; i < filterDataKeys.length; i++) {
+      const f = filterDataKeys[i];
       if (!filterData[f] || filterData[f] === '') continue;
       if (!metaData.dataTable[f] && f.search(/^_.+OR.+$/) === -1 && f !== 'commonFieldSearch')
         continue;
 
       // filter for SEARCH
       if (f === 'commonFieldSearch') {
-        for (let field in task) {
+        const fieldsArray = Object.keys(task);
+        for (let j = 0; j < fieldsArray.length; j++) {
+          const field = fieldsArray[j];
           if (field === 'value') continue;
           if (
             field !== metaData.specificParameters.mainValue // && metaData.dataTable[field]?.type !== 'fulltext'
@@ -134,14 +132,16 @@ class Filters {
           if (filter) break;
         }
       } else if (f.search(/^_(.+OR.+)$/) !== -1) {
-        let fieldsString = f.replace(/^_(.+OR.+)/, '$1');
-        let fieldsArray = fieldsString.split('OR');
-        for (let field of fieldsArray) {
+        const fieldsString = f.replace(/^_(.+OR.+)/, '$1');
+        const fieldsArray = fieldsString.split('OR');
+        for (let j = 0; j < fieldsArray.length; j++) {
+          const field = fieldsArray[j];
           if (!metaData.dataTable[field]) continue;
 
           if (metaData.dataTable[field].type === 'multi-select') {
-            for (let ff of task[field].split(',')) {
-              filter = this.compare(filterData[f], ff);
+            const fieldsList = task[field].split(',');
+            for (let k = 0; k < fieldsList.length; k++) {
+              filter = this.compare(filterData[f], fieldsList[k]);
               if (filter) break;
             }
           } else {
@@ -150,8 +150,9 @@ class Filters {
           if (filter) break;
         }
       } else if (metaData.dataTable[f].type === 'multi-select') {
-        for (let ff of task[f].split(',')) {
-          filter = this.compare(filterData[f], ff);
+        const fieldsList = task[f].split(',');
+        for (let k = 0; k < fieldsList.length; k++) {
+          filter = this.compare(filterData[f], fieldsList[k]);
           if (filter) break;
         }
       } else {
@@ -172,7 +173,7 @@ class Filters {
         taskValue !== '' &&
         taskValue.search(/\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/) !== -1
       ) {
-        let date = taskValue.replace(/(\d{4}-\d{2}-\d{2}) \d{2}:\d{2}:\d{2}/, '$1');
+        const date = taskValue.replace(/(\d{4}-\d{2}-\d{2}) \d{2}:\d{2}:\d{2}/, '$1');
 
         if (propertyValue !== date) filter = false;
       } else if (taskValue && propertyValue !== '' && !asRegexp) {
@@ -183,18 +184,17 @@ class Filters {
         filter = false;
       }
     } else if (typeof propertyValue === 'number') {
-      if (propertyValue && propertyValue > 0 && propertyValue !== parseInt(taskValue))
+      if (propertyValue && propertyValue > 0 && propertyValue !== parseInt(taskValue, 10))
         filter = false;
-    } else {
-      if (propertyValue && propertyValue.length > 0 && propertyValue.indexOf(taskValue) === -1)
-        filter = false;
+    } else if (propertyValue && propertyValue.length > 0 && !propertyValue.includes(taskValue)) {
+      filter = false;
     }
 
     return filter;
   };
 }
 
-export let filters = new Filters({});
+export const filters = new Filters({});
 
 /* universal filter function */
 export function filterTasks(redrawTable = false) {
@@ -208,17 +208,17 @@ export function filterTasks(redrawTable = false) {
     filters.perm = filtersStorage[metaData.dataTableName]?.perm || {};
   } else {
     if (filters.data.developer && filters.data.developer.length > 0) {
-      modes.forEach(mode => {
+      modes.forEach((mode) => {
         if (filtersStorage[mode.id]) {
           filtersStorage[mode.id].data.developer = [...filters.data.developer];
         } else {
           filtersStorage[mode.id] = {
             data: {
               developer: [...filters.data.developer],
-            }
+            },
           };
         }
-      })
+      });
     }
 
     filtersStorage[metaData.dataTableName] = filters;
@@ -226,11 +226,11 @@ export function filterTasks(redrawTable = false) {
     sessionStorage.setItem('filters', filtersString);
   }
 
-  let dataTableShow = [];
-  for (let task of dataTable) {
-    let filter = filters.checkValue(task);
+  const dataTableShow = [];
+  dataTable.forEach((task) => {
+    const filter = filters.checkValue(task);
     if (filter) dataTableShow.push(task);
-  }
+  });
 
   return dataTableShow;
 }

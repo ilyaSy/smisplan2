@@ -11,60 +11,75 @@ import './MainLeftSide.css';
 export default class MainLeftSide extends React.PureComponent {
   constructor(props) {
     super(props);
-    this.state = { open: true }
-    this.setOpen = this.setOpen.bind(this)
+    this.state = { open: true };
   }
-
-  setOpen = (open) => {
-    let root = document.documentElement;
-
-    let widthDefault = getComputedStyle(root).getPropertyValue('--width-left-side');
-    root.style.setProperty('--width-left-side-bottom', this.state.open ? "0px" : widthDefault);
-
-    this.setState({ open })
-  }
-
-  handleShow = () => { this.setOpen(true) }
-  handleHide = () => { this.setOpen(false) }
 
   componentDidMount() {
     this.unsubscribe = storage.state.subscribe(() => {
-      const dataLoading = storage.state.getState().STATE.dataLoading;
+      const { dataLoading } = storage.state.getState().STATE;
       if (dataLoading && dataLoading === 'data') {
         if (['discussion', 'calendar'].includes(metaData.dataTableName)) {
-          if (this.state.open) this.setOpen(false);
+          this.handleOpen(false);
         } else {
-          if (!this.state.open) this.setOpen(true);
+          this.handleOpen(true);
         }
       }
     });
   }
 
-  componentWillUnmount () {
-    this.unsubscribe()
+  componentWillUnmount() {
+    this.unsubscribe();
   }
 
+  setOpen = (open) => this.setState({ open });
+
+  handleOpen = (open) => {
+    const root = document.documentElement;
+
+    const widthDefault = getComputedStyle(root).getPropertyValue('--width-left-side');
+    root.style.setProperty('--width-left-side-bottom', !open ? '0px' : widthDefault);
+
+    this.setOpen({ open });
+  };
+
+  handleShow = () => this.handleOpen(true);
+
+  handleHide = () => this.handleOpen(false);
+
   render() {
-    const list = Object.values(this.props.developers).map((d) => {
-      return { id: d.id, value: d.value }
-    });
+    const { developers, developer } = this.props;
+    const { open: isOpened } = this.state;
+    const list = Object.values(developers).map((d) => ({ id: d.id, value: d.value }));
 
     return [
       <Drawer
         key="leftSideDrawer"
         variant="persistent"
         anchor="left"
-        open={this.state.open}
-        classes={{ paper: "left-side-bar" }}>
-
-        <CheckboxListFilter developer={this.props.developer} list={list} />
+        open={!!isOpened}
+        classes={{ paper: 'left-side-bar' }}
+      >
+        <CheckboxListFilter developer={developer} list={list} />
       </Drawer>,
       <div key="showHideButton" className="divSpacingBottom">
-        {this.state.open ?
-          <CustomIcon class="icn_arrow_left_fill" tip="Свернуть" fontSize="large" action={this.handleHide} style={{ borderRadius: "0px" }} /> :
-          <CustomIcon class="icn_arrow_right_fill" tip="Показать" fontSize="large" action={this.handleShow} style={{ borderRadius: "0px" }} />
-        }
-      </div>
-    ]
+        {isOpened ? (
+          <CustomIcon
+            class="icn_arrow_left_fill"
+            tip="Свернуть"
+            fontSize="large"
+            action={this.handleHide}
+            style={{ borderRadius: '0px' }}
+          />
+        ) : (
+          <CustomIcon
+            class="icn_arrow_right_fill"
+            tip="Показать"
+            fontSize="large"
+            action={this.handleShow}
+            style={{ borderRadius: '0px' }}
+          />
+        )}
+      </div>,
+    ];
   }
-};
+}

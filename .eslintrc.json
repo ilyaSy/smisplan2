@@ -35,6 +35,17 @@
         "react/jsx-uses-react": "off",
         "react/react-in-jsx-scope": "off",
         "no-underscore-dangle": "off",
-        "react/jsx-props-no-spreading": 0
+        "react/jsx-props-no-spreading": 0,
+        "prefer-destructuring": ["error", {"object": true, "array": false}],
+        "react/destructuring-assignment": "off",
+        "react/prop-types": 0,
+        "no-console": "off",
+        "no-plusplus": "off",
+        "react/no-array-index-key": "off",
+        "react/no-string-refs": "off",
+        "jsx-a11y/label-has-associated-control": "off",
+        "no-param-reassign": "off",
+        "no-nested-ternary": "off",
+        "no-continue": "off"
     }
 }

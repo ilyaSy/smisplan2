@@ -1,4 +1,5 @@
-import React, {Suspense, lazy} from 'react';
+/* eslint-disable prefer-destructuring */
+import React, { Suspense, lazy } from 'react';
 
 import { metaData, filters, mainModes } from './config/data';
 import { getData } from './utils/api';
@@ -23,11 +24,15 @@ export default function App() {
     if (resetFilter) sessionStorage.removeItem('sort');
 
     Promise.all([getData(`${dataTableName}_meta`), getData(metaData.dataTableName)])
-      .then(() => { if (typeof func === 'function') func(); })
-      .then(() => { storage.state.dispatch({ type: 'SET_DATALOADING', stage: 'data' }); });
+      .then(() => {
+        if (typeof func === 'function') func();
+      })
+      .then(() => {
+        storage.state.dispatch({ type: 'SET_DATALOADING', stage: 'data' });
+      });
   };
 
-  const pathname = document.location.pathname;
+  const { pathname } = document.location;
   const hostpath = window.location.href.search(/localhost:3000/) !== -1 ? '' : 'smisplan';
   const pathArray = pathname.split('/').slice(1);
   if (pathArray[0] === hostpath) {
@@ -53,16 +58,20 @@ export default function App() {
   ) {
     metaData.mobile = true;
 
-    let root = document.documentElement;
+    const root = document.documentElement;
     root.style.setProperty('--font-size-table-title', '16px');
     root.style.setProperty('--font-size-table', '14px');
   }
 
   React.useEffect(() => {
     getData('developer').then(() => {
-      setDevelopers(metaData.developerList)
-      Promise.all([ ...mainModes.map((mode) => getData(`${mode}_meta`)), getData(metaData.dataTableName) ])
-        .then(() => { storage.state.dispatch({ type: 'SET_DATALOADING', stage: 'data' }); })
+      setDevelopers(metaData.developerList);
+      Promise.all([
+        ...mainModes.map((mode) => getData(`${mode}_meta`)),
+        getData(metaData.dataTableName),
+      ]).then(() => {
+        storage.state.dispatch({ type: 'SET_DATALOADING', stage: 'data' });
+      });
     });
   }, []);
 
@@ -75,7 +84,7 @@ export default function App() {
       </header>
 
       <main style={{ display: 'flex' }} className="divBottom">
-        <MainLeftSide developer={inputFilter.developer} developers={developers}/>
+        <MainLeftSide developer={inputFilter.developer} developers={developers} />
         <Content dataRef={_divDataTable} reloadDataTable={reloadDataTable} />
 
         <Suspense fallback={<p>...</p>}>

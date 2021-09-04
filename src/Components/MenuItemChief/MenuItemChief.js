@@ -1,7 +1,7 @@
 import React from 'react';
 import { Menu, MenuItem, ListItemIcon, Typography } from '@material-ui/core';
 
-import { metaData, filters } from '../../config/data';
+import { filters } from '../../config/data';
 import { doData } from '../../utils/api';
 import storage from '../../storages/commonStorage';
 import CustomIcon from '../../SharedComponents/CustomIcon';
@@ -13,79 +13,63 @@ export default class MenuItemChief extends React.PureComponent {
     super(props);
     this.state = {
       menuEl: null,
-      menuElSub_c: null,
-      menuElSub: null,
-      checkedElSubList: [],
     };
-    this.setCheckedElSubList = this.setCheckedElSubList.bind(this);
   }
 
-  setCheckedElSubList = (checkedElSubList) => {
-    this.setState({ checkedElSubList });
-  };
-
-  handleClickItem = (menuItem) => (event) => {
+  senNotification = () => {
     const currentDate = new DateW();
     const currentWeek = currentDate.getWeek();
 
-    switch (menuItem) {
-      case 'discussionNotification':
-        let notifyWeek = `${currentDate.getFullYear()}.${
-          currentWeek + (currentDate.getDay() >= 5 ? 1 : 0)
-        }`;
+    storage.alert.dispatch({
+      type: 'SHOW_ALERT',
+      status: 'warn',
+      message: 'Идёт отправка уведомлений...',
+    });
+    const data = {
+      week: `${currentDate.getFullYear()}.${currentWeek + (currentDate.getDay() >= 5 ? 1 : 0)}`,
+      mode: 'done',
+      feature: 'discussion',
+    };
+    doData('notify', data, undefined, 'notification').then(([error]) => {
+      if (error) {
         storage.alert.dispatch({
           type: 'SHOW_ALERT',
-          status: 'warn',
-          message: 'Идёт отправка уведомлений...',
+          status: 'fail',
+          message: 'Ошибка при отправке уведомления',
         });
-        const data = {
-          week: notifyWeek,
-          mode: 'done',
-          feature: 'discussion',
-        };
-        doData('notify', data, undefined, 'notification').then(([error]) => {
-          error
-            ? storage.alert.dispatch({
-                type: 'SHOW_ALERT',
-                status: 'fail',
-                message: 'Ошибка при отправке уведомления',
-              })
-            : storage.alert.dispatch({
-                type: 'SHOW_ALERT',
-                status: 'success',
-                message: 'Уведомление послано успешно',
-              });
+      } else {
+        storage.alert.dispatch({
+          type: 'SHOW_ALERT',
+          status: 'success',
+          message: 'Уведомление послано успешно',
         });
+      }
+    });
+  };
+
+  goToCurrentWeekDiscussion = () => {
+    const loadTableName = 'discussion';
+    const currentDate = new DateW();
+    const currentWeek = currentDate.getWeek();
+
+    this.props.reloadDataTable(loadTableName, () => {
+      filters.data.week = `${currentDate.getFullYear()}.${
+        currentWeek + (currentDate.getDay() >= 5 ? 1 : 0)
+      }`;
+    });
+  };
+
+  handleClickItem = (menuItem) => () => {
+    switch (menuItem) {
+      case 'discussionNotification':
+        this.senNotification();
         break;
       default:
-        //discussion
-        const loadTableName = 'discussion';
-        this.props.reloadDataTable(loadTableName, () => {
-          filters.data.week = `${currentDate.getFullYear()}.${
-            currentWeek + (currentDate.getDay() >= 5 ? 1 : 0)
-          }`;
-        });
+        this.goToCurrentWeekDiscussion();
         break;
     }
     this.setState({ menuEl: null });
   };
-
-  componentDidMount() {
-    this.unsubscribe = storage.state.subscribe(() => {
-      let dataLoading = storage.state.getState().STATE.dataLoading;
-      if (dataLoading && dataLoading === 'meta') {
-        this.setCheckedElSubList(
-          Object.keys(metaData.dataTable).filter((a) => {
-            return metaData.dataTable[a].showInTable;
-          })
-        );
-      }
-    });
-  }
-
-  componentWillUnmount() {
-    this.unsubscribe();
-  }
 
   render() {
     return (
@@ -116,17 +100,6 @@ export default class MenuItemChief extends React.PureComponent {
               Расписание обсуждений
             </Typography>
           </MenuItem>
-
-          {/* <MenuItem key={`menu-${this.props.name}-discussionPrint`} onClick={this.handleClickItem('discussionPrint')}>
-                        <ListItemIcon>
-                        <CustomIcon
-                                class="icn_print"
-                                tip="Распечатать оповещения об обсуждениях на текущей неделе" />
-                        </ListItemIcon>
-                        <Typography variant="inherit" noWrap>
-                            Распечатать обсуждения
-                        </Typography>
-                    </MenuItem> */}
 
           <MenuItem
             key={`menu-${this.props.name}-discussionNotification`}

@@ -1,4 +1,3 @@
-import React from 'react';
 import { TablePagination, Tooltip, IconButton } from '@material-ui/core';
 import FirstPageIcon from '@material-ui/icons/FirstPage';
 import LastPageIcon from '@material-ui/icons/LastPage';
@@ -6,9 +5,11 @@ import KeyboardArrowLeftIcon from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
 
 export default function TblHeaderPagination(props) {
-  const TablePaginationActions = (props) => {
-    const { count, page, rowsPerPage, onChangePage } = props;
-    const countTotal = Math.ceil(count / rowsPerPage);
+  const { count: countPages, page, rowsPerPage, onChangePage, onChangeRowsPerPage } = props;
+
+  const TablePaginationActions = () => {
+    // const { count, page, rowsPerPage, onChangePage } = props;
+    const countTotal = Math.ceil(countPages / rowsPerPage);
 
     return (
       <div className="data-table__pagination-actions">
@@ -68,11 +69,11 @@ export default function TblHeaderPagination(props) {
     <TablePagination
       rowsPerPageOptions={[50, 100, 200]}
       component="div"
-      count={props.count}
-      rowsPerPage={props.rowsPerPage}
-      page={props.page}
-      onChangePage={props.onChangePage}
-      onChangeRowsPerPage={props.onChangeRowsPerPage}
+      count={countPages}
+      rowsPerPage={rowsPerPage}
+      page={page}
+      onChangePage={onChangePage}
+      onChangeRowsPerPage={onChangeRowsPerPage}
       labelRowsPerPage="Выводить по"
       labelDisplayedRows={({ from, to, count }) => `${from}-${to} из ${count}`}
       backIconButtonProps={{ style: { paddingTop: '0px', paddingBottom: '0px' } }}
@@ -86,4 +87,3 @@ export default function TblHeaderPagination(props) {
     />
   );
 }
-

@@ -21,25 +21,30 @@ const PopupEditFullText = lazy(() => import('../PopupEditFullText/PopupEditFullT
 const TblSecondaryList = lazy(() => import('../TblSecondaryList/TblSecondaryList'));
 const TblFullTextRow = lazy(() => import('../TblFullTextRow/TblFullTextRow'));
 
-const desc = (a, b, sort) => {
+const descSort = (a, b, sort) => {
   let desc = 0;
-  for (let field of sort) {
-    let orderBy = field.field;
-    let val_a = Number.isInteger(a[orderBy]) ? a[orderBy] : a[orderBy] ? a[orderBy].toString() : '';
-    let val_b = Number.isInteger(b[orderBy]) ? b[orderBy] : b[orderBy] ? b[orderBy].toString() : '';
+
+  for (let i = 0; i < sort.length; i++) {
+    const field = sort[i];
+    const orderBy = field.field;
+    let valA = Number.isInteger(a[orderBy]) ? a[orderBy] : a[orderBy] ? a[orderBy].toString() : '';
+    let valB = Number.isInteger(b[orderBy]) ? b[orderBy] : b[orderBy] ? b[orderBy].toString() : '';
 
     if (metaData.dataTable[orderBy].type === 'select') {
-      if (val_a !== '' && typeof val_a === 'string')
-        val_a = metaData[`${orderBy}List`][val_a].value;
-      if (val_b !== '' && typeof val_b === 'string')
-        val_b = metaData[`${orderBy}List`][val_b].value;
-      if (typeof val_a !== 'string') val_a = '';
-      if (typeof val_b !== 'string') val_b = '';
+      if (valA !== '' && typeof valA === 'string') {
+        valA = metaData[`${orderBy}List`][valA].value;
+      }
+      if (valB !== '' && typeof valB === 'string') {
+        valB = metaData[`${orderBy}List`][valB].value;
+      }
+
+      if (typeof valA !== 'string') valA = '';
+      if (typeof valB !== 'string') valB = '';
     }
 
     desc = 0;
-    if (val_b < val_a) desc = -1;
-    if (val_b > val_a) desc = 1;
+    if (valB < valA) desc = -1;
+    if (valB > valA) desc = 1;
     if (field.order === 'asc') desc *= -1;
     if (desc !== 0) break;
   }
@@ -58,9 +63,7 @@ const stableSort = (array, cmp) => {
   return stabilizedThis.map((el) => el[0]);
 };
 
-const getSorting = (sort) => {
-  return (a, b) => desc(a, b, sort);
-};
+const getSorting = (sort) => (a, b) => descSort(a, b, sort);
 
 const getAdditionalCellProps = () => {
   let hasAdditionalCell = false;
@@ -83,10 +86,8 @@ export default class DataTable extends React.Component {
     super(props);
     this.state = {
       loadData: false,
-      hasAddMenu: true,
       page: 0,
       rowsPerPage: 100,
-      search: '',
       sort: [{ field: 'id', order: 'asc' }],
       groupBy: '',
       groupHide: {},
@@ -99,56 +100,104 @@ export default class DataTable extends React.Component {
       titleRow: '',
       secDataList: [],
       weekDescription: undefined,
-
-      isOpenedPopupEdit: false,
-      taskPopupEdit: undefined,
     };
 
-    this.setData = this.setData.bind(this);
-    this.setPage = this.setPage.bind(this);
     this.setSearch = this.setSearch.bind(this);
-    this.setSort = this.setSort.bind(this);
-    this.setEditID = this.setEditID.bind(this);
-    this.setEditItem = this.setEditItem.bind(this);
-    this.setShowFullTextID = this.setShowFullTextID.bind(this);
-    this.setRowsPerPage = this.setRowsPerPage.bind(this);
-    this.setHeadCells = this.setHeadCells.bind(this);
-    this.setIsOpenedPopupEdit = this.setIsOpenedPopupEdit.bind(this);
-    this.setWeekDescription = this.setWeekDescription.bind(this);
+  }
+
+  componentDidMount() {
+    this.unsubscribe = storage.state.subscribe(() => {
+      const { dataLoading } = storage.state.getState().STATE;
+      if (dataLoading && dataLoading === 'data') {
+        // default sort
+        const order = metaData.specificParameters.defaultSortDirection || 'desc';
+        const orderBy = metaData.specificParameters.defaultSortField || 'id';
+        let sort = [];
+        const sortSString = sessionStorage.getItem('sort');
+        if (sortSString) {
+          const sortObj = JSON.parse(sortSString);
+          if (Array.isArray(sortObj)) sort = sortObj;
+        } else {
+          orderBy.split(',').map((field, i) => sort.push({ field, order: order.split(',')[i] }));
+        }
+
+        let groupBy = '';
+        if (metaData.specificParameters && metaData.specificParameters.defaultGroupField) {
+          groupBy = metaData.specificParameters.defaultGroupField;
+        }
+
+        this.setState({
+          headCells: metaData.dataTable,
+          sort,
+          // search: '',
+          groupBy,
+          editID: -1,
+          data: filterTasks(true),
+          loadData: true,
+        });
+      }
+    });
+
+    this.unsubscribeData = storage.data.subscribe(() => {
+      if (storage.data.getState().DATA.redraw) {
+        this.setData(filterTasks());
+        this.setPage(0);
+      }
+    });
+
+    this.unsubscribeTable = storage.table.subscribe(() => {
+      this.setState({ loadData: false, secDataList: [], titleRow: '' });
+    });
+  }
+
+  componentWillUnmount() {
+    this.unsubscribe();
+    this.unsubscribeData();
+    this.unsubscribeTable();
   }
 
   setData = (data) => {
     this.setEditID(-1);
     this.setState({ data });
   };
+
   setPage = (page) => {
     this.setEditID(-1);
     this.setState({ page });
   };
+
   setOrder = (order) => {
     this.setState({ order });
   };
+
   setOrderBy = (orderBy) => {
     this.setState({ orderBy });
   };
+
   setEditID = (editID) => {
     this.setState({ editID });
   };
+
   setEditItem = (editItem) => {
     this.setState({ editItem });
   };
+
   setShowFullTextID = (showFullTextID) => {
     this.setState({ showFullTextID });
   };
+
   setRowsPerPage = (rowsPerPage) => {
     this.setState({ rowsPerPage });
   };
+
   setHeadCells = (headCells) => {
     this.setState({ headCells });
   };
+
   setWeekDescription = (weekDescription) => {
     this.setState({ weekDescription });
   };
+
   /* handle search */
   setSearch = (search) => {
     filters.data.commonFieldSearch = search;
@@ -157,21 +206,19 @@ export default class DataTable extends React.Component {
 
   /* handle change sort order */
   setSort = (field) => {
-    let sort = this.state.sort;
-    let sortFieldIndex = sort
-      .map((f) => {
-        return f.field;
-      })
-      .indexOf(field);
+    const { sort } = this.state;
+    const sortFieldIndex = sort.map((f) => f.field).indexOf(field);
     if (sortFieldIndex !== -1) {
-      sort[sortFieldIndex].order === 'asc'
-        ? (sort[sortFieldIndex].order = 'desc')
-        : sort.splice(sortFieldIndex, 1);
+      if (sort[sortFieldIndex].order === 'asc') {
+        sort[sortFieldIndex].order = 'desc';
+      } else {
+        sort.splice(sortFieldIndex, 1);
+      }
     } else {
-      sort.push({ field: field, order: 'asc' });
+      sort.push({ field, order: 'asc' });
     }
     sessionStorage.setItem('sort', JSON.stringify(sort));
-    this.setState({ sort: sort });
+    this.setState({ sort });
   };
 
   /* handle sort click */
@@ -181,17 +228,19 @@ export default class DataTable extends React.Component {
 
   /* handle group click */
   handleRequestGroup = (event, field) => {
-    const sort = this.state.sort;
+    const { sort } = this.state;
     if (field && field !== '' && sort.field !== field) {
-      field === 'week'
-        ? this.setState({
-            sort: [
-              { field: field, order: 'desc' },
-              { field: 'date', order: 'asc' },
-              { field: 'time', order: 'asc' },
-            ],
-          })
-        : this.setState({ sort: [{ field: field, order: 'asc' }] });
+      if (field === 'week') {
+        this.setState({
+          sort: [
+            { field, order: 'desc' },
+            { field: 'date', order: 'asc' },
+            { field: 'time', order: 'asc' },
+          ],
+        });
+      } else {
+        this.setState({ sort: [{ field, order: 'asc' }] });
+      }
     }
     this.setState({ groupBy: field, byWeek: false });
   };
@@ -215,12 +264,16 @@ export default class DataTable extends React.Component {
       const sortObj = JSON.parse(sortSString);
       if (Array.isArray(sortObj)) sort = sortObj;
     } else {
-      orderBy.split(',').map((field, i) => {
-        return sort.push({ field: field, order: order.split(',')[i] });
+      orderBy.split(',').forEach((field, i) => {
+        sort.push({ field, order: order.split(',')[i] });
       });
     }
 
-    this.setState({ sort: sort, groupBy: '', search: '' });
+    this.setState({
+      sort,
+      groupBy: '',
+      // search: ''
+    });
 
     if (metaData.specificParameters && metaData.specificParameters.defaultGroupField) {
       this.setState({ groupBy: metaData.specificParameters.defaultGroupField });
@@ -228,13 +281,7 @@ export default class DataTable extends React.Component {
   };
 
   /* get array index (main data table) from given main task/theme (etc) ID */
-  realID = (id) => {
-    return dataTable
-      .map((task) => {
-        return task.id;
-      })
-      .indexOf(id);
-  };
+  realID = (id) => dataTable.map((task) => task.id).indexOf(id);
 
   /* called after OK click in edit dialog */
   editTableRow = (id, rowData) => {
@@ -244,26 +291,28 @@ export default class DataTable extends React.Component {
         if (error) {
           errorResult = true;
         } else {
-          let realID = this.realID(id);
-          Object.keys(rowData).map((key) => {
-            return (dataTable[realID][key] = rowData[key]);
+          const realID = this.realID(id);
+          Object.keys(rowData).forEach((key) => {
+            dataTable[realID][key] = rowData[key];
           });
           this.setData(filterTasks());
           storage.upd.dispatch({ type: 'UPDATE', update: true });
         }
       })
       .then(() => {
-        errorResult
-          ? storage.alert.dispatch({
-              type: 'SHOW_ALERT',
-              status: 'fail',
-              message: 'Ошибка при изменении',
-            })
-          : storage.alert.dispatch({
-              type: 'SHOW_ALERT',
-              status: 'success',
-              message: 'Изменение успешно',
-            });
+        if (errorResult) {
+          storage.alert.dispatch({
+            type: 'SHOW_ALERT',
+            status: 'fail',
+            message: 'Ошибка при изменении',
+          });
+        } else {
+          storage.alert.dispatch({
+            type: 'SHOW_ALERT',
+            status: 'success',
+            message: 'Изменение успешно',
+          });
+        }
       });
     storage.alert.dispatch({
       type: 'SHOW_ALERT',
@@ -289,12 +338,12 @@ export default class DataTable extends React.Component {
     ).then((returnDataArray) => {
       let error = 0;
       let jsonOk = 1;
-      for (let returnData of returnDataArray) {
+      returnDataArray.forEach((returnData) => {
         const returnError = returnData[0];
         const returnJson = returnData[1];
         if (returnError) error = 1;
         if (!returnJson || !returnJson.data || !returnJson.data.id) jsonOk = 0;
-      }
+      });
 
       if (error) {
         storage.alert.dispatch({
@@ -309,9 +358,9 @@ export default class DataTable extends React.Component {
           message: 'Добавление успешно',
         });
 
-        for (let i in rowDataArray) {
-          let rowData = rowDataArray[i];
-          let json = returnDataArray[i][1];
+        for (let i = 0; i < rowDataArray.length; i++) {
+          const rowData = rowDataArray[i];
+          const json = returnDataArray[i][1];
 
           rowData.id = json.data.id;
           rowData.value = rowData[metaData.specificParameters.mainValue];
@@ -325,30 +374,6 @@ export default class DataTable extends React.Component {
       }
     });
   };
-
-  //chosenWeek = 0 - this week, 1 - next week, 2 - ...
-  copyPreviousWeekDiscussions(selectedWeek, chosenWeek) {
-    let weekData = dataTable.filter((row) => row.week === selectedWeek);
-
-    const infoArray = [];
-    for (const data of weekData) {
-      const info = { ...data }; //Don't forget to create REALLY new object
-      info.result = '';
-      info.status = 'new';
-      info.videoConf = '';
-
-      const newWeekDate = moment()
-        .startOf('week')
-        .day(moment(info.date).day() + 7 * chosenWeek);
-
-      info.date = moment(newWeekDate).format('YYYY-MM-DD');
-      info.week = moment(newWeekDate).format('YYYY.WW');
-
-      infoArray.push(info);
-    }
-
-    this.addTableRowArray(infoArray);
-  }
 
   /* called after OK click in DELETE dialog */
   deleteTableRow = (id) => {
@@ -364,7 +389,7 @@ export default class DataTable extends React.Component {
           errorResult = true;
         } else {
           this.setShowFullTextID(-1);
-          let realID = this.realID(id);
+          const realID = this.realID(id);
           dataTable.splice(realID, 1);
           this.setData(filterTasks());
 
@@ -372,27 +397,29 @@ export default class DataTable extends React.Component {
         }
       })
       .then(() => {
-        errorResult
-          ? storage.alert.dispatch({
-              type: 'SHOW_ALERT',
-              status: 'fail',
-              message: 'Ошибка при изменении',
-            })
-          : storage.alert.dispatch({
-              type: 'SHOW_ALERT',
-              status: 'success',
-              message: 'Удаление успешно',
-            });
+        if (errorResult) {
+          storage.alert.dispatch({
+            type: 'SHOW_ALERT',
+            status: 'fail',
+            message: 'Ошибка при изменении',
+          });
+        } else {
+          storage.alert.dispatch({
+            type: 'SHOW_ALERT',
+            status: 'success',
+            message: 'Удаление успешно',
+          });
+        }
       });
   };
 
   /* called after inline edit of something */
-  inlineEditOk = (id) => (event) => {
-    let editProperty = this.state.editItem;
-    let realID = this.realID(id);
-    let rowData = {};
-    Object.keys(dataTable[realID]).map((key) => {
-      return (rowData[key] = dataTable[realID][key]);
+  inlineEditOk = (id) => () => {
+    const editProperty = this.state.editItem;
+    const realID = this.realID(id);
+    const rowData = {};
+    Object.keys(dataTable[realID]).forEach((key) => {
+      rowData[key] = dataTable[realID][key];
     });
     rowData[editProperty] = this[`edit-${editProperty}-${id}`].value;
 
@@ -415,7 +442,7 @@ export default class DataTable extends React.Component {
           message: 'Изменение успешно',
         });
 
-        //dataTable[realID][editProperty] = this[`edit-${editProperty}-${id}`].value;
+        // dataTable[realID][editProperty] = this[`edit-${editProperty}-${id}`].value;
         dataTable[realID][editProperty] = rowData[editProperty];
         this.setData(filterTasks());
       }
@@ -423,10 +450,10 @@ export default class DataTable extends React.Component {
   };
 
   dialogEditOk = (id, editProperty, editPropertyValue) => {
-    let realID = this.realID(id);
-    let rowData = {};
-    Object.keys(dataTable[realID]).map((key) => {
-      return (rowData[key] = dataTable[realID][key]);
+    const realID = this.realID(id);
+    const rowData = {};
+    Object.keys(dataTable[realID]).forEach((key) => {
+      rowData[key] = dataTable[realID][key];
     });
     rowData[editProperty] = editPropertyValue;
 
@@ -457,14 +484,14 @@ export default class DataTable extends React.Component {
 
   /* called after set task/theme etc status as DONE */
   completeTableRow = (id) => {
-    let realID = this.realID(id);
-    let task = {};
-    Object.keys(dataTable[realID]).map((key) => {
-      return (task[key] = dataTable[realID][key]);
+    const realID = this.realID(id);
+    const task = {};
+    Object.keys(dataTable[realID]).forEach((key) => {
+      task[key] = dataTable[realID][key];
     });
     task.status = 'done';
 
-    let today = new Date();
+    const today = new Date();
     task.dateEnd = today.toISOString().replace(/(.+)T(.+)/, '$1');
 
     storage.alert.dispatch({
@@ -494,15 +521,15 @@ export default class DataTable extends React.Component {
   };
 
   setStatusTableRow = (id, status) => {
-    let realID = this.realID(id);
-    let task = {};
-    Object.keys(dataTable[realID]).map((key) => {
-      return (task[key] = dataTable[realID][key]);
+    const realID = this.realID(id);
+    const task = {};
+    Object.keys(dataTable[realID]).forEach((key) => {
+      task[key] = dataTable[realID][key];
     });
     task.status = status;
 
     if (status === 'done') {
-      let today = new Date();
+      const today = new Date();
       task.dateEnd = today.toISOString().replace(/(.+)T(.+)/, '$1');
     }
 
@@ -533,16 +560,19 @@ export default class DataTable extends React.Component {
   };
 
   /* handle show full text row */
-  showFullText = (id) => (event) => {
-    this.state.showFullTextID === id ? this.setShowFullTextID(-1) : this.setShowFullTextID(id);
+  showFullText = (id) => () => {
+    if (this.state.showFullTextID === id) {
+      return this.setShowFullTextID(-1);
+    }
+    return this.setShowFullTextID(id);
   };
 
   /* go to linked table (questions, discussion) for given task */
   loadLinked = async (id, loadTableName) => {
-    let mainTable = metaData.dataTableName;
+    const mainTable = metaData.dataTableName;
     storage.table.dispatch({ type: 'SET_TABLE', tableName: metaData.dataTableName });
 
-    let data = await getData(mainTable, 'direct', { id: id });
+    const data = await getData(mainTable, 'direct', { id });
 
     this.props.reloadDataTable(loadTableName, () => {
       filters.data.idTask = id;
@@ -554,7 +584,7 @@ export default class DataTable extends React.Component {
 
   /* show results */
   showResults = async (id, loadTableName = 'discussion') => {
-    let data = await getData(loadTableName, 'direct', {
+    const data = await getData(loadTableName, 'direct', {
       idTask: id,
       mainTable: metaData.dataTableName,
     });
@@ -580,19 +610,19 @@ export default class DataTable extends React.Component {
 
   /* add 'linked' data: question for tasks, discussion for theme, etc */
   addLinkedData = (id, type, infoData) => {
-    let realID = this.realID(id);
-    let linkedData = {};
-    let metaTable = metaData.tables[`${type}_meta`];
+    const realID = this.realID(id);
+    const linkedData = {};
+    const metaTable = metaData.tables[`${type}_meta`];
 
-    for (let prop in metaTable.dataTable) {
+    metaTable.dataTable.forEach((prop) => {
       if (metaTable.dataTable[prop].defaultValue) {
         linkedData[prop] = getDefaultValues(realID, prop, metaTable.dataTable);
       }
-    }
+    });
 
-    for (let prop in infoData) {
+    infoData.forEach((prop) => {
       linkedData[prop] = infoData[prop];
-    }
+    });
 
     storage.alert.dispatch({
       type: 'SHOW_ALERT',
@@ -631,46 +661,34 @@ export default class DataTable extends React.Component {
     } else {
       this.setState({ showAddRows: id });
 
-      let secDataList = [];
+      const secDataList = [];
       field = 'taskgroup';
 
       if (metaData.dataTableName === 'discussion') {
-        let realID = this.realID(id);
+        const realID = this.realID(id);
         id = dataTable[realID].idTask;
       }
 
-      let data = await getData(dataListName, 'direct', { [field]: id });
+      const data = await getData(dataListName, 'direct', { [field]: id });
       data
-        .filter((task) => {
-          return parseInt(task[field]) === parseInt(id) && task.status !== 'done';
-        })
-        .sort((a, b) => {
-          return a.value <= b.value ? -1 : 1;
-        })
-        .map((info) => {
-          return secDataList.push({ id: info.id, value: info.value });
+        .filter((task) => parseInt(task[field], 10) === parseInt(id, 10) && task.status !== 'done')
+        .sort((a, b) => (a.value <= b.value ? -1 : 1))
+        .forEach((info) => {
+          secDataList.push({ id: info.id, value: info.value });
         });
 
-      this.setState({
-        secDataList: secDataList.map((task) => {
-          return { string: ` ${task.value}` };
-        }),
-      });
+      this.setState({ secDataList: secDataList.map((task) => ({ string: ` ${task.value}` })) });
     }
   };
 
-  menuActionLoadDiscussions = (id) => {
-    return this.loadLinked(id, 'discussion');
-  };
+  menuActionLoadDiscussions = (id) => this.loadLinked(id, 'discussion');
 
-  menuActionLoadThemeTasks = (id) => {
-    return this.loadSecondaryList(id, metaData.dataTableName, 'task');
-  };
+  menuActionLoadThemeTasks = (id) => this.loadSecondaryList(id, metaData.dataTableName, 'task');
 
   /* handle send notifiction */
   sendNotification = (id) => {
-    let rowData = {
-      id: id,
+    const rowData = {
+      id,
       mode: 'notify',
       feature: metaData.dataTableName,
     };
@@ -681,17 +699,19 @@ export default class DataTable extends React.Component {
       message: 'Идёт отправка уведомлений...',
     });
     doData('notify', rowData, id, 'notification').then(([error]) => {
-      error
-        ? storage.alert.dispatch({
-            type: 'SHOW_ALERT',
-            status: 'fail',
-            message: 'Ошибка при отправке уведомления',
-          })
-        : storage.alert.dispatch({
-            type: 'SHOW_ALERT',
-            status: 'success',
-            message: 'Уведомление послано успешно',
-          });
+      if (error) {
+        storage.alert.dispatch({
+          type: 'SHOW_ALERT',
+          status: 'fail',
+          message: 'Ошибка при отправке уведомления',
+        });
+      } else {
+        storage.alert.dispatch({
+          type: 'SHOW_ALERT',
+          status: 'success',
+          message: 'Уведомление послано успешно',
+        });
+      }
     });
   };
 
@@ -708,28 +728,29 @@ export default class DataTable extends React.Component {
     };
     if (date) data.date = date;
     doData('notify', data, undefined, 'notification').then(([error]) => {
-      error
-        ? storage.alert.dispatch({
-            type: 'SHOW_ALERT',
-            status: 'fail',
-            message: 'Ошибка при отправке уведомления',
-          })
-        : storage.alert.dispatch({
-            type: 'SHOW_ALERT',
-            status: 'success',
-            message: 'Уведомление послано успешно',
-          });
+      if (error) {
+        storage.alert.dispatch({
+          type: 'SHOW_ALERT',
+          status: 'fail',
+          message: 'Ошибка при отправке уведомления',
+        });
+      } else {
+        storage.alert.dispatch({
+          type: 'SHOW_ALERT',
+          status: 'success',
+          message: 'Уведомление послано успешно',
+        });
+      }
     });
   };
 
   /* create action menu list (edit/delete/done, etc) */
   actionMenuList = () => {
-    let menuList = [];
-    if (metaData.specificParameters.hasQuestions) {
-
-    }
+    const menuList = [];
+    // if (metaData.specificParameters.hasQuestions) {
+    // }
     if (metaData.specificParameters.haveDiscussion) {
-      let action = {
+      const action = {
         id: 'discussion',
         value: 'Добавить обсуждение',
         type: 'discussion',
@@ -738,7 +759,7 @@ export default class DataTable extends React.Component {
       menuList.push(action);
     }
     if (metaData.specificParameters.hasGoToDiscussion) {
-      let action = {
+      const action = {
         id: 'goToDiscussion',
         value: 'Связанные обсуждения',
         type: 'discussion',
@@ -747,7 +768,7 @@ export default class DataTable extends React.Component {
       menuList.push(action);
     }
     if (metaData.specificParameters.hasSublistData) {
-      let action = {
+      const action = {
         id: 'secDataList',
         value: 'Связанные задачи',
         action: this.menuActionLoadThemeTasks,
@@ -756,7 +777,7 @@ export default class DataTable extends React.Component {
       menuList.push({ id: 'divider' });
     }
     if (metaData.specificParameters.hasEditMenu) {
-      let action = {
+      const action = {
         id: 'tasks_edit',
         value: 'Редактировать',
         actionName: 'Редактирование',
@@ -766,7 +787,7 @@ export default class DataTable extends React.Component {
       menuList.push(action);
     }
     if (metaData.specificParameters.hasSetStatusMenu) {
-      let action = {
+      const action = {
         id: 'tasks_status',
         value: 'Изменить статус',
         actionName: 'Изменить статус',
@@ -777,7 +798,7 @@ export default class DataTable extends React.Component {
       menuList.push(action);
     }
     if (metaData.specificParameters.hasDeleteButton) {
-      let action = {
+      const action = {
         id: 'tasks_delete',
         value: 'Удалить',
         actionName: 'Удаление',
@@ -787,7 +808,7 @@ export default class DataTable extends React.Component {
     }
     if (metaData.specificParameters.hasNotificationButton) {
       menuList.push({ id: 'divider' });
-      let action = {
+      const action = {
         id: 'notification',
         value: 'Отправить уведомление',
         action: this.sendNotification,
@@ -795,7 +816,7 @@ export default class DataTable extends React.Component {
       menuList.push(action);
     }
     if (metaData.specificParameters.hasShowResults) {
-      let action = {
+      const action = {
         id: 'showThemeResults',
         value: 'История обсуждений',
         type: 'discussion',
@@ -807,15 +828,15 @@ export default class DataTable extends React.Component {
     return menuList;
   };
 
-  setIsOpenedPopupEdit = (taskID, state = true) => {
-    console.log(taskID, state);
+  // setIsOpenedPopupEdit = (taskID, state = true) => {
+  //   console.log(taskID, state);
 
-    this.setState({ taskPopupEdit: taskID });
-    this.setState({ isOpenedPopupEdit: state });
-  };
+  //   this.setState({ taskPopupEdit: taskID });
+  //   this.setState({ isOpenedPopupEdit: state });
+  // };
 
   getDateGroup = (date) => {
-    let weekNum = this.state.byWeek ? moment(date, 'YYYY-MM-DD').week() : date;
+    const weekNum = this.state.byWeek ? moment(date, 'YYYY-MM-DD').week() : date;
     return weekNum;
   };
 
@@ -828,64 +849,44 @@ export default class DataTable extends React.Component {
     }
   };
 
-  componentDidMount() {
-    this.unsubscribe = storage.state.subscribe(() => {
-      let dataLoading = storage.state.getState().STATE.dataLoading;
-      if (dataLoading && dataLoading === 'data') {
-        // default sort
-        const order = metaData.specificParameters.defaultSortDirection || 'desc';
-        const orderBy = metaData.specificParameters.defaultSortField || 'id';
-        let sort = [];
-        const sortSString = sessionStorage.getItem('sort');
-        if (sortSString) {
-          const sortObj = JSON.parse(sortSString);
-          if (Array.isArray(sortObj)) sort = sortObj;
-        } else {
-          orderBy.split(',').map((field, i) => {
-            return sort.push({ field: field, order: order.split(',')[i] });
-          });
-        }
+  // chosenWeek = 0 - this week, 1 - next week, 2 - ...
+  copyPreviousWeekDiscussions(selectedWeek, chosenWeek) {
+    const weekData = dataTable.filter((row) => row.week === selectedWeek);
 
-        let groupBy = '';
-        if (metaData.specificParameters && metaData.specificParameters.defaultGroupField) {
-          groupBy = metaData.specificParameters.defaultGroupField;
-        }
+    const infoArray = [];
+    weekData.forEach((data) => {
+      const info = { ...data };
+      info.result = '';
+      info.status = 'new';
+      info.videoConf = '';
 
-        this.setState({
-          headCells: metaData.dataTable,
-          sort: sort,
-          search: '',
-          groupBy: groupBy,
-          editID: -1,
-          data: filterTasks(true),
-          loadData: true,
-        });
-      }
+      const newWeekDate = moment()
+        .startOf('week')
+        .day(moment(info.date).day() + 7 * chosenWeek);
+
+      info.date = moment(newWeekDate).format('YYYY-MM-DD');
+      info.week = moment(newWeekDate).format('YYYY.WW');
+
+      infoArray.push(info);
     });
 
-    this.unsubscribeData = storage.data.subscribe(() => {
-      if (storage.data.getState().DATA.redraw) {
-        this.setData(filterTasks());
-        this.setPage(0);
-      }
-    });
-
-    this.unsubscribeTable = storage.table.subscribe(() => {
-      this.setState({ loadData: false, secDataList: [], titleRow: '' });
-    });
-  }
-
-  componentWillUnmount() {
-    this.unsubscribe();
-    this.unsubscribeData();
-    this.unsubscribeTable();
+    this.addTableRowArray(infoArray);
   }
 
   render() {
-    const { page, order, orderBy, sort, groupBy, headCells, weekDescription } = this.state;
-    let { rowsPerPage, data, secDataList } = this.state;
-    let groupList = {};
-    let { groupHide } = this.state;
+    const {
+      page,
+      order,
+      orderBy,
+      sort,
+      groupBy,
+      headCells,
+      weekDescription,
+      secDataList,
+      groupHide,
+    } = this.state;
+    let { rowsPerPage, data } = this.state;
+    const groupList = {};
     let d = new Date();
     d = d.toLocaleDateString().replace(/(\d+).(\d+).(\d+)/, '$3-$2-$1');
 
@@ -897,9 +898,8 @@ export default class DataTable extends React.Component {
 
     const hasAdditionalCell = getAdditionalCellProps();
     const fullColsNum =
-      Object.values(metaData.dataTable).filter((a) => {
-        return a.showInTable;
-      }).length + (hasAdditionalCell ? 1 : 0);
+      Object.values(metaData.dataTable).filter((a) => a.showInTable).length +
+      (hasAdditionalCell ? 1 : 0);
 
     return this.state.loadData ? (
       <Table size="small" stickyHeader className="data-table__table">
@@ -913,8 +913,8 @@ export default class DataTable extends React.Component {
             onRequestSort={this.handleRequestSort}
             onRequestGroup={this.handleRequestGroup}
             rowCount={data.length}
-            onFilter={(data) => {
-              this.setData(data);
+            onFilter={(_data) => {
+              this.setData(_data);
               this.setPage(0);
             }}
             headCells={headCells}
@@ -985,7 +985,7 @@ export default class DataTable extends React.Component {
                     date = moment(row.date, 'YYYY-MM-DD');
                   }
 
-                  let groupField = this.getDateGroup(row[groupBy]);
+                  const groupField = this.getDateGroup(row[groupBy]);
                   if (!groupList[groupField]) {
                     groupList[groupField] = 1;
                     showGroupByRow = true;
@@ -994,15 +994,14 @@ export default class DataTable extends React.Component {
                   if (headCells[groupBy].type === 'date') {
                     dayName = `${date.format('dddd')}
 ${date.format('DD MMMM')}`;
-                    //dayName = date.format('dddd') + '<br>' + date.format('DD MMMM');
+                    // dayName = date.format('dddd') + '<br>' + date.format('DD MMMM');
                     groupValue = date.format('DD MMMM YYYY');
                   } else if (groupBy === 'week') {
                     dayName = `${date.format('dddd')}
 ${date.format('DD MMMM')}`;
-                    groupValue =
-                      date.startOf('week').format('DD MMMM YYYY') +
-                      ' - ' +
-                      date.endOf('week').format('DD MMMM YYYY');
+                    groupValue = `${date.startOf('week').format('DD MMMM YYYY')} - ${date
+                      .endOf('week')
+                      .format('DD MMMM YYYY')}`;
                   } else {
                     groupValue = metaData[`${groupBy}List`]
                       ? metaData[`${groupBy}List`][row[groupBy]].value
@@ -1010,9 +1009,9 @@ ${date.format('DD MMMM')}`;
                   }
                 }
 
-                //big text data, like description, change_all. get Index of cell where Icon for click, value && property name
-                let fullText = { display: false };
-                for (let property of Object.values(headCells)) {
+                // big text data, like description, change_all. get Index of cell where Icon for click, value && property name
+                const fullText = { display: false };
+                Object.values(headCells).forEach((property) => {
                   if (
                     property.type === 'fulltext' &&
                     row[property.id] !== '' &&
@@ -1024,7 +1023,7 @@ ${date.format('DD MMMM')}`;
                     fullText.display = true;
                     fullText.fullTextIndexCell = property.tableIndex;
                   }
-                }
+                });
 
                 let ZoomLink = '';
                 if (
@@ -1059,11 +1058,11 @@ ${date.format('DD MMMM')}`;
                         groupBy={groupBy}
                         groupValue={groupValue}
                         groupHide={groupHide}
-                        setGroup={(groupHide) => {
-                          this.setState({ groupHide: groupHide });
+                        setGroup={(_groupHide) => {
+                          this.setState({ groupHide: _groupHide });
                         }}
                         row={row}
-                        weekData={dataTable.filter((r) => r.week === row.week )}
+                        weekData={dataTable.filter((r) => r.week === row.week)}
                         getDateGroup={this.getDateGroup}
                         sendNotification={(id, day) => {
                           this.sendNotificationWeekDate(id, day);
@@ -1094,11 +1093,9 @@ ${date.format('DD MMMM')}`;
                     >
                       {Object.values(headCells)
                         .filter((a) => a.showInTable)
-                        .sort((a, b) => {
-                          return a.tableIndex >= b.tableIndex ? 1 : -1;
-                        })
+                        .sort((a, b) => (a.tableIndex >= b.tableIndex ? 1 : -1))
                         .map((headCell, index) => {
-                          let property = headCell.id;
+                          const property = headCell.id;
                           let value =
                             groupBy &&
                             groupBy !== '' &&
@@ -1110,7 +1107,7 @@ ${date.format('DD MMMM')}`;
                             value = value.replace(/(\d\d:\d\d):\d\d/, '$1');
                           if (headCell.id === 'mainTable')
                             value = metaData.tables[`${value}_meta`].specificParameters.tableName;
-                          let id = row.id;
+                          const { id } = row;
                           let whiteSpace = '';
                           if (['datetime', 'date', 'time'].indexOf(headCell.type) !== -1) {
                             whiteSpace = 'nowrap';
@@ -1133,8 +1130,8 @@ ${date.format('DD MMMM')}`;
                                 align="left"
                                 padding="none"
                                 style={{
-                                  whiteSpace: whiteSpace,
-                                  paddingLeft: paddingLeft,
+                                  whiteSpace,
+                                  paddingLeft,
                                   fontSize: 'var(--font-size-table)',
                                 }}
                               >
@@ -1164,11 +1161,13 @@ ${date.format('DD MMMM')}`;
                                     autoFocus
                                     defaultValue={value}
                                     ref={`edit-${property}-${id}`}
-                                    inputRef={(el) => (this[`edit-${property}-${id}`] = el)}
+                                    inputRef={(el) => {
+                                      this[`edit-${property}-${id}`] = el;
+                                    }}
                                     inputProps={{
                                       style: { fontSize: 'var(--font-size-table)' },
                                     }}
-                                    /*edit item ok / cancel buttons*/
+                                    /* edit item ok / cancel buttons */
                                     endAdornment={
                                       <InputAdornment position="end">
                                         <div className="data-table__cell-edit-buttons">
@@ -1186,7 +1185,7 @@ ${date.format('DD MMMM')}`;
                                         </div>
                                       </InputAdornment>
                                     }
-                                    fullWidth={true}
+                                    fullWidth
                                   />
                                 )}
 
@@ -1273,7 +1272,7 @@ ${date.format('DD MMMM')}`;
                                     {/* <DescriptionIcon fontSize={fontSize}/>} */}
                                     {value
                                       .split(',')
-                                      .map((d) => metaData[`${property}List`][d]?.value || d)
+                                      .map((_d) => metaData[`${property}List`][_d]?.value || _d)
                                       .join(', ')}
                                   </div>
                                 )}
@@ -1286,8 +1285,8 @@ ${date.format('DD MMMM')}`;
                                   padding="none"
                                   style={{
                                     width: '10px',
-                                    whiteSpace: whiteSpace,
-                                    paddingLeft: paddingLeft,
+                                    whiteSpace,
+                                    paddingLeft,
                                     borderBottom:
                                       (this.state.showFullTextID === row.id ||
                                         (weekDescription && weekDescription === row.week)) &&
@@ -1333,14 +1332,26 @@ ${date.format('DD MMMM')}`;
                     {(this.state.showFullTextID === row.id ||
                       (weekDescription && weekDescription === row.week)) &&
                       fullText.display && (
-                        <Suspense fallback={<TableRow><TableCell>...</TableCell></TableRow>}>
+                        <Suspense
+                          fallback={
+                            <TableRow>
+                              <TableCell>...</TableCell>
+                            </TableRow>
+                          }
+                        >
                           <TblFullTextRow data={fullText} headCells={headCells} id={row.id} />
                         </Suspense>
                       )}
 
                     {/* Secondary List: show and hide */}
                     {this.state.showAddRows === row.id && !groupHide[row[groupBy]] && (
-                      <Suspense fallback={<TableRow><TableCell>...</TableCell></TableRow>}>
+                      <Suspense
+                        fallback={
+                          <TableRow>
+                            <TableCell>...</TableCell>
+                          </TableRow>
+                        }
+                      >
                         <TblSecondaryList
                           secDataList={secDataList}
                           fullColsNum={fullColsNum}

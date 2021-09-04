@@ -3,9 +3,13 @@ import { TextField, Tooltip, Button } from '@material-ui/core';
 import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
 import MomentUtils from '@date-io/moment';
 import moment from 'moment';
-import { MuiPickersUtilsProvider, KeyboardDatePicker, KeyboardTimePicker } from '@material-ui/pickers';
+import {
+  MuiPickersUtilsProvider,
+  KeyboardDatePicker,
+  KeyboardTimePicker,
+} from '@material-ui/pickers';
 
-import { dataTable, metaData, filters } from '../../config/data';
+import { dataTable, metaData } from '../../config/data';
 import { doData } from '../../utils/api';
 import storage from '../../storages/commonStorage';
 import CustomSelect from '../../SharedComponents/CustomSelect';
@@ -23,16 +27,38 @@ export default class DataAdd extends React.PureComponent {
       selectDialogOptions: [],
     };
     this._dialogSelect = React.createRef();
-    for (let key in metaData.dataTable) {
-      let field = metaData.dataTable[key];
-      if (!field.addMenuIndex || parseInt(field.addMenuIndex) === 0) continue;
 
-      this.state[key] = '';
-      this.state[`${key}Err`] = false;
-      if (metaData.dataTable[key].type === 'select') {
-        this.state[`${key}s`] = '';
+    Object.keys(metaData.dataTable).forEach((key) => {
+      const field = metaData.dataTable[key];
+      if (field.addMenuIndex && !parseInt(field.addMenuIndex, 10)) {
+        this.state[key] = '';
+        this.state[`${key}Err`] = false;
+        if (metaData.dataTable[key].type === 'select') {
+          this.state[`${key}s`] = '';
+        }
       }
-    }
+    });
+  }
+
+  componentDidMount() {
+    this.unsubscribe = storage.state.subscribe(() => {
+      const { dataLoading } = storage.state.getState().STATE;
+      if (dataLoading && dataLoading === 'root') {
+        this.setState({ developers: metaData.developerList });
+      }
+      //   if (dataLoading && dataLoading === 'meta') {
+      if (dataLoading && dataLoading === 'data') {
+        this.setState({
+          developers: metaData.developerList,
+          hasAddMenu: metaData.specificParameters.hasAddMenu,
+          addMenuTitle: metaData.specificParameters.addMenuTitle,
+        });
+      }
+    });
+  }
+
+  componentWillUnmount() {
+    this.unsubscribe();
   }
 
   addTask = () => {
@@ -42,46 +68,40 @@ export default class DataAdd extends React.PureComponent {
       message: 'Идёт добавление информации в БД...',
     });
 
-    let task = {
-      id:
-        parseInt(
-          dataTable
-            .map((task) => task.id)
-            .sort((a, b) => {
-              return b - a;
-            })[0]
-        ) + 1,
+    const task = {
+      id: parseInt(dataTable.map((t) => t.id).sort((a, b) => b - a)[0], 10) + 1,
     };
 
     // check empty fields in bottom menu
     let emptyDataError = false;
-    for (let key in metaData.dataTable) {
-      let field = metaData.dataTable[key];
-      if (!field.addMenuIndex || parseInt(field.addMenuIndex) === 0) continue;
-
-      let objName = `_addTask${field.id}`;
-      if (this[objName]) {
-        if (this[objName].value === '') {
-          this.setState({ [`${key}Err`]: true });
-          this[objName].focus();
-          emptyDataError = true;
-        } else {
-          this.setState({ [`${key}Err`]: false });
-          task[key] = this[objName].value;
-        }
-      } else if (this.refs[objName]) {
-        if (!this.state[key] || this.state[key] === '') {
-          this.setState({ [`${key}Err`]: true });
-          this.refs[objName].setState({ valueErr: true });
-          this.refs[objName].setFocus();
-          emptyDataError = true;
-        } else {
-          this.setState({ [`${key}Err`]: false });
-          this.refs[objName].setState({ valueErr: false });
-          task[key] = this.state[key];
+    Object.keys(metaData.dataTable).forEach((key) => {
+      const field = metaData.dataTable[key];
+      const state = this.state[key];
+      if (!field.addMenuIndex || parseInt(field.addMenuIndex, 10) === 0) {
+        const objName = `_addTask${field.id}`;
+        if (this[objName]) {
+          if (this[objName].value === '') {
+            this.setState({ [`${key}Err`]: true });
+            this[objName].focus();
+            emptyDataError = true;
+          } else {
+            this.setState({ [`${key}Err`]: false });
+            task[key] = this[objName].value;
+          }
+        } else if (this.refs[objName]) {
+          if (!state || state === '') {
+            this.setState({ [`${key}Err`]: true });
+            this.refs[objName].setState({ valueErr: true });
+            this.refs[objName].setFocus();
+            emptyDataError = true;
+          } else {
+            this.setState({ [`${key}Err`]: false });
+            this.refs[objName].setState({ valueErr: false });
+            task[key] = state;
+          }
         }
       }
-    }
+    });
 
     if (!emptyDataError) {
       if (metaData.dataTableName === 'discussion') {
@@ -90,9 +110,10 @@ export default class DataAdd extends React.PureComponent {
         task.participants = task.responsible;
 
         const now = moment();
-        task.date = DateW.toDateTimeStr('date', this.state.date || now);
-        task.time = DateW.toDateTimeStr('time', this.state.time || now);
-        task.week = new DateW(this.state.date || now).getYearWeekStr();
+        const { date, time } = this.state;
+        task.date = DateW.toDateTimeStr('date', date || now);
+        task.time = DateW.toDateTimeStr('time', time || now);
+        task.week = new DateW(date || now).getYearWeekStr();
       }
 
       // set default values
@@ -122,45 +143,47 @@ export default class DataAdd extends React.PureComponent {
       });
 
       doData('put', task, undefined, metaData.dataTableName).then(([error, json]) => {
+        console.log(json);
         if (error) {
           storage.alert.dispatch({
             type: 'SHOW_ALERT',
             status: 'fail',
             message: 'Ошибка при добавлении',
           });
-        } else if (json && json.data && json.data.id) {
+        } else if (json && json.id) {
           storage.alert.dispatch({
             type: 'SHOW_ALERT',
             status: 'success',
             message: 'Добавление успешно',
           });
-          task.id = json.data.id;
+          task.id = json.id;
           task.value = task[metaData.specificParameters.mainValue];
           if (metaData[`${metaData.dataTableName}List`]) {
             metaData[`${metaData.dataTableName}List`][task.id] = task;
           }
           dataTable.push(task);
 
-          //redraw table after adding row
+          // redraw table after adding row
           storage.data.dispatch({ type: 'REDRAW', redraw: true });
 
-          for (let key in metaData.dataTable) {
-            let field = metaData.dataTable[key];
-            if (!field.addMenuIndex || parseInt(field.addMenuIndex) === 0) continue;
-            let objName = `_addTask${field.id}`;
+          Object.keys(metaData.dataTable).forEach((key) => {
+            const field = metaData.dataTable[key];
+            if (!field.addMenuIndex || parseInt(field.addMenuIndex, 10) === 0) {
+              const objName = `_addTask${field.id}`;
 
-            //clear states
-            this.setState({ [`${key}Err`]: false });
-            this.setState({ [key]: '' });
+              // clear states
+              this.setState({ [`${key}Err`]: false });
+              this.setState({ [key]: '' });
 
-            //clear fields
-            if (this[objName]) {
-              this[objName].value = '';
-            } else if (this.refs[objName]) {
-              this.refs[objName].setState({ valueErr: false });
-              this.refs[objName].setState({ value: null });
+              // clear fields
+              if (this[objName]) {
+                this[objName].value = '';
+              } else if (this.refs[objName]) {
+                this.refs[objName].setState({ valueErr: false });
+                this.refs[objName].setState({ value: null });
+              }
             }
-          }
+          });
         } else {
           storage.alert.dispatch({
             type: 'SHOW_ALERT',
@@ -180,51 +203,28 @@ export default class DataAdd extends React.PureComponent {
   };
 
   handleDateClick = (field) => (value) => {
-    this.setState({[field]: value});
-  }
-
-  componentDidMount() {
-    this.unsubscribe = storage.state.subscribe(() => {
-      let dataLoading = storage.state.getState().STATE.dataLoading;
-      if (dataLoading && dataLoading === 'root') {
-        this.setState({ developers: metaData.developerList });
-      }
-    //   if (dataLoading && dataLoading === 'meta') {
-      if (dataLoading && dataLoading === 'data') {
-        this.setState({
-          developers: metaData.developerList,
-          hasAddMenu: metaData.specificParameters.hasAddMenu,
-          addMenuTitle: metaData.specificParameters.addMenuTitle,
-        });
-      }
-    });
-  }
-
-  componentWillUnmount() {
-    this.unsubscribe();
-  }
+    this.setState({ [field]: value });
+  };
 
   render() {
-    const { developers, addMenuTitle } = this.state;
-    const textFieldClass = `data-add__text-field${metaData.dataTableName === 'discussion' && '_discussion'}`;
+    const { developers, addMenuTitle, hasAddMenu } = this.state;
+    const textFieldClass = `data-add__text-field${
+      metaData.dataTableName === 'discussion' && '_discussion'
+    }`;
 
     return (
       <>
-        {this.state.hasAddMenu && (
+        {hasAddMenu && (
           <div className="data-add">
             <div className="data-add__title">
               <b>{addMenuTitle}</b>
             </div>
 
             {Object.values(metaData.dataTable)
-              .filter((field) => {
-                return field.addMenuIndex && parseInt(field.addMenuIndex) > 0;
-              })
-              .sort((a, b) => {
-                return parseInt(a.addMenuIndex) - parseInt(b.addMenuIndex);
-              })
+              .filter((field) => field.addMenuIndex && parseInt(field.addMenuIndex, 10) > 0)
+              .sort((a, b) => parseInt(a.addMenuIndex, 10) - parseInt(b.addMenuIndex, 10))
               .map((field) => {
-                let objName = `_addTask${field.id}`;
+                const objName = `_addTask${field.id}`;
 
                 return (
                   <Fragment key={field.id}>
@@ -232,18 +232,14 @@ export default class DataAdd extends React.PureComponent {
                       <CustomSelect
                         style={{ width: '200px', marginTop: '-4px' }}
                         options={Object.values(developers)
-                          .sort((a, b) => {
-                            return a['value'] >= b['value'] ? 1 : -1;
-                          })
-                          .map((developer) => {
-                            return { value: developer.id, label: developer.value };
-                          })}
+                          .sort((a, b) => (a.value >= b.value ? 1 : -1))
+                          .map((developer) => ({ value: developer.id, label: developer.value }))}
                         refName={objName}
                         ref={objName}
-                        inputRef={(el) => (this[objName] = el)}
-                        setValue={(value) => {
-                          return this.setState({ [field.id]: value });
+                        inputRef={(el) => {
+                          this[objName] = el;
                         }}
+                        setValue={(value) => this.setState({ [field.id]: value })}
                         label={`${field.value}*`}
                       />
                     )}
@@ -252,30 +248,34 @@ export default class DataAdd extends React.PureComponent {
                       <div className={textFieldClass}>
                         <TextField
                           required
-                          fullWidth={true}
+                          fullWidth
                           placeholder={field.value}
-                          error={this.state[`${field.id}Err`] ? true : false}
+                          error={!!this.state[`${field.id}Err`]}
                           ref={objName}
-                          inputRef={(el) => (this[objName] = el)}
+                          inputRef={(el) => {
+                            this[objName] = el;
+                          }}
                         />
                       </div>
                     )}
 
-                    {field.type === 'date' &&
+                    {field.type === 'date' && (
                       <MuiPickersUtilsProvider utils={MomentUtils}>
                         <KeyboardDatePicker
                           format="YYYY-MM-DD"
                           margin="normal"
                           value={this.state[field.id] || new Date()}
                           onChange={this.handleDateClick(field.id)}
-                          style={{ width: "140px", margin: "0 0 9px 0" }}
+                          style={{ width: '140px', margin: '0 0 9px 0' }}
                           className="tbl-header-btn-menu__datepicker"
-                          inputRef={(el) => (this[objName] = el)}
+                          inputRef={(el) => {
+                            this[objName] = el;
+                          }}
                         />
                       </MuiPickersUtilsProvider>
-                    }
+                    )}
 
-                    {field.type === 'time' &&
+                    {field.type === 'time' && (
                       <MuiPickersUtilsProvider utils={MomentUtils}>
                         <KeyboardTimePicker
                           format="HH:mm:ss"
@@ -284,12 +284,14 @@ export default class DataAdd extends React.PureComponent {
                           margin="normal"
                           value={this.state[field.id] || new Date()}
                           onChange={this.handleDateClick(field.id)}
-                          style={{ width: "97px", margin: "0 0 9px 0" }}
+                          style={{ width: '97px', margin: '0 0 9px 0' }}
                           className="tbl-header-btn-menu__datepicker"
-                          inputRef={(el) => (this[objName] = el)}
+                          inputRef={(el) => {
+                            this[objName] = el;
+                          }}
                         />
                       </MuiPickersUtilsProvider>
-                    }
+                    )}
                   </Fragment>
                 );
               })}

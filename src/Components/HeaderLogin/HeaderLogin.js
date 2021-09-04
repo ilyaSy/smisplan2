@@ -19,25 +19,24 @@ export default class HeaderLogin extends React.PureComponent {
     this._columnsList = React.createRef();
   }
 
-  filtersOff = () => {
-    filters.clear();
-    const filtersStorage = JSON.parse(sessionStorage.getItem('filters') || '{}');
-    filtersStorage[metaData.dataTableName] = {data: {}, perm: {}};
-    const filtersString = JSON.stringify(filtersStorage);
-    sessionStorage.setItem('filters', filtersString);
-
-    storage.data.dispatch({ type: 'REDRAW', redraw: true });
-  };
+  componentDidMount() {
+    getData('user').then((user) => this.setState({ username: user.username }));
+  }
 
   reloadDataTable = (mode) => {
     this.filtersOff();
     this.props.reloadDataTable(mode);
   };
 
-  componentDidMount() {
-    getData('user')
-      .then((user) => this.setState({ username: user.username }));
-  }
+  filtersOff = () => {
+    filters.clear();
+    const filtersStorage = JSON.parse(sessionStorage.getItem('filters') || '{}');
+    filtersStorage[metaData.dataTableName] = { data: {}, perm: {} };
+    const filtersString = JSON.stringify(filtersStorage);
+    sessionStorage.setItem('filters', filtersString);
+
+    storage.data.dispatch({ type: 'REDRAW', redraw: true });
+  };
 
   render() {
     return (

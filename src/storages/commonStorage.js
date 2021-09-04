@@ -17,7 +17,7 @@ function ALERT(state = {}, action) {
 function STATE(state = {}, action) {
   switch (action.type) {
     case 'SET_DATALOADING':
-      state.dataLoading = action.stage; //chain: root, meta, data => clear
+      state.dataLoading = action.stage; // chain: root, meta, data => clear
       return state;
     case 'UNSET_DATALOADING':
       delete state.dataLoading;
@@ -40,7 +40,7 @@ function TABLE(state = {}, action) {
 function META(state = {}, action) {
   switch (action.type) {
     case 'INCREASE':
-      state.count = state.count + 1;
+      state.count++;
       return state;
     case 'ZERO':
       state.count = 0;

@@ -7,26 +7,28 @@ import storage from '../../storages/commonStorage';
 import './CheckboxListFilter.css';
 
 function resortActive(developerList) {
-  let activeDevsList = [];
+  const activeDevsList = [];
   if (dataTable) {
-    for (let row of dataTable) {
+    dataTable.forEach((row) => {
       if (row.author && row.author !== '' && activeDevsList.indexOf(row.author) === -1) {
         activeDevsList.push(row.author);
       }
       if (row.developer && row.developer !== '' && activeDevsList.indexOf(row.developer) === -1) {
         activeDevsList.push(row.developer);
       }
-    }
+    });
   }
 
-  let activeDevs = {};
-  let nonActiveDevs = {};
+  const activeDevs = {};
+  const nonActiveDevs = {};
   if (Object.keys(developerList).length > 0) {
-    for (let dev of Object.keys(developerList)) {
-      activeDevsList.indexOf(dev) !== -1
-        ? (activeDevs[dev] = developerList[dev])
-        : (nonActiveDevs[dev] = developerList[dev]);
-    }
+    Object.keys(developerList).forEach((dev) => {
+      if (activeDevsList.includes(dev)) {
+        activeDevs[dev] = developerList[dev];
+      } else {
+        nonActiveDevs[dev] = developerList[dev];
+      }
+    });
   }
 
   return [activeDevs, nonActiveDevs];
@@ -36,66 +38,18 @@ export default class CheckboxListFilter extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      open: true,
       checked: [],
       developers: Object.keys(metaData.developerList),
     };
 
     this.inputFilter = this.props.developer;
 
-    this.setOpen = this.setOpen.bind(this);
     this.setChecked = this.setChecked.bind(this);
   }
 
-  setOpen = (open) => this.setOpen({ open });
-  setChecked = (checked) => this.setState({ checked });
-
-  resortDevelopers = (inputDevelopers = metaData.developerList) => {
-    let sortedDevelopers = [];
-    sortedDevelopers = resortActive(inputDevelopers);
-
-    let outputDevelopers = [];
-    if (Object.keys(sortedDevelopers[0]).length > 0) {
-      Object.keys(sortedDevelopers[0])
-        .sort((a, b) => sortedDevelopers[0][a].value >= sortedDevelopers[0][b].value ? 1 : -1)
-        .map((key) => outputDevelopers.push(key));
-      outputDevelopers.push('divider');
-      Object.keys(sortedDevelopers[1])
-        .sort((a, b) => sortedDevelopers[1][a].value >= sortedDevelopers[1][b].value ? 1 : -1)
-        .map((key) => outputDevelopers.push(key));
-    } else if (Object.keys(sortedDevelopers[1]).length > 0) {
-      Object.keys(sortedDevelopers[1])
-        .sort((a, b) => sortedDevelopers[1][a].value >= sortedDevelopers[1][b].value ? 1 : -1)
-        .map((key) => outputDevelopers.push(key));
-    } else {
-      Object.keys(inputDevelopers)
-        .sort((a, b) => inputDevelopers[a].value >= inputDevelopers[b].value ? 1 : -1)
-        .map((key) => outputDevelopers.push(key));
-    }
-
-    return outputDevelopers;
-  };
-
-  handleToggle = (value) => (event) => {
-    if (value !== '') {
-      const currentIndex = this.state.checked.indexOf(value);
-      const newChecked = [...this.state.checked];
-
-      currentIndex === -1 ? newChecked.push(value) : newChecked.splice(currentIndex, 1);
-
-      filters.setValue('data', 'developer', [...newChecked]);
-
-      storage.data.dispatch({ type: 'REDRAW', redraw: true });
-      this.setChecked(newChecked);
-    } else {
-      storage.data.dispatch({ type: 'REDRAW', redraw: true });
-      this.props.updateData();
-    }
-  };
-
   componentDidMount() {
     this.unsubscribe = storage.state.subscribe(() => {
-      let dataLoading = storage.state.getState().STATE.dataLoading;
+      const { dataLoading } = storage.state.getState().STATE;
       if (dataLoading && dataLoading === 'data') {
         this.setState({ developers: this.resortDevelopers() });
         filters.setValue('data', 'developer', this.state.checked);
@@ -116,7 +70,7 @@ export default class CheckboxListFilter extends React.PureComponent {
     });
 
     this.unsubscribeData = storage.data.subscribe(() => {
-      let redraw = storage.data.getState().DATA.redraw;
+      const { redraw } = storage.data.getState().DATA;
       if (
         redraw &&
         filters.data.developer &&
@@ -134,8 +88,57 @@ export default class CheckboxListFilter extends React.PureComponent {
     this.unsubscribeData();
   }
 
+  setChecked = (checked) => this.setState({ checked });
+
+  resortDevelopers = (inputDevelopers = metaData.developerList) => {
+    let sortedDevelopers = [];
+    sortedDevelopers = resortActive(inputDevelopers);
+
+    const outputDevelopers = [];
+    if (Object.keys(sortedDevelopers[0]).length > 0) {
+      Object.keys(sortedDevelopers[0])
+        .sort((a, b) => (sortedDevelopers[0][a].value >= sortedDevelopers[0][b].value ? 1 : -1))
+        .map((key) => outputDevelopers.push(key));
+      outputDevelopers.push('divider');
+      Object.keys(sortedDevelopers[1])
+        .sort((a, b) => (sortedDevelopers[1][a].value >= sortedDevelopers[1][b].value ? 1 : -1))
+        .map((key) => outputDevelopers.push(key));
+    } else if (Object.keys(sortedDevelopers[1]).length > 0) {
+      Object.keys(sortedDevelopers[1])
+        .sort((a, b) => (sortedDevelopers[1][a].value >= sortedDevelopers[1][b].value ? 1 : -1))
+        .map((key) => outputDevelopers.push(key));
+    } else {
+      Object.keys(inputDevelopers)
+        .sort((a, b) => (inputDevelopers[a].value >= inputDevelopers[b].value ? 1 : -1))
+        .map((key) => outputDevelopers.push(key));
+    }
+
+    return outputDevelopers;
+  };
+
+  handleToggle = (value) => () => {
+    if (value !== '') {
+      const currentIndex = this.state.checked.indexOf(value);
+      const newChecked = [...this.state.checked];
+
+      if (currentIndex === -1) {
+        newChecked.push(value);
+      } else {
+        newChecked.splice(currentIndex, 1);
+      }
+
+      filters.setValue('data', 'developer', [...newChecked]);
+
+      storage.data.dispatch({ type: 'REDRAW', redraw: true });
+      this.setChecked(newChecked);
+    } else {
+      storage.data.dispatch({ type: 'REDRAW', redraw: true });
+      this.props.updateData();
+    }
+  };
+
   render() {
-    let { developers } = this.state;
+    const { developers } = this.state;
     return (
       <List dense className="checkbox-list-filter">
         {developers.map((key) => {

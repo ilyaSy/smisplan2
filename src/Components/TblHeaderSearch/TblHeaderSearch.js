@@ -7,9 +7,13 @@ export default function TblHeaderSearch(props) {
   const [search, setSearch] = React.useState('');
 
   const clearSearch = () => {
-    setSearch('')
-    props.setSearch('')
-  }
+    setSearch('');
+    props.setSearch('');
+  };
+
+  const handleSearch = () => props.setSearch(search);
+
+  const handleChange = (e) => setSearch(e.target.value);
 
   return (
     <Input
@@ -17,23 +21,19 @@ export default function TblHeaderSearch(props) {
       placeholder="Поиск"
       value={search}
       inputProps={{ style: { fontSize: 'var(--font-size-table)', width: '200px' } }}
-      onChange={(e) => {setSearch(e.target.value)}}
+      onChange={handleChange}
       onKeyDown={(e) => {
-        if (e.key === 'Enter') props.setSearch(search);
+        if (e.key === 'Enter') handleSearch();
         if (e.key === 'Escape') clearSearch();
       }}
       startAdornment={
         <InputAdornment position="start">
-          <CustomIcon class="icn_search" tip="Найти" action={() => { props.setSearch(search) }} />
+          <CustomIcon class="icn_search" tip="Найти" action={handleSearch} />
         </InputAdornment>
       }
       endAdornment={
         <InputAdornment position="end">
-          <CustomIcon
-            class="icn_clear"
-            tip="Сбросить поиск"
-            action={clearSearch}
-          />
+          <CustomIcon class="icn_clear" tip="Сбросить поиск" action={clearSearch} />
         </InputAdornment>
       }
     />

@@ -21,60 +21,12 @@ export default class HeaderProjects extends React.PureComponent {
     this.setProjects = this.setProjects.bind(this);
   }
 
-  setProjects = (projects) => {
-    this.setState({ projects });
-  };
-  setValue = (value) => {
-    this.setState({ value });
-  };
-
-  reloadActiveProjects = () => {
-    let projects = [];
-    let projectsHash = {};
-    dataTable.map((data) => {
-      return (projectsHash[data.project] = true);
-    });
-    let projectsActive = {};
-    let projectsOther = {};
-
-    for (let project in metaData.projectList) {
-      if (projectsHash[project] && !projectsActive[project]) {
-        metaData.projectList[project].showAsDisabled = false;
-        projectsActive[project] = metaData.projectList[project];
-      }
-
-      if (!projectsHash[project] && !projectsOther[project]) {
-        metaData.projectList[project].showAsDisabled = true;
-        projectsOther[project] = metaData.projectList[project];
-      }
-    }
-
-    Object.values(projectsActive)
-      .sort((a, b) => {
-        return a.value >= b.value ? 1 : -1;
-      })
-      .map((project) => {
-        return projects.push(project);
-      });
-    Object.values(projectsOther)
-      .sort((a, b) => {
-        return a.value >= b.value ? 1 : -1;
-      })
-      .map((project) => {
-        return projects.push(project);
-      });
-
-    this.setProjects(projects);
-  };
-
   componentDidMount() {
     getData('project').then(() => this.setProjects(Object.values(metaData.projectList)));
 
     this.unsubscribe = storage.state.subscribe(() => {
-      let dataLoading = storage.state.getState().STATE.dataLoading;
-      // if (dataLoading && dataLoading === 'meta') this.setValue(0);
+      const { dataLoading } = storage.state.getState().STATE;
 
-      //reload projects list with active/not active
       if (dataLoading && dataLoading === 'data') {
         this.setValue(0);
         this.reloadActiveProjects();
@@ -88,12 +40,9 @@ export default class HeaderProjects extends React.PureComponent {
     });
 
     this.unsubscribeData = storage.data.subscribe(() => {
-      let redraw = storage.data.getState().DATA.redraw;
-      if (
-        redraw &&
-        (!filters.data.project || filters.data.project === '') &&
-        this.state.value > 0
-      ) {
+      const { redraw } = storage.data.getState().DATA;
+      const { value } = this.state;
+      if (redraw && (!filters.data.project || filters.data.project === '') && value > 0) {
         this.setValue(0);
       }
     });
@@ -105,8 +54,48 @@ export default class HeaderProjects extends React.PureComponent {
     this.unsubscribeUpd();
   }
 
+  setProjects = (projects) => {
+    this.setState({ projects });
+  };
+
+  setValue = (value) => {
+    this.setState({ value });
+  };
+
+  reloadActiveProjects = () => {
+    const projects = [];
+    const projectsHash = {};
+    dataTable.forEach((data) => {
+      projectsHash[data.project] = true;
+    });
+    const projectsActive = {};
+    const projectsOther = {};
+
+    Object.keys(metaData.projectList).forEach((project) => {
+      if (projectsHash[project] && !projectsActive[project]) {
+        metaData.projectList[project].showAsDisabled = false;
+        projectsActive[project] = metaData.projectList[project];
+      }
+
+      if (!projectsHash[project] && !projectsOther[project]) {
+        metaData.projectList[project].showAsDisabled = true;
+        projectsOther[project] = metaData.projectList[project];
+      }
+    });
+
+    Object.values(projectsActive)
+      .sort((a, b) => (a.value >= b.value ? 1 : -1))
+      .map((project) => projects.push(project));
+    Object.values(projectsOther)
+      .sort((a, b) => (a.value >= b.value ? 1 : -1))
+      .map((project) => projects.push(project));
+
+    this.setProjects(projects);
+  };
+
   handleChange = (event, newValue) => {
-    filters.setValue('data', 'project', newValue === 0 ? '' : this.state.projects[newValue - 1].id);
+    const { projects } = this.state;
+    filters.setValue('data', 'project', newValue === 0 ? '' : projects[newValue - 1].id);
 
     storage.data.dispatch({ type: 'REDRAW', redraw: true });
     this.setValue(newValue);
@@ -114,8 +103,7 @@ export default class HeaderProjects extends React.PureComponent {
 
   render() {
     const classes = {};
-    const value = this.state.value;
-    let projects = this.state.projects;
+    const { value, projects } = this.state;
 
     return (
       <AppBar position="static" className="header-modes-projects__bar" color="default">
@@ -136,18 +124,16 @@ export default class HeaderProjects extends React.PureComponent {
             className="header-modes-projects__modes-item"
           />
 
-          {projects.map((project, index) => {
-            return (
-              <Tab
-                label={project.value}
-                {...a11yProps(index + 1)}
-                key={project.id}
-                disabled={project.showAsDisabled ? true : false}
-                classes={{ root: classes.tabStyles }}
-                className="header-modes-projects__modes-item"
-              />
-            );
-          })}
+          {projects.map((project, index) => (
+            <Tab
+              label={project.value}
+              {...a11yProps(index + 1)}
+              key={project.id}
+              disabled={project.showAsDisabled}
+              classes={{ root: classes.tabStyles }}
+              className="header-modes-projects__modes-item"
+            />
+          ))}
         </Tabs>
       </AppBar>
     );

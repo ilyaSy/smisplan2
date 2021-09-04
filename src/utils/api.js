@@ -1,7 +1,7 @@
-import storage from '../storages/commonStorage';
-import { metaData, dataTable, mainModes, filters, setDataTable } from '../config/data';
-import { urlApi } from '../config/constants';
 import axios from 'axios';
+import storage from '../storages/commonStorage';
+import { metaData, dataTable, mainModes, filters, resetDataTable } from '../config/data';
+import { urlApi, TEST } from '../config/constants';
 import setMockAdapter from './apiMockAdapter';
 
 setMockAdapter();
@@ -26,7 +26,9 @@ class Api {
   }
 
   static async getMetaData(mode) {
-    return axios.get(`${urlApi}/${mode.replace('_', '-')}/`).then(Api._handleApiResult.bind(null, 'getMetaData'));
+    return axios
+      .get(`${urlApi}/${mode.replace('_', '-')}/`)
+      .then(Api._handleApiResult.bind(null, 'getMetaData'));
   }
 
   static async getData(mode) {
@@ -38,11 +40,15 @@ class Api {
   }
 
   static async patchData(mode, body) {
-    return axios.patch(`${urlApi}/${mode}/`, body).then(Api._handleApiResult.bind(null, 'patchData'));
+    return axios
+      .patch(`${urlApi}/${mode}/`, body)
+      .then(Api._handleApiResult.bind(null, 'patchData'));
   }
 
   static async deleteData(mode, body) {
-    return axios.delete(`${urlApi}/${mode}/`, body).then(Api._handleApiResult.bind(null, 'deleteData'));
+    return axios
+      .delete(`${urlApi}/${mode}/`, body)
+      .then(Api._handleApiResult.bind(null, 'deleteData'));
   }
 
   static async postData(mode, body) {
@@ -51,7 +57,9 @@ class Api {
 
   static _handleApiResult(fnName, res) {
     console.log(res);
-    return res.data.data;
+    if (TEST) {
+      return res.data.data;
+    }
 
     if (res.data.status !== 'OK') {
       storage.alert.dispatch({ type: 'SHOW_ALERT', status: 'fail', message: 'Ошибка' });
@@ -70,7 +78,8 @@ class Api {
 }
 
 /* get meta/data etc function */
-export const getData = async (mode, type = 'initialize', filter = {}) => {
+// eslint-disable-next-line consistent-return
+export const getData = async (mode, type = 'initialize') => {
   if (mode === 'user') {
     const result = await Api.getUser();
 
@@ -89,9 +98,9 @@ export const getData = async (mode, type = 'initialize', filter = {}) => {
 
     if (result !== 'ERROR') {
       metaData[`${mode}List`] = {};
-      for (let info of result) {
+      result.forEach((info) => {
         metaData[`${mode}List`][info.id] = { id: info.id, value: info.value };
-      }
+      });
     }
 
     if (!metaData[`${mode}List`] || Object.keys(metaData[`${mode}List`]).length === 0) {
@@ -99,25 +108,25 @@ export const getData = async (mode, type = 'initialize', filter = {}) => {
     }
   }
 
-  if ( mainModes.map(m => `${m}_meta`).includes(mode)) {
+  if (mainModes.map((m) => `${m}_meta`).includes(mode)) {
     if (!metaData.tables[mode]) {
       const result = await Api.getMetaData(mode);
 
       if (result !== 'ERROR') {
         metaData.tables[mode] = {};
         metaData.tables[mode].dataTable = {};
-        for (let infoR of result) {
-          let infoKey = Object.keys(infoR)[0];
-          let info = Object.values(infoR)[0];
 
-          //fix json 'true','false' to boolean
-          for (let key in info) {
+        result.forEach((infoR) => {
+          const infoKey = Object.keys(infoR)[0];
+          const info = Object.values(infoR)[0];
+
+          Object.keys(info).forEach((key) => {
             if (metaData.mobile && typeof info.showInTableMobile !== 'undefined')
               info.showInTable = info.showInTableMobile;
 
             if (info[key] === 'true') info[key] = true;
             if (info[key] === 'false') info[key] = false;
-          }
+          });
 
           if (infoKey === 'specificParameters') {
             metaData.tables[mode][infoKey] = info;
@@ -135,19 +144,19 @@ export const getData = async (mode, type = 'initialize', filter = {}) => {
           if (infoKey !== 'specificParameters') {
             metaData.tables[mode].dataTable[info.id] = info;
           }
-        }
+        });
       }
     }
 
-    if (metaData.tables[mode] && mode === metaData.dataTableName + '_meta') {
-      for (let key in metaData.tables[mode]) {
+    if (metaData.tables[mode] && mode === `${metaData.dataTableName}_meta`) {
+      Object.keys(metaData.tables[mode]).forEach((key) => {
         metaData[key] = metaData.tables[mode][key];
-      }
-      setDataTable([]);
+      });
+      resetDataTable();
     }
 
-    for (let prop in metaData.dataTable) {
-      let propInfo = metaData.dataTable[prop];
+    Object.keys(metaData.dataTable).forEach((prop) => {
+      const propInfo = metaData.dataTable[prop];
       if (
         (propInfo.type === 'select' || propInfo.type === 'multi-select') &&
         !metaData[`${prop}List`] &&
@@ -156,21 +165,23 @@ export const getData = async (mode, type = 'initialize', filter = {}) => {
       ) {
         metaData[`${prop}List`] = metaData[`${propInfo.vocabulary}List`];
       }
-    }
+    });
 
     filters.setKeys(metaData.dataTable);
   }
 
-  let data = [];
+  const data = [];
   if (mainModes.includes(mode)) {
     const result = await Api.getData(mode);
 
     if (result !== 'ERROR') {
-      if (type === 'initialize') setDataTable([]);
+      if (type === 'initialize') resetDataTable();
 
-      for (let info of result) {
+      for (let i = 0; i < result.length; i++) {
+        const info = result[i];
+
         try {
-          info.id = parseInt(info.id);
+          info.id = parseInt(info.id, 10);
         } catch (e) {
           console.error('Ошибка: невозможно поле id сделать integer');
         }
@@ -193,8 +204,7 @@ export const getData = async (mode, type = 'initialize', filter = {}) => {
 };
 
 /* put/delete/patch data */
-export const doData = async (mode, data, id, feature) => {
-  if (!feature) feature = 'task';
+export const doData = async (mode, data, id, feature = 'task') => {
   let json = {};
   let error = true;
 
@@ -202,21 +212,21 @@ export const doData = async (mode, data, id, feature) => {
     console.error(`Mode [${mode}] is not available`);
   } else {
     try {
-      let body = {
-        feature: feature,
-        data: {
-          data: data,
-          id: id,
-        },
+      const body = {
+        feature,
+        data: { data, id },
       };
 
       let result;
       if (mode === 'put') result = await Api.putData(feature, body);
       if (mode === 'patch') result = await Api.patchData(feature, body);
       if (mode === 'delete') result = await Api.deleteData(feature, body);
-      if (mode === 'notify') result = await Api.postData(feature, {...body, method: mode});
+      if (mode === 'notify') result = await Api.postData(feature, { ...body, method: mode });
 
-      json = result !== "ERROR" ? result.data : result;
+      json = result;
+      if (result !== 'ERROR') {
+        error = false;
+      }
     } catch (err) {
       console.log(`Unexpected error ${err}`); // Failed to fetch
     }
@@ -227,14 +237,14 @@ export const doData = async (mode, data, id, feature) => {
 
 /* file uploader function */
 export async function fileUpload(file) {
-  let urlApi = '/smisplan/cgi/upload.pl';
+  const urlUploadApi = '/smisplan/cgi/upload.pl';
   const formData = new FormData();
   formData.append('file', file);
 
   let json = {};
   let error = true;
   try {
-    let response = await fetch(urlApi, {
+    const response = await fetch(urlUploadApi, {
       method: 'POST',
       body: formData,
     });
