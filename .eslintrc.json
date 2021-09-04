@@ -46,6 +46,7 @@
         "jsx-a11y/label-has-associated-control": "off",
         "no-param-reassign": "off",
         "no-nested-ternary": "off",
-        "no-continue": "off"
+        "no-continue": "off",        
+        "react/jsx-no-bind": "off"
     }
 }

@@ -51,7 +51,8 @@ export default class CustomSelect extends React.Component {
   };
 
   setFocus = () => {
-    this.refs[this.props.refName].focus();
+    // this.refs[this.props.refName].focus();
+    this.selectRef.focus();
   };
 
   filterValues = (data, value) => {
@@ -155,6 +156,7 @@ export default class CustomSelect extends React.Component {
           <Select
             allowCreate={this.props.allowCreate}
             ref={this.selectRef}
+            // ref={this.props.refName}
             options={this.props.options}
             styles={selectStyles}
             // menuPlacement={this.state.offsetTop < 250 ? "bottom" : "top"}
@@ -182,6 +184,7 @@ export default class CustomSelect extends React.Component {
           <CreatableSelect
             allowCreate={this.props.allowCreate}
             ref={this.selectRef}
+            // ref={this.props.refName}
             options={this.props.options}
             styles={selectStyles}
             menuPlacement={

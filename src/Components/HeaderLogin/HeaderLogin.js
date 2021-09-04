@@ -4,7 +4,7 @@ import PrintIcon from '@material-ui/icons/Print';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import ReactToPrint from 'react-to-print';
 
-import { metaData, filters } from '../../config/data';
+import { filters } from '../../config/filters';
 import { getData } from '../../utils/api';
 import MenuItemSettings from '../MenuItemSettings/MenuItemSettings';
 import MenuItemChief from '../MenuItemChief/MenuItemChief';
@@ -30,11 +30,6 @@ export default class HeaderLogin extends React.PureComponent {
 
   filtersOff = () => {
     filters.clear();
-    const filtersStorage = JSON.parse(sessionStorage.getItem('filters') || '{}');
-    filtersStorage[metaData.dataTableName] = { data: {}, perm: {} };
-    const filtersString = JSON.stringify(filtersStorage);
-    sessionStorage.setItem('filters', filtersString);
-
     storage.data.dispatch({ type: 'REDRAW', redraw: true });
   };
 

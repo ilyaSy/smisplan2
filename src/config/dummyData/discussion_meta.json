@@ -270,7 +270,8 @@
         "hasDoneButton": "false",
         "tableName": "Обсуждения",
         "hasSublistData": "true",
-        "mainValue": "theme"
+        "mainValue": "theme",
+        "addMenuTitle": "Новое совещание"
       }
     }
   ]

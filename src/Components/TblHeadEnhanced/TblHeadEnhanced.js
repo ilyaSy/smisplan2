@@ -2,7 +2,8 @@ import React, { Fragment } from 'react';
 import { TableRow, TableCell, TableSortLabel } from '@material-ui/core';
 
 import TblHeaderBtnMenu from '../TblHeaderBtnMenu/TblHeaderBtnMenu';
-import { metaData, filters, filterTasks } from '../../config/data';
+import { metaData } from '../../config/data';
+import { filters, filterTasks } from '../../config/filters';
 
 const getAdditionalCellProps = (props) => {
   let hasAdditionalCell = false;

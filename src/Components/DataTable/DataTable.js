@@ -5,7 +5,8 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import moment from 'moment';
 import 'moment/locale/ru';
 
-import { dataTable, metaData, filters, filterTasks } from '../../config/data';
+import { dataTable, metaData } from '../../config/data';
+import { filters, filterTasks } from '../../config/filters';
 import { doData, getData } from '../../utils/api';
 import storage from '../../storages/commonStorage';
 import TblHeadEnhanced from '../TblHeadEnhanced/TblHeadEnhanced';
@@ -112,14 +113,8 @@ export default class DataTable extends React.Component {
         // default sort
         const order = metaData.specificParameters.defaultSortDirection || 'desc';
         const orderBy = metaData.specificParameters.defaultSortField || 'id';
-        let sort = [];
-        const sortSString = sessionStorage.getItem('sort');
-        if (sortSString) {
-          const sortObj = JSON.parse(sortSString);
-          if (Array.isArray(sortObj)) sort = sortObj;
-        } else {
-          orderBy.split(',').map((field, i) => sort.push({ field, order: order.split(',')[i] }));
-        }
+        const sort = [];
+        orderBy.split(',').map((field, i) => sort.push({ field, order: order.split(',')[i] }));
 
         let groupBy = '';
         if (metaData.specificParameters && metaData.specificParameters.defaultGroupField) {
@@ -166,37 +161,21 @@ export default class DataTable extends React.Component {
     this.setState({ page });
   };
 
-  setOrder = (order) => {
-    this.setState({ order });
-  };
+  setOrder = (order) => this.setState({ order });
 
-  setOrderBy = (orderBy) => {
-    this.setState({ orderBy });
-  };
+  setOrderBy = (orderBy) => this.setState({ orderBy });
 
-  setEditID = (editID) => {
-    this.setState({ editID });
-  };
+  setEditID = (editID) => this.setState({ editID });
 
-  setEditItem = (editItem) => {
-    this.setState({ editItem });
-  };
+  setEditItem = (editItem) => this.setState({ editItem });
 
-  setShowFullTextID = (showFullTextID) => {
-    this.setState({ showFullTextID });
-  };
+  setShowFullTextID = (showFullTextID) => this.setState({ showFullTextID });
 
-  setRowsPerPage = (rowsPerPage) => {
-    this.setState({ rowsPerPage });
-  };
+  setRowsPerPage = (rowsPerPage) => this.setState({ rowsPerPage });
 
-  setHeadCells = (headCells) => {
-    this.setState({ headCells });
-  };
+  setHeadCells = (headCells) => this.setState({ headCells });
 
-  setWeekDescription = (weekDescription) => {
-    this.setState({ weekDescription });
-  };
+  setWeekDescription = (weekDescription) => this.setState({ weekDescription });
 
   /* handle search */
   setSearch = (search) => {
@@ -217,14 +196,11 @@ export default class DataTable extends React.Component {
     } else {
       sort.push({ field, order: 'asc' });
     }
-    sessionStorage.setItem('sort', JSON.stringify(sort));
     this.setState({ sort });
   };
 
   /* handle sort click */
-  handleRequestSort = (event, field) => {
-    this.setSort(field);
-  };
+  handleRequestSort = (event, field) => this.setSort(field);
 
   /* handle group click */
   handleRequestGroup = (event, field) => {
@@ -258,16 +234,10 @@ export default class DataTable extends React.Component {
 
   /* set sort/group to default options */
   defaultSort = (order = 'desc', orderBy = 'id') => {
-    let sort = [];
-    const sortSString = sessionStorage.getItem('sort');
-    if (sortSString) {
-      const sortObj = JSON.parse(sortSString);
-      if (Array.isArray(sortObj)) sort = sortObj;
-    } else {
-      orderBy.split(',').forEach((field, i) => {
-        sort.push({ field, order: order.split(',')[i] });
-      });
-    }
+    const sort = [];
+    orderBy.split(',').forEach((field, i) => {
+      sort.push({ field, order: order.split(',')[i] });
+    });
 
     this.setState({
       sort,
@@ -827,13 +797,6 @@ export default class DataTable extends React.Component {
 
     return menuList;
   };
-
-  // setIsOpenedPopupEdit = (taskID, state = true) => {
-  //   console.log(taskID, state);
-
-  //   this.setState({ taskPopupEdit: taskID });
-  //   this.setState({ isOpenedPopupEdit: state });
-  // };
 
   getDateGroup = (date) => {
     const weekNum = this.state.byWeek ? moment(date, 'YYYY-MM-DD').week() : date;

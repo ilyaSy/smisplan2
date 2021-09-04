@@ -433,7 +433,7 @@ export default class PopupEdit extends React.Component {
                         />
                       )}
                     {propertyInfo.isEditable &&
-                      ['string', 'int', 'fulltext'].indexOf(propertyInfo.type) !== -1 && (
+                      ['string', 'int', 'fulltext'].includes(propertyInfo.type) && (
                         <Input
                           defaultValue={this.task[property]}
                           fullWidth

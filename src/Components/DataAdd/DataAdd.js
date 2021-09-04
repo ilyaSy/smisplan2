@@ -46,7 +46,6 @@ export default class DataAdd extends React.PureComponent {
       if (dataLoading && dataLoading === 'root') {
         this.setState({ developers: metaData.developerList });
       }
-      //   if (dataLoading && dataLoading === 'meta') {
       if (dataLoading && dataLoading === 'data') {
         this.setState({
           developers: metaData.developerList,
@@ -62,6 +61,8 @@ export default class DataAdd extends React.PureComponent {
   }
 
   addTask = () => {
+    console.log(this.state);
+
     storage.alert.dispatch({
       type: 'SHOW_ALERT',
       status: 'warn',
@@ -77,7 +78,7 @@ export default class DataAdd extends React.PureComponent {
     Object.keys(metaData.dataTable).forEach((key) => {
       const field = metaData.dataTable[key];
       const state = this.state[key];
-      if (!field.addMenuIndex || parseInt(field.addMenuIndex, 10) === 0) {
+      if (field.addMenuIndex && +field.addMenuIndex >= 0) {
         const objName = `_addTask${field.id}`;
         if (this[objName]) {
           if (this[objName].value === '') {
@@ -88,17 +89,15 @@ export default class DataAdd extends React.PureComponent {
             this.setState({ [`${key}Err`]: false });
             task[key] = this[objName].value;
           }
-        } else if (this.refs[objName]) {
-          if (!state || state === '') {
-            this.setState({ [`${key}Err`]: true });
-            this.refs[objName].setState({ valueErr: true });
-            this.refs[objName].setFocus();
-            emptyDataError = true;
-          } else {
-            this.setState({ [`${key}Err`]: false });
-            this.refs[objName].setState({ valueErr: false });
-            task[key] = state;
-          }
+        } else if (!state || state === '') {
+          this.setState({ [`${key}Err`]: true });
+          // this.refs[objName].setState({ valueErr: true });
+          // this.refs[objName].setFocus();
+          emptyDataError = true;
+        } else {
+          this.setState({ [`${key}Err`]: false });
+          // this.refs[objName].setState({ valueErr: false });
+          task[key] = state;
         }
       }
     });
@@ -143,7 +142,6 @@ export default class DataAdd extends React.PureComponent {
       });
 
       doData('put', task, undefined, metaData.dataTableName).then(([error, json]) => {
-        console.log(json);
         if (error) {
           storage.alert.dispatch({
             type: 'SHOW_ALERT',
@@ -179,8 +177,8 @@ export default class DataAdd extends React.PureComponent {
               if (this[objName]) {
                 this[objName].value = '';
               } else if (this.refs[objName]) {
-                this.refs[objName].setState({ valueErr: false });
-                this.refs[objName].setState({ value: null });
+                // this.refs[objName].setState({ valueErr: false });
+                // this.refs[objName].setState({ value: null });
               }
             }
           });
@@ -213,106 +211,89 @@ export default class DataAdd extends React.PureComponent {
     }`;
 
     return (
-      <>
-        {hasAddMenu && (
-          <div className="data-add">
-            <div className="data-add__title">
-              <b>{addMenuTitle}</b>
-            </div>
-
-            {Object.values(metaData.dataTable)
-              .filter((field) => field.addMenuIndex && parseInt(field.addMenuIndex, 10) > 0)
-              .sort((a, b) => parseInt(a.addMenuIndex, 10) - parseInt(b.addMenuIndex, 10))
-              .map((field) => {
-                const objName = `_addTask${field.id}`;
-
-                return (
-                  <Fragment key={field.id}>
-                    {field.type === 'select' && (
-                      <CustomSelect
-                        style={{ width: '200px', marginTop: '-4px' }}
-                        options={Object.values(developers)
-                          .sort((a, b) => (a.value >= b.value ? 1 : -1))
-                          .map((developer) => ({ value: developer.id, label: developer.value }))}
-                        refName={objName}
-                        ref={objName}
-                        inputRef={(el) => {
-                          this[objName] = el;
-                        }}
-                        setValue={(value) => this.setState({ [field.id]: value })}
-                        label={`${field.value}*`}
-                      />
-                    )}
-
-                    {field.type === 'string' && (
-                      <div className={textFieldClass}>
-                        <TextField
-                          required
-                          fullWidth
-                          placeholder={field.value}
-                          error={!!this.state[`${field.id}Err`]}
-                          ref={objName}
-                          inputRef={(el) => {
-                            this[objName] = el;
-                          }}
-                        />
-                      </div>
-                    )}
-
-                    {field.type === 'date' && (
-                      <MuiPickersUtilsProvider utils={MomentUtils}>
-                        <KeyboardDatePicker
-                          format="YYYY-MM-DD"
-                          margin="normal"
-                          value={this.state[field.id] || new Date()}
-                          onChange={this.handleDateClick(field.id)}
-                          style={{ width: '140px', margin: '0 0 9px 0' }}
-                          className="tbl-header-btn-menu__datepicker"
-                          inputRef={(el) => {
-                            this[objName] = el;
-                          }}
-                        />
-                      </MuiPickersUtilsProvider>
-                    )}
-
-                    {field.type === 'time' && (
-                      <MuiPickersUtilsProvider utils={MomentUtils}>
-                        <KeyboardTimePicker
-                          format="HH:mm:ss"
-                          ampm={false}
-                          minutesStep={5}
-                          margin="normal"
-                          value={this.state[field.id] || new Date()}
-                          onChange={this.handleDateClick(field.id)}
-                          style={{ width: '97px', margin: '0 0 9px 0' }}
-                          className="tbl-header-btn-menu__datepicker"
-                          inputRef={(el) => {
-                            this[objName] = el;
-                          }}
-                        />
-                      </MuiPickersUtilsProvider>
-                    )}
-                  </Fragment>
-                );
-              })}
-
-            <div className="data-add__button">
-              <Tooltip title={addMenuTitle}>
-                <Button
-                  variant="outlined"
-                  component="span"
-                  color="primary"
-                  onClick={this.addTask}
-                  style={{ paddingBottom: '0px', paddingTop: '0px' }}
-                  startIcon={<PlaylistAddIcon />}
-                >
-                  Добавить
-                </Button>
-              </Tooltip>
-            </div>
+      hasAddMenu && (
+        <div className="data-add">
+          <div className="data-add__title">
+            <b>{addMenuTitle}</b>
           </div>
-        )}
-      </>
+
+          {Object.values(metaData.dataTable)
+            .filter((field) => field.addMenuIndex && parseInt(field.addMenuIndex, 10) > 0)
+            .sort((a, b) => parseInt(a.addMenuIndex, 10) - parseInt(b.addMenuIndex, 10))
+            .map((field) => (
+              <Fragment key={field.id}>
+                {field.type === 'select' && (
+                  <CustomSelect
+                    style={{ width: '200px', marginTop: '-4px' }}
+                    options={Object.values(developers)
+                      .sort((a, b) => (a.value >= b.value ? 1 : -1))
+                      .map((developer) => ({ value: developer.id, label: developer.value }))}
+                    setValue={(value) => this.setState({ [field.id]: value })}
+                    label={`${field.value}*`}
+                  />
+                )}
+
+                {field.type === 'string' && (
+                  <div className={textFieldClass}>
+                    <TextField
+                      required
+                      fullWidth
+                      placeholder={field.value}
+                      error={!!this.state[`${field.id}Err`]}
+                      value={this.state[field.id]}
+                      onChange={(e) => {
+                        this.setState({ [field.id]: e.target.value });
+                      }}
+                    />
+                  </div>
+                )}
+
+                {field.type === 'date' && (
+                  <MuiPickersUtilsProvider utils={MomentUtils}>
+                    <KeyboardDatePicker
+                      format="YYYY-MM-DD"
+                      margin="normal"
+                      value={this.state[field.id] || new Date()}
+                      onChange={this.handleDateClick(field.id)}
+                      style={{ width: '140px', margin: '0 0 9px 0' }}
+                      className="tbl-header-btn-menu__datepicker"
+                    />
+                  </MuiPickersUtilsProvider>
+                )}
+
+                {field.type === 'time' && (
+                  <MuiPickersUtilsProvider utils={MomentUtils}>
+                    <KeyboardTimePicker
+                      format="HH:mm:ss"
+                      ampm={false}
+                      minutesStep={5}
+                      margin="normal"
+                      value={this.state[field.id] || new Date()}
+                      onChange={this.handleDateClick(field.id)}
+                      style={{ width: '97px', margin: '0 0 9px 0' }}
+                      className="tbl-header-btn-menu__datepicker"
+                    />
+                  </MuiPickersUtilsProvider>
+                )}
+              </Fragment>
+            ))}
+
+          <div className="data-add__button">
+            <Tooltip title={addMenuTitle}>
+              <Button
+                variant="outlined"
+                component="span"
+                color="primary"
+                onClick={this.addTask}
+                style={{ paddingBottom: '0px', paddingTop: '0px' }}
+                startIcon={<PlaylistAddIcon />}
+              >
+                Добавить
+              </Button>
+            </Tooltip>
+          </div>
+        </div>
+      )
     );
   }
 }

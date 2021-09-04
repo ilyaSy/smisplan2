@@ -30,18 +30,18 @@ export default class PopupEditFullText extends React.Component {
     this.setState({ open: false });
   };
 
+  handleOpen = () => this.setState({ open: true });
+
+  handleClose = () => this.setState({ open: false });
+
   render() {
     return (
       <>
-        <CustomIcon
-          class={this.props.class}
-          tip="Изменить"
-          action={() => this.setState({ open: true })}
-        />
+        <CustomIcon class={this.props.class} tip="Изменить" action={this.handleOpen} />
 
         <Dialog
           open={this.state.open}
-          onClose={() => this.setState({ open: false })}
+          onClose={this.handleClose}
           aria-labelledby="dialog-title"
           fullWidth
         >
@@ -72,7 +72,7 @@ export default class PopupEditFullText extends React.Component {
             </Button>
             <Button
               variant="contained"
-              onClick={() => this.setState({ open: false })}
+              onClick={this.handleClose}
               color="secondary"
               startIcon={<CloseIcon />}
             >

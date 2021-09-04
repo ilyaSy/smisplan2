@@ -1,7 +1,7 @@
-/* eslint-disable prefer-destructuring */
 import React, { Suspense, lazy } from 'react';
 
-import { metaData, filters, mainModes } from './config/data';
+import { metaData, mainModes } from './config/data';
+import { filters } from './config/filters';
 import { getData } from './utils/api';
 import storage from './storages/commonStorage';
 import Header from './Components/Header/Header';
@@ -21,7 +21,6 @@ export default function App() {
     storage.table.dispatch({ type: 'SET_TABLENAME', tableName: dataTableName });
 
     if (resetFilter) filters.clear();
-    if (resetFilter) sessionStorage.removeItem('sort');
 
     Promise.all([getData(`${dataTableName}_meta`), getData(metaData.dataTableName)])
       .then(() => {

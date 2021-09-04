@@ -32,6 +32,13 @@ const weekDays = [
   'суббота',
   'воскресение',
 ];
+const calendarModes = {
+  today: 'Сегодня',
+  month: 'Месяц',
+  week: 'Неделя',
+  day: 'День',
+  list: 'Список',
+};
 
 export default class MainCalendar extends React.Component {
   constructor(props) {
@@ -166,13 +173,7 @@ export default class MainCalendar extends React.Component {
             center: 'title',
             right: 'today prev,next',
           }}
-          buttonText={{
-            today: 'Сегодня',
-            month: 'Месяц',
-            week: 'Неделя',
-            day: 'День',
-            list: 'Список',
-          }}
+          buttonText={calendarModes}
         />
 
         <PopupSimpleOutput

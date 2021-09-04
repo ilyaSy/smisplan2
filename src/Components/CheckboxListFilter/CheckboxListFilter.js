@@ -2,7 +2,8 @@ import React from 'react';
 import { List, ListItem, ListItemText, ListItemIcon, Checkbox } from '@material-ui/core';
 import Divider from '@material-ui/core/Divider';
 
-import { metaData, dataTable, filters } from '../../config/data';
+import { metaData, dataTable } from '../../config/data';
+import { filters } from '../../config/filters';
 import storage from '../../storages/commonStorage';
 import './CheckboxListFilter.css';
 

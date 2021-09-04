@@ -12,8 +12,12 @@ export default function TblHeaderSearch(props) {
   };
 
   const handleSearch = () => props.setSearch(search);
-
   const handleChange = (e) => setSearch(e.target.value);
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') handleSearch();
+    if (e.key === 'Escape') clearSearch();
+  };
 
   return (
     <Input
@@ -22,10 +26,7 @@ export default function TblHeaderSearch(props) {
       value={search}
       inputProps={{ style: { fontSize: 'var(--font-size-table)', width: '200px' } }}
       onChange={handleChange}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter') handleSearch();
-        if (e.key === 'Escape') clearSearch();
-      }}
+      onKeyDown={handleKeyDown}
       startAdornment={
         <InputAdornment position="start">
           <CustomIcon class="icn_search" tip="Найти" action={handleSearch} />

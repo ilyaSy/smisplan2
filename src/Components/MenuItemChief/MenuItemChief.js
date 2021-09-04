@@ -1,7 +1,7 @@
 import React from 'react';
 import { Menu, MenuItem, ListItemIcon, Typography } from '@material-ui/core';
 
-import { filters } from '../../config/data';
+import { filters } from '../../config/filters';
 import { doData } from '../../utils/api';
 import storage from '../../storages/commonStorage';
 import CustomIcon from '../../SharedComponents/CustomIcon';
