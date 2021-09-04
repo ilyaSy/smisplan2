@@ -11,9 +11,7 @@ import './MenuItemChief.css';
 export default class MenuItemChief extends React.PureComponent {
   constructor(props) {
     super(props);
-    this.state = {
-      menuEl: null,
-    };
+    this.state = { menuEl: null };
   }
 
   senNotification = () => {

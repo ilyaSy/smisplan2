@@ -1,6 +1,7 @@
 import React, { Suspense, lazy } from 'react';
 
-import { metaData, mainModes } from './config/data';
+import { metaData } from './config/data';
+import { mainModes } from './config/constants';
 import { filters } from './utils/filters';
 import { getData } from './utils/api';
 import storage from './storages/commonStorage';

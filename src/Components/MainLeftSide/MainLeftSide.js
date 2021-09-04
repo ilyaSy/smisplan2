@@ -4,7 +4,8 @@ import { Drawer } from '@material-ui/core';
 import CustomIcon from '../../SharedComponents/CustomIcon';
 import storage from '../../storages/commonStorage';
 import { metaData } from '../../config/data';
-import CheckboxListFilter from '../CheckboxListFilter/CheckboxListFilter';
+// import CheckboxListFilter from '../CheckboxListFilter/CheckboxListFilter';
+import DevelopersFilter from '../DevelopersFilter/DevelopersFilter';
 import './MainLeftSide.css';
 
 /* *************************  Developers list  ******************************* */
@@ -39,12 +40,10 @@ export default class MainLeftSide extends React.PureComponent {
     const widthDefault = getComputedStyle(root).getPropertyValue('--width-left-side');
     root.style.setProperty('--width-left-side-bottom', !open ? '0px' : widthDefault);
 
-    this.setOpen({ open });
+    this.setOpen(open);
   };
 
-  handleShow = () => this.handleOpen(true);
-
-  handleHide = () => this.handleOpen(false);
+  handleToggle = () => this.handleOpen(!this.state.open);
 
   render() {
     const { developers, developer } = this.props;
@@ -56,10 +55,10 @@ export default class MainLeftSide extends React.PureComponent {
         key="leftSideDrawer"
         variant="persistent"
         anchor="left"
-        open={!!isOpened}
+        open={isOpened}
         classes={{ paper: 'left-side-bar' }}
       >
-        <CheckboxListFilter developer={developer} list={list} />
+        <DevelopersFilter developer={developer} list={list} />
       </Drawer>,
       <div key="showHideButton" className="divSpacingBottom">
         {isOpened ? (
@@ -67,7 +66,7 @@ export default class MainLeftSide extends React.PureComponent {
             class="icn_arrow_left_fill"
             tip="Свернуть"
             fontSize="large"
-            action={this.handleHide}
+            action={this.handleToggle}
             style={{ borderRadius: '0px' }}
           />
         ) : (
@@ -75,7 +74,7 @@ export default class MainLeftSide extends React.PureComponent {
             class="icn_arrow_right_fill"
             tip="Показать"
             fontSize="large"
-            action={this.handleShow}
+            action={this.handleToggle}
             style={{ borderRadius: '0px' }}
           />
         )}

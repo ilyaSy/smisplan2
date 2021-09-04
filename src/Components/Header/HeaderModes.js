@@ -3,7 +3,7 @@ import { Tab, Tabs, AppBar } from '@material-ui/core';
 import { Switch, Route, Link, Redirect } from 'react-router-dom';
 
 import storage from '../../storages/commonStorage';
-import { modes, mainModes } from '../../config/data';
+import { modes, mainModes } from '../../config/constants';
 import { filters } from '../../utils/filters';
 
 function a11yProps(index) {

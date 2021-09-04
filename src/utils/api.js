@@ -1,8 +1,8 @@
 import axios from 'axios';
 import storage from '../storages/commonStorage';
-import { metaData, dataTable, mainModes, resetDataTable } from '../config/data';
+import { metaData, dataTable, resetDataTable } from '../config/data';
 import { filters } from './filters';
-import { urlApi, TEST } from '../config/constants';
+import { urlApi, TEST, mainModes } from '../config/constants';
 import setMockAdapter from './apiMockAdapter';
 
 setMockAdapter();

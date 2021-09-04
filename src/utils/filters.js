@@ -4,13 +4,12 @@ class Filters {
   constructor() {
     this.data = { developer: [], project: '' };
     this.perm = {};
-    this.perm = {};
   }
 
   // clear all data
   clear = () => {
     this.getKeys().forEach((key) => {
-      if (/^_.+/.test(key)) {
+      if (key.startsWith('_')) {
         delete this.data[key];
       } else if (typeof this.data[key] === 'string') {
         this.data[key] = '';
