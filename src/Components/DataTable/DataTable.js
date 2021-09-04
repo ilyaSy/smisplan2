@@ -6,7 +6,7 @@ import moment from 'moment';
 import 'moment/locale/ru';
 
 import { dataTable, metaData } from '../../config/data';
-import { filters, filterTasks } from '../../config/filters';
+import { filters, filterTasks } from '../../utils/filters';
 import { doData, getData } from '../../utils/api';
 import storage from '../../storages/commonStorage';
 import TblHeadEnhanced from '../TblHeadEnhanced/TblHeadEnhanced';

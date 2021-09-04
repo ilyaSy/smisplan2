@@ -3,7 +3,7 @@ import { List, ListItem, ListItemText, ListItemIcon, Checkbox } from '@material-
 import Divider from '@material-ui/core/Divider';
 
 import { metaData, dataTable } from '../../config/data';
-import { filters } from '../../config/filters';
+import { filters } from '../../utils/filters';
 import storage from '../../storages/commonStorage';
 import './CheckboxListFilter.css';
 

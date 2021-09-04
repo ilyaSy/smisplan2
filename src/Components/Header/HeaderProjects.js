@@ -2,7 +2,7 @@ import React from 'react';
 import { Tab, Tabs, AppBar } from '@material-ui/core';
 
 import { metaData, dataTable } from '../../config/data';
-import { filters } from '../../config/filters';
+import { filters } from '../../utils/filters';
 import { getData } from '../../utils/api';
 import storage from '../../storages/commonStorage';
 

@@ -3,7 +3,7 @@ import { Menu, MenuItem } from '@material-ui/core';
 import MomentUtils from '@date-io/moment';
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
 
-import { filters, filterTasks } from '../../config/filters';
+import { filters, filterTasks } from '../../utils/filters';
 import CustomIcon from '../../SharedComponents/CustomIcon';
 
 export default class TblHeaderBtnMenu extends React.Component {

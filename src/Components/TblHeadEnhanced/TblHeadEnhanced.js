@@ -3,7 +3,7 @@ import { TableRow, TableCell, TableSortLabel } from '@material-ui/core';
 
 import TblHeaderBtnMenu from '../TblHeaderBtnMenu/TblHeaderBtnMenu';
 import { metaData } from '../../config/data';
-import { filters, filterTasks } from '../../config/filters';
+import { filters, filterTasks } from '../../utils/filters';
 
 const getAdditionalCellProps = (props) => {
   let hasAdditionalCell = false;

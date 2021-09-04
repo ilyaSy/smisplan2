@@ -4,7 +4,7 @@ import PrintIcon from '@material-ui/icons/Print';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import ReactToPrint from 'react-to-print';
 
-import { filters } from '../../config/filters';
+import { filters } from '../../utils/filters';
 import { getData } from '../../utils/api';
 import MenuItemSettings from '../MenuItemSettings/MenuItemSettings';
 import MenuItemChief from '../MenuItemChief/MenuItemChief';

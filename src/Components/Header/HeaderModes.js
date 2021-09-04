@@ -4,7 +4,7 @@ import { Switch, Route, Link, Redirect } from 'react-router-dom';
 
 import storage from '../../storages/commonStorage';
 import { modes, mainModes } from '../../config/data';
-import { filters } from '../../config/filters';
+import { filters } from '../../utils/filters';
 
 function a11yProps(index) {
   return {
