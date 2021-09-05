@@ -2,7 +2,7 @@ import React from 'react';
 import { Tab, Tabs, AppBar } from '@material-ui/core';
 
 import { filters } from '../../utils/filters';
-import { getData } from '../../utils/api';
+import { getData } from '../../utils/apiFunctions';
 import storage from '../../storages/commonStorage';
 
 function a11yProps(index) {

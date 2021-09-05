@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  Dialog,
-  DialogTitle,
-  DialogActions,
-  TextField,
-  DialogContent,
-  Button,
-} from '@material-ui/core';
+import { Dialog, DialogTitle, DialogActions, TextField, DialogContent, Button } from '@material-ui/core';
 import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
 import CustomIcon from '../../SharedComponents/CustomIcon';
@@ -40,9 +33,7 @@ function PopupEditFullText({ id, property, text, action, class: className, value
         <DialogContent>
           <TextField value={fullText} onChange={handleChange} fullWidth multiline />
         </DialogContent>
-        <DialogActions
-          style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-between' }}
-        >
+        <DialogActions style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-between' }}>
           <Button
             variant="outlined"
             onClick={handleOk}
@@ -52,12 +43,7 @@ function PopupEditFullText({ id, property, text, action, class: className, value
           >
             Принять изменения
           </Button>
-          <Button
-            variant="contained"
-            onClick={handleClose}
-            color="secondary"
-            startIcon={<CloseIcon />}
-          >
+          <Button variant="contained" onClick={handleClose} color="secondary" startIcon={<CloseIcon />}>
             Закрыть
           </Button>
         </DialogActions>

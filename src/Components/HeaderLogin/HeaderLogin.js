@@ -5,7 +5,7 @@ import VisibilityIcon from '@material-ui/icons/Visibility';
 import ReactToPrint from 'react-to-print';
 
 import { filters } from '../../utils/filters';
-import { getData } from '../../utils/api';
+import { getData } from '../../utils/apiFunctions';
 import MenuItemSettings from '../MenuItemSettings/MenuItemSettings';
 import MenuItemChief from '../MenuItemChief/MenuItemChief';
 import storage from '../../storages/commonStorage';
@@ -13,7 +13,6 @@ import './HeaderLogin.css';
 
 function HeaderLogin({ reloadDataTable, dataRef }) {
   const [username, setUsername] = React.useState('');
-  const _columnsListRef = React.useRef(null);
 
   React.useEffect(() => {
     getData('user').then((user) => setUsername(user.username));
@@ -38,7 +37,7 @@ function HeaderLogin({ reloadDataTable, dataRef }) {
           content={() => dataRef.current}
         />
 
-        <MenuItemSettings ref={_columnsListRef} class="icn_filter" name="MenuSettings" />
+        <MenuItemSettings class="icn_filter" name="MenuSettings" />
 
         <MenuItemChief class="icn_chief" name="MenuChief" reloadDataTable={reloadDataTable} />
 

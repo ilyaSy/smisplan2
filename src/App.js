@@ -3,12 +3,13 @@ import React, { Suspense, lazy } from 'react';
 import { metaData, dataTable } from './config/data';
 import { mainModes } from './config/constants';
 import { filters } from './utils/filters';
-import { getData } from './utils/api';
+import { getData } from './utils/apiFunctions';
 import storage from './storages/commonStorage';
 import Header from './Components/Header/Header';
 import HeaderLogin from './Components/HeaderLogin/HeaderLogin';
 import MainLeftSide from './Components/MainLeftSide/MainLeftSide';
 import Content from './Components/Content/Content';
+import CustomSuspenseFallback from './SharedComponents/CustomSuspenseFallback';
 import './App.css';
 
 const Hint = lazy(() => import('./SharedComponents/Hint'));
@@ -101,7 +102,7 @@ export default function App() {
           dataTableName={metaData.dataTableName}
         />
 
-        <Suspense fallback={<p>...</p>}>
+        <Suspense fallback={<CustomSuspenseFallback type="textNode" />}>
           <Hint />
         </Suspense>
       </main>

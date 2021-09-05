@@ -2,8 +2,7 @@ import { TableRow, TableCell } from '@material-ui/core';
 
 export default function TblFullTextRow(props) {
   const dummyCells = 3;
-  const activeCells =
-    Object.values(props.headCells).filter((a) => a.showInTable).length - dummyCells;
+  const activeCells = Object.values(props.headCells).filter((a) => a.showInTable).length - dummyCells;
 
   return (
     props.data.display && (

@@ -29,6 +29,8 @@ function TblActionMenu(props) {
   };
 
   const handleClick = (event) => {
+    props.onBeforeClick();
+
     setIsPopupLinkedOpened({});
     if (isPopupConfirmOpened) setIsPopupConfirmOpened(false);
     if (isPopupEditOpened) setIsPopupEditOpened(false);
@@ -41,8 +43,7 @@ function TblActionMenu(props) {
   const handleClickSub = (event) => {
     showBasicElement();
     setMenuElSub(event.currentTarget);
-    _menuElSub.current.style.marginLeft =
-      -1 * `${_menuElSub.current.children[1].offsetWidth + 5}px`;
+    _menuElSub.current.style.marginLeft = -1 * `${_menuElSub.current.children[1].offsetWidth + 5}px`;
   };
 
   const action = (item, args) => {
@@ -104,10 +105,7 @@ function TblActionMenu(props) {
               {item.id === 'divider' && <Divider key={`menu-divider-${index}`} />}
 
               {item.id !== 'divider' && !item.isListOfItems && (
-                <MenuItem
-                  key={`menu-${item.id}-menuItem`}
-                  onClick={handleClickItem(item, props.id)}
-                >
+                <MenuItem key={`menu-${item.id}-menuItem`} onClick={handleClickItem(item, props.id)}>
                   <ListItemIcon>
                     {item.id === 'tasks_edit' && (
                       <>

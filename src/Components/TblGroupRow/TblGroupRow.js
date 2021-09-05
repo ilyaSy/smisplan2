@@ -14,9 +14,10 @@ export default function TblGroupRow(props) {
 
       const weekDate = new Date();
       weekDate.setDate(weekDate.getDate() + 7 * i);
-      const weekStr = `${moment(weekDate, 'YYYY-MM-DD')
-        .startOf('week')
-        .format('DD MMMM')} - ${moment(weekDate, 'YYYY-MM-DD')
+      const weekStr = `${moment(weekDate, 'YYYY-MM-DD').startOf('week').format('DD MMMM')} - ${moment(
+        weekDate,
+        'YYYY-MM-DD'
+      )
         .endOf('week')
         .format('DD MMMM YYYY')} г`;
 

@@ -24,6 +24,14 @@
   font-size: var(--font-size-table) !important;
 }
 
+.data-table__row {
+  height: 31px;
+}
+
+.data-table__row  .MuiInput-input {
+  font-size: var(--font-size-table) !important;
+}
+
 .data-table__row-title {
   font-size: var(--font-size-table) !important;
 }
@@ -73,11 +81,23 @@
   padding-bottom: 0px !important;
 }
 
+.data-table__cell {
+  font-size: var(--font-size-table) !important;
+}
+
+.data-table__cell_inline-edit {
+  width: 10px;
+}
+
+.data-table__cell:first-child {
+  padding-left: 10px;
+}
+
 .data-table__cell-text {
   width: calc(100% - 40px);
 }
 
-.data-table__cell-inline-edit {
+.data-table__cell_inline-edit {
   width: 40px;
   justify-content: center;
 }

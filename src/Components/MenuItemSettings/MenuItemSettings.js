@@ -8,7 +8,7 @@ import CustomIcon from '../../SharedComponents/CustomIcon';
 import MenuItemsList from '../../SharedComponents/MenuItemsList';
 import './MenuItemSettings.css';
 
-function MenuItemSettings(props) {
+export default function MenuItemSettings({ name }) {
   const [menuEl, setMenuEl] = React.useState(null);
   const [menuElColors, setMenuElColors] = React.useState(null);
   const [menuElColumns, setMenuElColumns] = React.useState(null);
@@ -97,7 +97,7 @@ function MenuItemSettings(props) {
           onClose={closeMenuItem(setMenuElColors, null)}
           className="menu-item-settings__item-menu"
         >
-          <MenuItemsList itemsList={colorsList} name={props.name} onChange={handleChangeColor} />
+          <MenuItemsList itemsList={colorsList} name={name} onChange={handleChangeColor} />
         </Menu>
 
         {/* Columns menu - START */}
@@ -114,7 +114,7 @@ function MenuItemSettings(props) {
         >
           <MenuItemsList
             itemsList={columnsList}
-            name={props.name}
+            name={name}
             onChange={handleChangeColumns}
             hasStartCheckbox
             checkFunction={(e) => checkedElSubList.includes(e)}
@@ -128,5 +128,3 @@ function MenuItemSettings(props) {
     </div>
   );
 }
-
-export default MenuItemSettings;

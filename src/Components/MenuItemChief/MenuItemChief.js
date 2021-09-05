@@ -2,7 +2,7 @@ import React from 'react';
 import { Menu, MenuItem, ListItemIcon, Typography } from '@material-ui/core';
 
 import { filters } from '../../utils/filters';
-import { doData } from '../../utils/api';
+import { doData } from '../../utils/apiFunctions';
 import storage from '../../storages/commonStorage';
 import CustomIcon from '../../SharedComponents/CustomIcon';
 import DateW from '../../utils/date';

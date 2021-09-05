@@ -1,17 +1,11 @@
 import React, { Fragment } from 'react';
 import { TextField, Tooltip, Button } from '@material-ui/core';
 import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
-// import MomentUtils from '@date-io/moment';
 import moment from 'moment';
-// import {
-//   MuiPickersUtilsProvider,
-//   KeyboardDatePicker,
-//   KeyboardTimePicker,
-// } from '@material-ui/pickers';
 import CustomDateTimePicker from '../../SharedComponents/CustomDateTimePicker';
 
 import { dataTable, metaData } from '../../config/data';
-import { doData } from '../../utils/api';
+import { doData } from '../../utils/apiFunctions';
 import storage from '../../storages/commonStorage';
 import CustomSelect from '../../SharedComponents/CustomSelect';
 import DateW from '../../utils/date';

@@ -22,7 +22,7 @@ import CustomDateTimePicker from '../../SharedComponents/CustomDateTimePicker';
 import 'moment/locale/ru';
 
 import { metaData, dataTable } from '../../config/data';
-import { getData, fileUpload } from '../../utils/api';
+import { getData, fileUpload } from '../../utils/apiFunctions';
 import storage from '../../storages/commonStorage';
 import CustomSelect from '../../SharedComponents/CustomSelect';
 import CustomIcon from '../../SharedComponents/CustomIcon';
@@ -36,15 +36,13 @@ const textToDoc = (task, tasksList) => {
   const properties = [];
   Object.keys(metaData.dataTable)
     .filter(
-      (key) =>
-        key !== 'specificParameters' && key !== 'undefined' && metaData.dataTable[key].isEditable
+      (key) => key !== 'specificParameters' && key !== 'undefined' && metaData.dataTable[key].isEditable
     )
     .sort((a, b) => (metaData.dataTable[a].tableIndex >= metaData.dataTable[b].tableIndex ? 1 : -1))
     .forEach((property) => properties.push(property));
   Object.keys(metaData.dataTable)
     .filter(
-      (key) =>
-        key !== 'specificParameters' && key !== 'undefined' && !metaData.dataTable[key].isEditable
+      (key) => key !== 'specificParameters' && key !== 'undefined' && !metaData.dataTable[key].isEditable
     )
     .sort((a, b) => (metaData.dataTable[a].tableIndex >= metaData.dataTable[b].tableIndex ? 1 : -1))
     .forEach((property) => properties.push(property));
@@ -60,10 +58,7 @@ const textToDoc = (task, tasksList) => {
       value = metaData.tables[`${value}_meta`].specificParameters.tableName;
     }
 
-    if (
-      ['select', 'multi-select'].indexOf(metaData.dataTable[property].type) !== -1 &&
-      value !== ''
-    ) {
+    if (['select', 'multi-select'].indexOf(metaData.dataTable[property].type) !== -1 && value !== '') {
       const selectString = value;
       value = '';
       selectString.split(',').forEach((v) => {
@@ -120,9 +115,7 @@ export default class PopupEdit extends React.Component {
 
         const filesAttached = [];
         if (
-          /\b(http:.+?)(txt|docx?|xlsx?|pptx?|pdf|png|bmp|img|jpg|jpeg)\b/im.test(
-            this.task[property]
-          )
+          /\b(http:.+?)(txt|docx?|xlsx?|pptx?|pdf|png|bmp|img|jpg|jpeg)\b/im.test(this.task[property])
         ) {
           filesAttached.push(
             this.task[property].match(

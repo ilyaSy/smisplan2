@@ -1,13 +1,12 @@
-import React from 'react';
-import LoadingComponent from '../LoadingComponent/LoadingComponent';
+import React, { Suspense, lazy } from 'react';
+import CustomSuspenseFallback from '../../SharedComponents/CustomSuspenseFallback';
 
 import storage from '../../storages/commonStorage';
-// import { dataTable } from '../../config/data';
 import DataTable from '../DataTable/DataTable';
 import './Content.css';
 
-const MainCalendar = React.lazy(() => import('../MainCalendar/MainCalendar'));
-const DataAdd = React.lazy(() => import('../DataAdd/DataAdd'));
+const MainCalendar = lazy(() => import('../MainCalendar/MainCalendar'));
+const DataAdd = lazy(() => import('../DataAdd/DataAdd'));
 
 export default function Content({ dataRef, reloadDataTable, dataTable, dataTableName }) {
   const [tableName, setTableName] = React.useState(dataTableName);
@@ -28,21 +27,21 @@ export default function Content({ dataRef, reloadDataTable, dataTable, dataTable
     <section className="content">
       {tableName !== 'calendar' ? (
         <div className="content__table">
-          <React.Suspense fallback={<LoadingComponent />}>
+          <Suspense fallback={<CustomSuspenseFallback type="loading" />}>
             <DataTable reloadDataTable={reloadDataTable} ref={dataRef} />
-          </React.Suspense>
+          </Suspense>
         </div>
       ) : (
         <div className="content__calendar">
-          <React.Suspense fallback={<LoadingComponent />}>
+          <Suspense fallback={<CustomSuspenseFallback type="loading" />}>
             <MainCalendar dates={dataTable} />
-          </React.Suspense>
+          </Suspense>
         </div>
       )}
 
-      <React.Suspense fallback={<LoadingComponent />}>
+      <Suspense fallback={<CustomSuspenseFallback type="loading" />}>
         <DataAdd />
-      </React.Suspense>
+      </Suspense>
     </section>
   );
 }

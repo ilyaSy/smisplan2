@@ -50,10 +50,7 @@ export default class CustomSelect extends React.Component {
     }
   };
 
-  setFocus = () => {
-    // this.refs[this.props.refName].focus();
-    this.selectRef.focus();
-  };
+  setFocus = () => this.selectRef.focus();
 
   filterValues = (data, value) => {
     let isDisplayed = this.optionsCounter < this.maxOptions;
@@ -64,10 +61,7 @@ export default class CustomSelect extends React.Component {
     }
 
     if (isDisplayed) this.optionsCounter++;
-    if (
-      this.optionsCounter === this.props.options.length ||
-      this.optionsCounter === this.maxOptions
-    ) {
+    if (this.optionsCounter === this.props.options.length || this.optionsCounter === this.maxOptions) {
       this.optionsCounter = 0;
     }
     return isDisplayed;
@@ -160,9 +154,7 @@ export default class CustomSelect extends React.Component {
             options={this.props.options}
             styles={selectStyles}
             // menuPlacement={this.state.offsetTop < 250 ? "bottom" : "top"}
-            menuPlacement={
-              this.props.bottom ? 'bottom' : this.state.offsetTop < 250 ? 'bottom' : 'top'
-            }
+            menuPlacement={this.props.bottom ? 'bottom' : this.state.offsetTop < 250 ? 'bottom' : 'top'}
             value={this.state.value}
             placeholder={this.props.label}
             defaultValue={this.props.defaultValue}
@@ -187,9 +179,7 @@ export default class CustomSelect extends React.Component {
             // ref={this.props.refName}
             options={this.props.options}
             styles={selectStyles}
-            menuPlacement={
-              this.props.bottom ? 'bottom' : this.state.offsetTop < 250 ? 'bottom' : 'top'
-            }
+            menuPlacement={this.props.bottom ? 'bottom' : this.state.offsetTop < 250 ? 'bottom' : 'top'}
             value={this.state.value}
             placeholder={this.props.label}
             defaultValue={this.props.defaultValue}

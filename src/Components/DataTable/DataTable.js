@@ -7,17 +7,19 @@ import 'moment/locale/ru';
 
 import { dataTable, metaData } from '../../config/data';
 import { filters, filterTasks } from '../../utils/filters';
-import { doData, getData } from '../../utils/api';
+import { doData, getData } from '../../utils/apiFunctions';
 import storage from '../../storages/commonStorage';
 import TblHeadEnhanced from '../TblHeadEnhanced/TblHeadEnhanced';
 import CustomIcon from '../../SharedComponents/CustomIcon';
+import CustomSuspenseFallback from '../../SharedComponents/CustomSuspenseFallback';
+import TblCell from '../TblCell/TblCell';
+import TblCellIcon from '../TblCellIcon/TblCellIcon';
 import TblHeaderSearch from '../TblHeaderSearch/TblHeaderSearch';
 import TblHeaderPagination from '../TblHeaderPagination/TblHeaderPagination';
 import TblGroupRow from '../TblGroupRow/TblGroupRow';
 import getDefaultValues from '../../utils/defaultData';
 import './DataTable.css';
 
-const TblActionMenu = lazy(() => import('../TblActionMenu/TblActionMenu'));
 const TblSecondaryList = lazy(() => import('../TblSecondaryList/TblSecondaryList'));
 const TblFullTextRow = lazy(() => import('../TblFullTextRow/TblFullTextRow'));
 
@@ -807,13 +809,159 @@ export default class DataTable extends React.Component {
     return weekNum;
   };
 
-  toggleDescription = (week) => {
+  toggleDescription = (week) => () => {
     const { weekDescription } = this.state;
     if (weekDescription && weekDescription === week) {
       this.setWeekDescription(undefined);
     } else {
       this.setWeekDescription(week);
     }
+  };
+
+  getYouTubeLink = (videoConf) => {
+    let youTubeLink = '';
+    if (videoConf && /youtu\.?be/.test(videoConf)) {
+      const url = videoConf.replace(/^[\s\S]*(https:\/\/(www\.)?youtu\.?be.+\b)[\s\S]*/, '$1');
+      youTubeLink = <CustomIcon type="link" class="icn_youtube" href={url} />;
+    }
+    return youTubeLink;
+  };
+
+  getZoomLink = (videoConf) => {
+    let zoomLink = '';
+    if (videoConf && /https:\/\/us02web\.zoom\.us\/j\/\d+\?pwd=.+/.test(videoConf)) {
+      const url = videoConf.replace(
+        /^[\s\S]*(https:\/\/us02web\.zoom\.us\/j\/\d+\?pwd=\S+\b)[\s\S]*/,
+        '$1'
+      );
+      const tip = url.replace(/^https:\/\/us02web\.zoom\.us\/j\/\d{7}(\d{4}).+/, '$1');
+      zoomLink = <CustomIcon type="link" class="icn_zoom" tip={tip} href={url} />;
+    }
+    return zoomLink;
+  };
+
+  getRowClass = (row) => {
+    const date = new Date().toLocaleDateString().replace(/(\d+).(\d+).(\d+)/, '$3-$2-$1');
+    let rowClass = '';
+    if (row.status === 'new') rowClass = 'task_alert';
+    if (metaData.dataTableName === 'discussion' && row.status === 'new' && row.date >= date) {
+      rowClass = '';
+    }
+    if (row.priority === 'hard') rowClass = 'task_bad';
+    if (row.status === 'rejected') rowClass = 'task_bad';
+    if (row.status === 'done') rowClass = 'task_good';
+    if (metaData.dataTableName === 'discussion' && !row.result && row.status === 'done') {
+      rowClass = 'task_noresult';
+    }
+    return rowClass;
+  };
+
+  getGroupRowNames = (groupBy, row, headCells) => {
+    let groupValue = '';
+    let dayName = '';
+
+    if (groupBy && groupBy !== '') {
+      let date = '';
+      if (headCells[groupBy].type === 'date') {
+        date = moment(row[groupBy], 'YYYY-MM-DD');
+      } else if (groupBy === 'week') {
+        date = moment(row.date, 'YYYY-MM-DD');
+      }
+
+      if (headCells[groupBy].type === 'date') {
+        dayName = `${date.format('dddd')}
+${date.format('DD MMMM')}`;
+        // dayName = date.format('dddd') + '<br>' + date.format('DD MMMM');
+        groupValue = date.format('DD MMMM YYYY');
+      } else if (groupBy === 'week') {
+        dayName = `${date.format('dddd')}
+${date.format('DD MMMM')}`;
+        groupValue = `${date.startOf('week').format('DD MMMM YYYY')} - ${date
+          .endOf('week')
+          .format('DD MMMM YYYY')}`;
+      } else {
+        groupValue = metaData[`${groupBy}List`]
+          ? metaData[`${groupBy}List`][row[groupBy]].value
+          : row[groupBy];
+      }
+    }
+
+    return { groupValue, dayName };
+  };
+
+  getFullText = (row, headCells) => {
+    const fullText = { display: false, element: null };
+    Object.values(headCells).forEach((property) => {
+      if (
+        property.type === 'fulltext' &&
+        row[property.id] !== '' &&
+        typeof row[property.id] === 'string'
+      ) {
+        fullText.value = row[property.id];
+        fullText.title = property.value;
+        fullText.id = property.id;
+        fullText.display = true;
+        fullText.fullTextIndexCell = property.tableIndex;
+
+        fullText.element =
+          fullText.display && metaData.dataTable[property.id].hasFullTextLink ? (
+            <CustomIcon class="icn_description" action={this.showFullText(row.id)} />
+          ) : null;
+      }
+    });
+
+    return fullText;
+  };
+
+  getFullTextIcon = (fullText, property, row) => {
+    const element =
+      fullText.display && metaData.dataTable[property].hasFullTextLink ? (
+        <CustomIcon class="icn_description" action={this.showFullText(row.id)} />
+      ) : null;
+    return element;
+  };
+
+  getCellValue = (row, groupBy, headCell, dayName) => {
+    let value =
+      groupBy && (headCell.id === groupBy || (headCell.id === 'date' && groupBy === 'week'))
+        ? dayName
+        : row[headCell.id];
+    if (headCell.type === 'time') {
+      value = value.replace(/(\d\d:\d\d):\d\d/, '$1');
+    } else if (headCell.id === 'mainTable') {
+      value = metaData.tables[`${value}_meta`].specificParameters.tableName;
+    } else if (headCell.type === 'select') {
+      ({ value } = metaData[`${headCell.id}List`][value]);
+    } else if (headCell.type === 'multi-select') {
+      value = value
+        .split(',')
+        .map((_d) => metaData[`${headCell.id}List`][_d]?.value || _d)
+        .join(', ');
+    }
+
+    return value;
+  };
+
+  getWhiteSpace = (headCell, groupBy) => {
+    let whiteSpace = '';
+    if (['datetime', 'date', 'time'].includes(headCell.type)) {
+      whiteSpace = 'nowrap';
+    }
+    if (groupBy && (headCell.id === groupBy || (headCell.id === 'date' && groupBy === 'week'))) {
+      whiteSpace = 'pre';
+    }
+    return whiteSpace;
+  };
+
+  getRowDisplayIfGroup = (row, groupBy) => {
+    const display =
+      groupBy && this.state.groupHide[this.getDateGroup(row[groupBy])] ? 'none' : 'table-row';
+    return display;
+  };
+
+  handleCloseInlineEdit = () => {
+    this.setEditID(-1);
+    this.setEditItem('');
   };
 
   // chosenWeek = 0 - this week, 1 - next week, 2 - ...
@@ -841,21 +989,10 @@ export default class DataTable extends React.Component {
   }
 
   render() {
-    const {
-      page,
-      order,
-      orderBy,
-      sort,
-      groupBy,
-      headCells,
-      weekDescription,
-      secDataList,
-      groupHide,
-    } = this.state;
-    let { rowsPerPage, data } = this.state;
+    const { page, order, orderBy, sort, groupBy, headCells, weekDescription, secDataList, groupHide } =
+      this.state;
     const groupList = {};
-    let d = new Date();
-    d = d.toLocaleDateString().replace(/(\d+).(\d+).(\d+)/, '$3-$2-$1');
+    let { rowsPerPage, data } = this.state;
 
     // for `noPagination` parameter (print PDF click)
     if (this.props.noPagination) {
@@ -920,104 +1057,25 @@ export default class DataTable extends React.Component {
             stableSort(data, getSorting(sort))
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((row) => {
-                let rowClass = '';
-                if (row.status === 'new') rowClass = 'task_alert';
-                if (
-                  metaData.dataTableName === 'discussion' &&
-                  row.status === 'new' &&
-                  row.date >= d
-                ) {
-                  rowClass = '';
-                }
-                if (row.priority === 'hard') rowClass = 'task_bad';
-                if (row.status === 'rejected') rowClass = 'task_bad';
-                if (row.status === 'done') rowClass = 'task_good';
-                if (
-                  metaData.dataTableName === 'discussion' &&
-                  !row.result &&
-                  row.status === 'done'
-                ) {
-                  rowClass = 'task_noresult';
-                }
-
+                // It`s about how to show while 'group rows by' mode
                 let showGroupByRow = false;
-                let groupValue = '';
-                let dayName = '';
+                const { groupValue, dayName } = this.getGroupRowNames(groupBy, row, headCells);
 
-                if (groupBy && groupBy !== '') {
-                  let date = '';
-                  if (headCells[groupBy].type === 'date') {
-                    date = moment(row[groupBy], 'YYYY-MM-DD');
-                  } else if (groupBy === 'week') {
-                    date = moment(row.date, 'YYYY-MM-DD');
-                  }
-
+                if (groupBy) {
                   const groupField = this.getDateGroup(row[groupBy]);
                   if (!groupList[groupField]) {
                     groupList[groupField] = 1;
                     showGroupByRow = true;
                   }
-
-                  if (headCells[groupBy].type === 'date') {
-                    dayName = `${date.format('dddd')}
-${date.format('DD MMMM')}`;
-                    // dayName = date.format('dddd') + '<br>' + date.format('DD MMMM');
-                    groupValue = date.format('DD MMMM YYYY');
-                  } else if (groupBy === 'week') {
-                    dayName = `${date.format('dddd')}
-${date.format('DD MMMM')}`;
-                    groupValue = `${date.startOf('week').format('DD MMMM YYYY')} - ${date
-                      .endOf('week')
-                      .format('DD MMMM YYYY')}`;
-                  } else {
-                    groupValue = metaData[`${groupBy}List`]
-                      ? metaData[`${groupBy}List`][row[groupBy]].value
-                      : row[groupBy];
-                  }
                 }
 
-                // big text data, like description, change_all. get Index of cell where Icon for click, value && property name
-                const fullText = { display: false };
-                Object.values(headCells).forEach((property) => {
-                  if (
-                    property.type === 'fulltext' &&
-                    row[property.id] !== '' &&
-                    typeof row[property.id] === 'string'
-                  ) {
-                    fullText.value = row[property.id];
-                    fullText.title = property.value;
-                    fullText.id = property.id;
-                    fullText.display = true;
-                    fullText.fullTextIndexCell = property.tableIndex;
-                  }
-                });
-
-                let ZoomLink = '';
-                if (
-                  row.videoConf &&
-                  /https:\/\/us02web\.zoom\.us\/j\/\d+\?pwd=.+/.test(row.videoConf)
-                ) {
-                  const url = row.videoConf.replace(
-                    /^[\s\S]*(https:\/\/us02web\.zoom\.us\/j\/\d+\?pwd=\S+\b)[\s\S]*/,
-                    '$1'
-                  );
-                  const tip = url.replace(/^https:\/\/us02web\.zoom\.us\/j\/\d{7}(\d{4}).+/, '$1');
-                  ZoomLink = <CustomIcon type="link" class="icn_zoom" tip={tip} href={url} />;
-                }
-
-                let YouTubeLink = '';
-                if (row.videoConf && /youtu\.?be/.test(row.videoConf)) {
-                  const url = row.videoConf.replace(
-                    /^[\s\S]*(https:\/\/(www\.)?youtu\.?be.+\b)[\s\S]*/,
-                    '$1'
-                  );
-                  YouTubeLink = <CustomIcon type="link" class="icn_youtube" href={url} />;
-                }
+                const fullText = this.getFullText(row, headCells);
+                const zoomLink = this.getZoomLink(row.videoConf);
+                const youTubeLink = this.getYouTubeLink(row.videoConf);
 
                 return (
                   <Fragment key={`${row.id}`}>
-                    {/* Group row with show/hide icons */}
-                    {groupBy && groupBy !== '' && showGroupByRow && (
+                    {groupBy && groupBy !== '' && showGroupByRow ? (
                       <TblGroupRow
                         tableName={metaData.dataTableName}
                         fullColsNum={hasAdditionalCell ? fullColsNum + 2 : fullColsNum}
@@ -1034,60 +1092,29 @@ ${date.format('DD MMMM')}`;
                         sendNotification={(id, day) => {
                           this.sendNotificationWeekDate(id, day);
                         }}
-                        toggleDescription={() => {
-                          this.toggleDescription(row.week);
-                        }}
+                        toggleDescription={this.toggleDescription(row.week)}
                         copyPreviousWeekDiscussions={(id, week) => {
                           this.copyPreviousWeekDiscussions(id, week);
                         }}
                       />
-                    )}
+                    ) : null}
                     <TableRow
                       hover
                       tabIndex={-1}
                       key={`row-main-${row.id}`}
-                      className={`${rowClass} data-table__row`}
-                      style={{
-                        height: '31px',
-                        display:
-                          !groupBy ||
-                          (groupBy &&
-                            groupList[this.getDateGroup(row[groupBy])] &&
-                            !groupHide[this.getDateGroup(row[groupBy])])
-                            ? 'table-row'
-                            : 'none',
-                      }}
+                      className={`${this.getRowClass(row)} data-table__row`}
+                      style={{ display: this.getRowDisplayIfGroup(row, groupBy) }}
                     >
                       {Object.values(headCells)
                         .filter((a) => a.showInTable)
                         .sort((a, b) => (a.tableIndex >= b.tableIndex ? 1 : -1))
-                        .map((headCell, index) => {
-                          const property = headCell.id;
-                          let value =
-                            groupBy &&
-                            (headCell.id === groupBy ||
-                              (headCell.id === 'date' && groupBy === 'week'))
-                              ? dayName
-                              : row[headCell.id];
-                          if (headCell.type === 'time')
-                            value = value.replace(/(\d\d:\d\d):\d\d/, '$1');
-                          if (headCell.id === 'mainTable')
-                            value = metaData.tables[`${value}_meta`].specificParameters.tableName;
+                        .map((headCell) => {
                           const { id } = row;
-                          let whiteSpace = '';
-                          if (['datetime', 'date', 'time'].includes(headCell.type)) {
-                            whiteSpace = 'nowrap';
-                          }
-                          if (
-                            groupBy &&
-                            groupBy !== '' &&
-                            (headCell.id === groupBy ||
-                              (headCell.id === 'date' && groupBy === 'week'))
-                          ) {
-                            whiteSpace = 'pre';
-                          }
 
-                          const paddingLeft = index === 0 ? '10px' : '0px';
+                          const property = headCell.id;
+                          const value = this.getCellValue(row, groupBy, headCell, dayName);
+                          const whiteSpace = this.getWhiteSpace(headCell, groupBy);
+                          const fullTextIcon = this.getFullTextIcon(fullText, headCell.id, row);
 
                           return (
                             <Fragment key={`td-${property}-${id}`}>
@@ -1095,214 +1122,81 @@ ${date.format('DD MMMM')}`;
                                 className="data-table__cell"
                                 align="left"
                                 padding="none"
-                                style={{
-                                  whiteSpace,
-                                  paddingLeft,
-                                  fontSize: 'var(--font-size-table)',
-                                }}
+                                style={{ whiteSpace }}
                               >
-                                {headCell.isInlineEditable &&
-                                  headCell.type === 'string' &&
-                                  (this.state.editID !== id ||
-                                    this.state.editItem !== property) && (
-                                    <>
-                                      {fullText.display &&
-                                        metaData.dataTable[property].hasFullTextLink && (
-                                          <CustomIcon
-                                            class="icn_description"
-                                            tip={`Показать ${fullText.title}`}
-                                            action={this.showFullText(row.id)}
-                                          />
-                                        )}
-                                      {ZoomLink}
-                                      {YouTubeLink}
-                                      {value}
-                                    </>
-                                  )}
+                                {(this.state.editID !== id || this.state.editItem !== property) && (
+                                  <TblCell
+                                    value={value}
+                                    headCell={headCell}
+                                    zoomLink={zoomLink}
+                                    youTubeLink={youTubeLink}
+                                    fullTextIcon={fullTextIcon}
+                                  />
+                                )}
 
                                 {/* edit item textbox */}
                                 {this.state.editID === id && this.state.editItem === property && (
                                   <Input
                                     type="text"
+                                    fullWidth
                                     autoFocus
                                     defaultValue={value}
                                     ref={`edit-${property}-${id}`}
                                     inputRef={(el) => {
                                       this[`edit-${property}-${id}`] = el;
                                     }}
-                                    inputProps={{
-                                      style: { fontSize: 'var(--font-size-table)' },
-                                    }}
                                     /* edit item ok / cancel buttons */
                                     endAdornment={
                                       <InputAdornment position="end">
                                         <div className="data-table__cell-edit-buttons">
-                                          <CustomIcon
-                                            class="icn_ok"
-                                            action={this.inlineEditOk(id)}
-                                          />
+                                          <CustomIcon class="icn_ok" action={this.inlineEditOk(id)} />
                                           <CustomIcon
                                             class="icn_cancel"
-                                            action={() => {
-                                              this.setEditID(-1);
-                                              this.setEditItem('');
-                                            }}
+                                            action={this.handleCloseInlineEdit}
                                           />
                                         </div>
                                       </InputAdornment>
                                     }
-                                    fullWidth
                                   />
                                 )}
-
-                                {/* Fulltext editable cell value */}
-                                {headCell.isInlineEditable && headCell.type === 'fulltext' && (
-                                  <div
-                                    ref={`div-${property}-${id}`}
-                                    className="data-table__cell-fulltext"
-                                  >
-                                    {/* text */}
-                                    <div className="data-table__cell-fulltext-value">
-                                      {fullText.display &&
-                                        metaData.dataTable[property].hasFullTextLink && (
-                                          <CustomIcon
-                                            class="icn_description"
-                                            action={this.showFullText(row.id)}
-                                          />
-                                        )}
-                                      {value}
-                                    </div>
-                                  </div>
-                                )}
-
-                                {/* None of the other cell values */}
-                                {!headCell.isInlineEditable &&
-                                  headCell.type !== 'multi-select' &&
-                                  (headCell.type !== 'select' ||
-                                    typeof metaData[`${property}List`][value] === 'undefined') && (
-                                    <>
-                                      {fullText.display &&
-                                        metaData.dataTable[property].hasFullTextLink && (
-                                          <CustomIcon
-                                            class="icn_description"
-                                            action={this.showFullText(row.id)}
-                                          />
-                                        )}
-                                      {value}
-                                    </>
-                                  )}
-
-                                {/* Select non-editable cell value */}
-                                {!headCell.isInlineEditable &&
-                                  headCell.type === 'select' &&
-                                  typeof metaData[`${property}List`][value] !== 'undefined' && (
-                                    <>
-                                      {fullText.display &&
-                                        index + 1 === fullText.fullTextIndexCell &&
-                                        metaData.dataTable[property].hasFullTextLink && (
-                                          <CustomIcon
-                                            class="icn_description"
-                                            action={this.showFullText(row.id)}
-                                          />
-                                        )}
-                                      {metaData[`${property}List`][value].value}
-                                    </>
-                                  )}
-
-                                {/* Multi-select non-editable cell value */}
-                                {!headCell.isInlineEditable && headCell.type === 'multi-select' && (
-                                  <div className="data-table__cell-multiselect">
-                                    {fullText.display &&
-                                      index + 1 === fullText.fullTextIndexCell &&
-                                      metaData.dataTable[property].hasFullTextLink && (
-                                        <CustomIcon
-                                          class="icn_description"
-                                          action={this.showFullText(row.id)}
-                                        />
-                                      )}
-                                    {/* <DescriptionIcon fontSize={fontSize}/>} */}
-                                    {value
-                                      .split(',')
-                                      .map((_d) => metaData[`${property}List`][_d]?.value || _d)
-                                      .join(', ')}
-                                  </div>
-                                )}
                               </TableCell>
-
-                              {headCell.isInlineEditable && headCell.type === 'string' && (
-                                <TableCell
-                                  className="data-table__cell"
-                                  align="center"
-                                  padding="none"
-                                  style={{
-                                    width: '10px',
-                                    whiteSpace,
-                                    paddingLeft,
-                                    borderBottom:
-                                      (this.state.showFullTextID === row.id ||
-                                        (weekDescription && weekDescription === row.week)) &&
-                                      fullText.display &&
-                                      0,
-                                  }}
-                                >
-                                  {this.state.editID !== id && (
-                                    <div className="data-table__hover-icon data-table__cell-inline-edit">
-                                      <CustomIcon
-                                        class="icn_tasks_edit"
-                                        tip={`Изменить: ${metaData.dataTable[property].value}`}
-                                        action={() => {
-                                          this.setEditID(id);
-                                          this.setEditItem(property);
-                                        }}
-                                      />
-                                    </div>
-                                  )}
-                                </TableCell>
-                              )}
+                              <TblCellIcon
+                                showCell={headCell.isInlineEditable && headCell.type === 'string'}
+                                showInner={this.state.editID !== id}
+                                type="data-table__cell_inline-edit"
+                                action={() => {
+                                  this.setEditID(id);
+                                  this.setEditItem(property);
+                                }}
+                                tip={`Изменить: ${metaData.dataTable[property].value}`}
+                                style={{ whiteSpace }}
+                              />
                             </Fragment>
                           );
                         })}
-
-                      {/* Right column with actions menu */}
-                      {hasAdditionalCell && (
-                        <TableCell
-                          className="data-table__cell data-table__hover-icon"
-                          padding="none"
-                          style={{ paddingLeft: metaData.mobile ? '10px' : '' }}
-                        >
-                          <div className="data-table__hover-icon">
-                            <Suspense fallback={<p>...</p>}>
-                              <TblActionMenu id={row.id} task={row} list={this.actionMenuList} />
-                            </Suspense>
-                          </div>
-                        </TableCell>
-                      )}
+                      <TblCellIcon
+                        showCell={hasAdditionalCell}
+                        showInner
+                        type="data-table__hover-icon"
+                        action={this.handleCloseInlineEdit}
+                        row={row}
+                        actionMenuList={this.actionMenuList}
+                        style={{ paddingLeft: metaData.mobile ? '10px' : '' }}
+                      />
                     </TableRow>
 
                     {/* Full text row - if click to show */}
                     {(this.state.showFullTextID === row.id ||
                       (weekDescription && weekDescription === row.week)) &&
                       fullText.display && (
-                        <Suspense
-                          fallback={
-                            <TableRow>
-                              <TableCell>...</TableCell>
-                            </TableRow>
-                          }
-                        >
+                        <Suspense fallback={<CustomSuspenseFallback type="row" />}>
                           <TblFullTextRow data={fullText} headCells={headCells} id={row.id} />
                         </Suspense>
                       )}
 
                     {/* Secondary List: show and hide */}
                     {this.state.showAddRows === row.id && !groupHide[row[groupBy]] && (
-                      <Suspense
-                        fallback={
-                          <TableRow>
-                            <TableCell>...</TableCell>
-                          </TableRow>
-                        }
-                      >
+                      <Suspense fallback={<CustomSuspenseFallback type="row" />}>
                         <TblSecondaryList
                           secDataList={secDataList}
                           fullColsNum={fullColsNum}

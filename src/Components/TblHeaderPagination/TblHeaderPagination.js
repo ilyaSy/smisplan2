@@ -17,44 +17,52 @@ export default function TblHeaderPagination(props) {
   const TablePaginationActions = () => (
     <div className="data-table__pagination-actions">
       <Tooltip title="Первая страница" placement="bottom" enterDelay={300}>
-        <IconButton
-          onClick={goToFirstPage}
-          disabled={page === 0}
-          aria-label="Первая"
-          className="data-table__pagination-select"
-        >
-          <FirstPageIcon fontSize="small" />
-        </IconButton>
+        <span>
+          <IconButton
+            onClick={goToFirstPage}
+            disabled={page === 0}
+            aria-label="Первая"
+            className="data-table__pagination-select"
+          >
+            <FirstPageIcon fontSize="small" />
+          </IconButton>
+        </span>
       </Tooltip>
       <Tooltip title="Предыдущая" placement="bottom" enterDelay={300}>
-        <IconButton
-          onClick={goToPrevPage}
-          disabled={page === 0}
-          aria-label="Предыдущая"
-          className="data-table__pagination-select"
-        >
-          <KeyboardArrowLeftIcon fontSize="small" />
-        </IconButton>
+        <span>
+          <IconButton
+            onClick={goToPrevPage}
+            disabled={page === 0}
+            aria-label="Предыдущая"
+            className="data-table__pagination-select"
+          >
+            <KeyboardArrowLeftIcon fontSize="small" />
+          </IconButton>
+        </span>
       </Tooltip>
       <Tooltip title="Следующая" placement="bottom" enterDelay={300}>
-        <IconButton
-          onClick={goToNextPage}
-          disabled={page >= countTotal - 1}
-          aria-label="Следующая"
-          className="data-table__pagination-select"
-        >
-          <KeyboardArrowRightIcon fontSize="small" />
-        </IconButton>
+        <span>
+          <IconButton
+            onClick={goToNextPage}
+            disabled={page >= countTotal - 1}
+            aria-label="Следующая"
+            className="data-table__pagination-select"
+          >
+            <KeyboardArrowRightIcon fontSize="small" />
+          </IconButton>
+        </span>
       </Tooltip>
       <Tooltip title="Последняя страница" placement="bottom" enterDelay={300}>
-        <IconButton
-          onClick={goToLastPage}
-          disabled={page >= countTotal - 1}
-          aria-label="Последняя"
-          className="data-table__pagination-select"
-        >
-          <LastPageIcon fontSize="small" />
-        </IconButton>
+        <span>
+          <IconButton
+            onClick={goToLastPage}
+            disabled={page >= countTotal - 1}
+            aria-label="Последняя"
+            className="data-table__pagination-select"
+          >
+            <LastPageIcon fontSize="small" />
+          </IconButton>
+        </span>
       </Tooltip>
     </div>
   );
