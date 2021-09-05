@@ -7,7 +7,7 @@ import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 
-import CustomIcon from '../../SharedComponents/CustomIcon';
+import CustomIcon from '../../../SharedComponents/CustomIcon';
 import './PopupConfirmChoice.css';
 
 // Standart dialog: confirm with choice
@@ -73,12 +73,7 @@ function PopupConfirmChoice(props) {
           >
             Да
           </Button>
-          <Button
-            variant="outlined"
-            onClick={handleClose}
-            color="secondary"
-            startIcon={<CloseIcon />}
-          >
+          <Button variant="outlined" onClick={handleClose} color="secondary" startIcon={<CloseIcon />}>
             Отмена
           </Button>
         </DialogActions>

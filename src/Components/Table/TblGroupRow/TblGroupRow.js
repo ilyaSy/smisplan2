@@ -1,8 +1,8 @@
 import { MenuItem, ListItemIcon, Typography, TableRow, TableCell } from '@material-ui/core';
 import moment from 'moment';
-import PopupConfirmChoice from '../PopupConfirmChoice/PopupConfirmChoice';
-import DateW from '../../utils/date';
-import CustomIcon from '../../SharedComponents/CustomIcon';
+import PopupConfirmChoice from '../../Popup/PopupConfirmChoice/PopupConfirmChoice';
+import DateW from '../../../utils/date';
+import CustomIcon from '../../../SharedComponents/CustomIcon';
 
 const currentWeek = new DateW().getYearWeekStr();
 

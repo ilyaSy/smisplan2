@@ -6,11 +6,11 @@ import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
 import 'moment/locale/ru';
 
-import CustomSelect from '../../SharedComponents/CustomSelect';
-import CustomDateTimePicker from '../../SharedComponents/CustomDateTimePicker';
-import { metaData, dataTable } from '../../config/data';
-import DateW from '../../utils/date';
-import getDefaultValues from '../../utils/defaultData';
+import CustomSelect from '../../../SharedComponents/CustomSelect';
+import CustomDateTimePicker from '../../../SharedComponents/CustomDateTimePicker';
+import { metaData, dataTable } from '../../../config/data';
+import DateW from '../../../utils/date';
+import getDefaultValues from '../../../utils/defaultData';
 import './PopupAddLinkedInfo.css';
 
 // Standart dialog:
@@ -148,9 +148,7 @@ export default class PopupAddLinkedInfo extends React.Component {
                         .map((k) => ({ value: k, label: listInfo[k].value }))}
                       defaultValue={
                         initialValue
-                          ? initialValue
-                              .split(',')
-                              .map((v) => ({ value: v, label: listInfo[v].value }))
+                          ? initialValue.split(',').map((v) => ({ value: v, label: listInfo[v].value }))
                           : null
                       }
                       ref={property}

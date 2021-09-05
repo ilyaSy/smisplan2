@@ -1,7 +1,7 @@
 import React from 'react';
 import { Input } from '@material-ui/core';
 import InputAdornment from '@material-ui/core/InputAdornment';
-import CustomIcon from '../../SharedComponents/CustomIcon';
+import CustomIcon from '../../../SharedComponents/CustomIcon';
 
 function TblHeaderSearch(props) {
   const [search, setSearch] = React.useState('');

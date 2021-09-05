@@ -3,9 +3,9 @@ import { Menu, MenuItem } from '@material-ui/core';
 import MomentUtils from '@date-io/moment';
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
 
-import { filters, filterTasks } from '../../utils/filters';
-import MenuItemsList from '../../SharedComponents/MenuItemsList';
-import CustomIcon from '../../SharedComponents/CustomIcon';
+import { filters, filterTasks } from '../../../utils/filters';
+import MenuItemsList from '../../../SharedComponents/MenuItemsList';
+import CustomIcon from '../../../SharedComponents/CustomIcon';
 
 function TblHeaderBtnMenu({ type, name, itemList, action, all, noClosed }) {
   const [anchorEl, setAnchorEl] = React.useState(null);

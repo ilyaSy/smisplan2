@@ -2,12 +2,12 @@ import React, { Fragment } from 'react';
 import { TableRow, TableCell, TableSortLabel } from '@material-ui/core';
 
 import TblHeaderBtnMenu from '../TblHeaderBtnMenu/TblHeaderBtnMenu';
-import { metaData } from '../../config/data';
+import { metaData } from '../../../config/data';
 import {
   getColumnWidths,
   getFilterVisibility,
   getGroupVisibility,
-} from '../../utils/tblHeaderHelpers';
+} from '../../../utils/tblHeaderHelpers';
 
 export default class TblHeadEnhanced extends React.PureComponent {
   constructor(props) {

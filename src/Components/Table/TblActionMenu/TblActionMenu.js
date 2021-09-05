@@ -2,10 +2,10 @@ import React from 'react';
 import { Menu, MenuItem, ListItemIcon, Typography, Divider } from '@material-ui/core';
 import ArrowLeft from '@material-ui/icons/ArrowLeft';
 
-import CustomIcon from '../../SharedComponents/CustomIcon';
-import PopupEdit from '../PopupEdit/PopupEdit';
-import PopupConfirm from '../PopupConfirm/PopupConfirm';
-import PopupAddLinkedInfo from '../PopupAddLinkedInfo/PopupAddLinkedInfo';
+import CustomIcon from '../../../SharedComponents/CustomIcon';
+import PopupEdit from '../../Popup/PopupEdit/PopupEdit';
+import PopupConfirm from '../../Popup/PopupConfirm/PopupConfirm';
+import PopupAddLinkedInfo from '../../Popup/PopupAddLinkedInfo/PopupAddLinkedInfo';
 import './TblActionMenu.css';
 
 function TblActionMenu(props) {

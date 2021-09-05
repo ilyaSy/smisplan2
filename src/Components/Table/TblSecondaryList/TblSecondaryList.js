@@ -1,6 +1,6 @@
 import React from 'react';
 import { MenuItem, ListItemIcon, Typography, TableRow, TableCell } from '@material-ui/core';
-import CustomIcon from '../../SharedComponents/CustomIcon';
+import CustomIcon from '../../../SharedComponents/CustomIcon';
 
 function TblSecondaryList(props) {
   const { secDataList, fullColsNum, loadSecondaryList } = props;

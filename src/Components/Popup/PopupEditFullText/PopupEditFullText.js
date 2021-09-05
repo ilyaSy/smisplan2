@@ -2,7 +2,7 @@ import React from 'react';
 import { Dialog, DialogTitle, DialogActions, TextField, DialogContent, Button } from '@material-ui/core';
 import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
-import CustomIcon from '../../SharedComponents/CustomIcon';
+import CustomIcon from '../../../SharedComponents/CustomIcon';
 
 function PopupEditFullText({ id, property, text, action, class: className, value, metaData }) {
   const [open, setOpen] = React.useState(false);

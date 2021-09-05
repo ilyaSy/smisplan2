@@ -7,7 +7,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 
 import { dataTable, metaData } from '../../config/data';
 import storage from '../../storages/commonStorage';
-import PopupSimpleOutput from '../PopupSimpleOutput/PopupSimpleOutput';
+import PopupSimpleOutput from '../Popup/PopupSimpleOutput/PopupSimpleOutput';
 
 const months = [
   'января',
@@ -23,22 +23,8 @@ const months = [
   'ноября',
   'декабря',
 ];
-const weekDays = [
-  'понедельник',
-  'вторник',
-  'среда',
-  'четверг',
-  'пятница',
-  'суббота',
-  'воскресение',
-];
-const calendarModes = {
-  today: 'Сегодня',
-  month: 'Месяц',
-  week: 'Неделя',
-  day: 'День',
-  list: 'Список',
-};
+const weekDays = ['понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота', 'воскресение'];
+const calendarModes = { today: 'Сегодня', month: 'Месяц', week: 'Неделя', day: 'День', list: 'Список' };
 
 export default class MainCalendar extends React.Component {
   constructor(props) {

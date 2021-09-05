@@ -1,6 +1,5 @@
 import React, { Fragment, Suspense, lazy } from 'react';
-import { Table, TableHead, TableBody, TableRow, TableCell, Input } from '@material-ui/core';
-import InputAdornment from '@material-ui/core/InputAdornment';
+import { Table, TableHead, TableBody, TableRow, TableCell } from '@material-ui/core';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import moment from 'moment';
 import 'moment/locale/ru';
@@ -9,19 +8,20 @@ import { dataTable, metaData } from '../../config/data';
 import { filters, filterTasks } from '../../utils/filters';
 import { doData, getData } from '../../utils/apiFunctions';
 import storage from '../../storages/commonStorage';
-import TblHeadEnhanced from '../TblHeadEnhanced/TblHeadEnhanced';
+import TblHeadEnhanced from '../Table/TblHeadEnhanced/TblHeadEnhanced';
 import CustomIcon from '../../SharedComponents/CustomIcon';
 import CustomSuspenseFallback from '../../SharedComponents/CustomSuspenseFallback';
-import TblCell from '../TblCell/TblCell';
-import TblCellIcon from '../TblCellIcon/TblCellIcon';
-import TblHeaderSearch from '../TblHeaderSearch/TblHeaderSearch';
-import TblHeaderPagination from '../TblHeaderPagination/TblHeaderPagination';
-import TblGroupRow from '../TblGroupRow/TblGroupRow';
+import TblCell from '../Table/TblCell/TblCell';
+import TblCellInput from '../Table/TblCellInput/TblCellInput';
+import TblCellIcon from '../Table/TblCellIcon/TblCellIcon';
+import TblHeaderSearch from '../Table/TblHeaderSearch/TblHeaderSearch';
+import TblHeaderPagination from '../Table/TblHeaderPagination/TblHeaderPagination';
+import TblGroupRow from '../Table/TblGroupRow/TblGroupRow';
 import getDefaultValues from '../../utils/defaultData';
 import './DataTable.css';
 
-const TblSecondaryList = lazy(() => import('../TblSecondaryList/TblSecondaryList'));
-const TblFullTextRow = lazy(() => import('../TblFullTextRow/TblFullTextRow'));
+const TblSecondaryList = lazy(() => import('../Table/TblSecondaryList/TblSecondaryList'));
+const TblFullTextRow = lazy(() => import('../Table/TblFullTextRow/TblFullTextRow'));
 
 const descSort = (a, b, sort) => {
   let desc = 0;
@@ -93,8 +93,7 @@ export default class DataTable extends React.Component {
       sort: [{ field: 'id', order: 'asc' }],
       groupBy: '',
       groupHide: {},
-      editID: -1,
-      editItem: '',
+      editItem: { id: -1, property: '', value: '' },
       showFullTextID: -1,
       showAddRows: -1,
       data: dataTable,
@@ -125,9 +124,8 @@ export default class DataTable extends React.Component {
         this.setState({
           headCells: metaData.dataTable,
           sort,
-          // search: '',
           groupBy,
-          editID: -1,
+          editItem: { id: -1, property: '', value: '' },
           data: filterTasks(true),
           loadData: true,
         });
@@ -158,20 +156,18 @@ export default class DataTable extends React.Component {
   }
 
   setData = (data) => {
-    this.setEditID(-1);
+    this.setEditItem({ id: -1, property: '', value: '' });
     this.setState({ data });
   };
 
   setPage = (page) => {
-    this.setEditID(-1);
+    this.setEditItem({ id: -1, property: '', value: '' });
     this.setState({ page });
   };
 
   setOrder = (order) => this.setState({ order });
 
   setOrderBy = (orderBy) => this.setState({ orderBy });
-
-  setEditID = (editID) => this.setState({ editID });
 
   setEditItem = (editItem) => this.setState({ editItem });
 
@@ -390,14 +386,13 @@ export default class DataTable extends React.Component {
   };
 
   /* called after inline edit of something */
-  inlineEditOk = (id) => () => {
-    const editProperty = this.state.editItem;
+  handleInlineEditOk = (id) => (editProperty, editValue) => {
     const realID = this.realID(id);
     const rowData = {};
     Object.keys(dataTable[realID]).forEach((key) => {
       rowData[key] = dataTable[realID][key];
     });
-    rowData[editProperty] = this[`edit-${editProperty}-${id}`].value;
+    rowData[editProperty] = editValue;
 
     storage.alert.dispatch({
       type: 'SHOW_ALERT',
@@ -418,12 +413,13 @@ export default class DataTable extends React.Component {
           message: 'Изменение успешно',
         });
 
-        // dataTable[realID][editProperty] = this[`edit-${editProperty}-${id}`].value;
         dataTable[realID][editProperty] = rowData[editProperty];
         this.setData(filterTasks());
       }
     });
   };
+
+  handleInlineEditClose = () => this.setEditItem({ id: -1, property: '', value: '' });
 
   dialogEditOk = (id, editProperty, editPropertyValue) => {
     const realID = this.realID(id);
@@ -959,11 +955,6 @@ ${date.format('DD MMMM')}`;
     return display;
   };
 
-  handleCloseInlineEdit = () => {
-    this.setEditID(-1);
-    this.setEditItem('');
-  };
-
   // chosenWeek = 0 - this week, 1 - next week, 2 - ...
   copyPreviousWeekDiscussions(selectedWeek, chosenWeek) {
     const weekData = dataTable.filter((row) => row.week === selectedWeek);
@@ -993,6 +984,7 @@ ${date.format('DD MMMM')}`;
       this.state;
     const groupList = {};
     let { rowsPerPage, data } = this.state;
+    const { tableName } = metaData?.specificParameters || {};
 
     // for `noPagination` parameter (print PDF click)
     if (this.props.noPagination) {
@@ -1124,7 +1116,8 @@ ${date.format('DD MMMM')}`;
                                 padding="none"
                                 style={{ whiteSpace }}
                               >
-                                {(this.state.editID !== id || this.state.editItem !== property) && (
+                                {(this.state.editItem.id !== id ||
+                                  this.state.editItem.property !== property) && (
                                   <TblCell
                                     value={value}
                                     headCell={headCell}
@@ -1135,39 +1128,20 @@ ${date.format('DD MMMM')}`;
                                 )}
 
                                 {/* edit item textbox */}
-                                {this.state.editID === id && this.state.editItem === property && (
-                                  <Input
-                                    type="text"
-                                    fullWidth
-                                    autoFocus
-                                    defaultValue={value}
-                                    ref={`edit-${property}-${id}`}
-                                    inputRef={(el) => {
-                                      this[`edit-${property}-${id}`] = el;
-                                    }}
-                                    /* edit item ok / cancel buttons */
-                                    endAdornment={
-                                      <InputAdornment position="end">
-                                        <div className="data-table__cell-edit-buttons">
-                                          <CustomIcon class="icn_ok" action={this.inlineEditOk(id)} />
-                                          <CustomIcon
-                                            class="icn_cancel"
-                                            action={this.handleCloseInlineEdit}
-                                          />
-                                        </div>
-                                      </InputAdornment>
-                                    }
-                                  />
-                                )}
+                                {this.state.editItem.id === id &&
+                                  this.state.editItem.property === property && (
+                                    <TblCellInput
+                                      defaultValue={this.state.editItem}
+                                      actionOk={this.handleInlineEditOk(id)}
+                                      actionCancel={this.handleInlineEditClose}
+                                    />
+                                  )}
                               </TableCell>
                               <TblCellIcon
                                 showCell={headCell.isInlineEditable && headCell.type === 'string'}
-                                showInner={this.state.editID !== id}
+                                showInner={this.state.editItem.id !== id}
                                 type="data-table__cell_inline-edit"
-                                action={() => {
-                                  this.setEditID(id);
-                                  this.setEditItem(property);
-                                }}
+                                action={() => this.setEditItem({ id, property, value })}
                                 tip={`Изменить: ${metaData.dataTable[property].value}`}
                                 style={{ whiteSpace }}
                               />
@@ -1178,7 +1152,7 @@ ${date.format('DD MMMM')}`;
                         showCell={hasAdditionalCell}
                         showInner
                         type="data-table__hover-icon"
-                        action={this.handleCloseInlineEdit}
+                        action={this.handleInlineEditClose}
                         row={row}
                         actionMenuList={this.actionMenuList}
                         style={{ paddingLeft: metaData.mobile ? '10px' : '' }}
@@ -1210,9 +1184,7 @@ ${date.format('DD MMMM')}`;
           ) : (
             <TableRow>
               <TableCell colSpan={fullColsNum}>
-                {metaData.specificParameters?.tableName
-                  ? `${metaData.specificParameters?.tableName}: отсутствуют`
-                  : 'Данные загружаются...'}
+                {tableName ? `${tableName}: отсутствуют` : 'Данные загружаются...'}
               </TableCell>
             </TableRow>
           )}

@@ -1,7 +1,7 @@
 import { Suspense, lazy } from 'react';
 import { TableCell } from '@material-ui/core';
-import CustomSuspenseFallback from '../../SharedComponents/CustomSuspenseFallback';
-import CustomIcon from '../../SharedComponents/CustomIcon';
+import CustomSuspenseFallback from '../../../SharedComponents/CustomSuspenseFallback';
+import CustomIcon from '../../../SharedComponents/CustomIcon';
 
 const TblActionMenu = lazy(() => import('../TblActionMenu/TblActionMenu'));
 

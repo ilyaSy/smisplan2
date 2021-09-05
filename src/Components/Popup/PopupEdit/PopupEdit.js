@@ -18,16 +18,16 @@ import CloseIcon from '@material-ui/icons/Close';
 import SaveAltIcon from '@material-ui/icons/SaveAlt';
 import ReactToPrint from 'react-to-print';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
-import CustomDateTimePicker from '../../SharedComponents/CustomDateTimePicker';
+import CustomDateTimePicker from '../../../SharedComponents/CustomDateTimePicker';
 import 'moment/locale/ru';
 
-import { metaData, dataTable } from '../../config/data';
-import { getData, fileUpload } from '../../utils/apiFunctions';
-import storage from '../../storages/commonStorage';
-import CustomSelect from '../../SharedComponents/CustomSelect';
-import CustomIcon from '../../SharedComponents/CustomIcon';
-import exportDocx from '../../SharedComponents/exportDocx';
-import DateW from '../../utils/date';
+import { metaData, dataTable } from '../../../config/data';
+import { getData, fileUpload } from '../../../utils/apiFunctions';
+import storage from '../../../storages/commonStorage';
+import CustomSelect from '../../../SharedComponents/CustomSelect';
+import CustomIcon from '../../../SharedComponents/CustomIcon';
+import exportDocx from '../../../SharedComponents/exportDocx';
+import DateW from '../../../utils/date';
 import './PopupEdit.css';
 
 const textToDoc = (task, tasksList) => {
