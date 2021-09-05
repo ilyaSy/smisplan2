@@ -62,6 +62,24 @@ export default class DateW extends Date {
         default:
           date = undefined;
       }
+    } else if (typeof value === 'object' && value instanceof Date) {
+      switch (mode) {
+        case 'date':
+          date = value.toLocaleDateString('ru-RU').replace(/(\d+)\.(\d+)\.(\d+)/, '$3-$2-$1');
+          break;
+        case 'time':
+          date = value.toLocaleTimeString('ru-RU').replace(/(\d+):(\d+):(\d+)/, '$1:$2:00');
+          break;
+        case 'datetime':
+          date = `${value
+            .toLocaleDateString('ru-RU')
+            .replace(/(\d+?)\.(\d+?)\.(\d+?)/, '$3-$2-$1')}  ${value
+            .toLocaleTimeString('ru-RU')
+            .replace(/(\d+?):(\d+?):(\d+?)/, '$1:$2:00')}`;
+          break;
+        default:
+          date = undefined;
+      }
     }
     return date;
   };

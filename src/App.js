@@ -17,7 +17,7 @@ export default function App() {
   const [developers, setDevelopers] = React.useState([]);
   const _divDataTable = React.useRef(null);
 
-  const reloadDataTable = (dataTableName, func, resetFilter = true) => {
+  const reloadDataTable = (dataTableName, cb, resetFilter = true) => {
     metaData.dataTableName = dataTableName;
     storage.table.dispatch({ type: 'SET_TABLENAME', tableName: dataTableName });
 
@@ -25,7 +25,7 @@ export default function App() {
 
     Promise.all([getData(`${dataTableName}_meta`), getData(metaData.dataTableName)])
       .then(() => {
-        if (typeof func === 'function') func();
+        if (typeof cb === 'function') cb();
       })
       .then(() => {
         storage.state.dispatch({ type: 'SET_DATALOADING', stage: 'data' });

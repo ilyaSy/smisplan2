@@ -14,10 +14,7 @@ export default function exportDocx(textRows) {
 
   try {
     textRows.forEach((text) => {
-      rows.push(
-        // Size is 50% of MS Word pts
-        new Paragraph({ children: [new TextRun({ text: `${text}`, size: '24', font: 'Arial' })] })
-      );
+      rows.push(new Paragraph({ children: [new TextRun({ text, size: '24', font: 'Arial' })] }));
     });
 
     doc.addSection({ children: rows });

@@ -99,8 +99,8 @@
     },
     {
       "description": {
-        "isInlineEditable": "true",
-        "showInTable": "true",
+        "isInlineEditable": "false",
+        "showInTable": "false",
         "isEditable": "true",
         "value": "Описание",
         "validValues": "",

@@ -588,13 +588,13 @@ export default class DataTable extends React.Component {
     const linkedData = {};
     const metaTable = metaData.tables[`${type}_meta`];
 
-    metaTable.dataTable.forEach((prop) => {
+    Object.keys(metaTable.dataTable).forEach((prop) => {
       if (metaTable.dataTable[prop].defaultValue) {
         linkedData[prop] = getDefaultValues(realID, prop, metaTable.dataTable);
       }
     });
 
-    infoData.forEach((prop) => {
+    Object.keys(infoData).forEach((prop) => {
       linkedData[prop] = infoData[prop];
     });
 
@@ -610,7 +610,7 @@ export default class DataTable extends React.Component {
           status: 'fail',
           message: 'Ошибка при добавлении',
         });
-      } else if (json && json.data && json.data.id) {
+      } else if (json && json.id) {
         storage.alert.dispatch({
           type: 'SHOW_ALERT',
           status: 'success',

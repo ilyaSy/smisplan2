@@ -18,13 +18,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import SaveAltIcon from '@material-ui/icons/SaveAlt';
 import ReactToPrint from 'react-to-print';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
-import {
-  MuiPickersUtilsProvider,
-  KeyboardDatePicker,
-  KeyboardTimePicker,
-  KeyboardDateTimePicker,
-} from '@material-ui/pickers';
-import MomentUtils from '@date-io/moment';
+import CustomDateTimePicker from '../../SharedComponents/CustomDateTimePicker';
 import 'moment/locale/ru';
 
 import { metaData, dataTable } from '../../config/data';
@@ -100,7 +94,6 @@ export default class PopupEdit extends React.Component {
     super(props);
 
     this.state = {
-      // open: props.isOpened || false,
       openConfirm: false,
       confirmMessage: '',
       printPDF: false,
@@ -142,9 +135,7 @@ export default class PopupEdit extends React.Component {
     }
   }
 
-  setOpenConfirm = (openConfirm) => {
-    this.setState({ openConfirm });
-  };
+  setOpenConfirm = (openConfirm) => this.setState({ openConfirm });
 
   setOpen = (open) => {
     this.setState({ open });
@@ -155,7 +146,6 @@ export default class PopupEdit extends React.Component {
           metaData.dataTable[property].isEditable &&
           ['select', 'multi-select'].includes(metaData.dataTable[property].type)
         ) {
-          // Reset property values (maybe we want to edit one more time ?)
           this.task[property] = dataTable[this.realId][property];
 
           const listName = metaData.dataTable[property].vocabulary
@@ -177,14 +167,12 @@ export default class PopupEdit extends React.Component {
     }
   };
 
-  handleDateTimeChange = (property) => (value) => {
-    this.setState({ [property]: value });
-  };
+  handleDateTimeChange = (property) => (value) => this.setState({ [property]: value });
+
+  getRealId = () => dataTable.map((task) => task.id).indexOf(this.props.id);
 
   handleOk = () => {
-    const realId = dataTable.map((task) => task.id).indexOf(this.props.id);
-    const task = dataTable[realId];
-    // let task = this.props.task;
+    const task = dataTable[this.getRealId()];
 
     const dataEdited = {};
     Object.keys(metaData.dataTable).forEach((key) => {
@@ -209,7 +197,6 @@ export default class PopupEdit extends React.Component {
         propertyInfo.type === 'int' ? parseInt(dataEdited[key], 10) : dataEdited[key];
       if (propertyInfo.type !== 'int' && dataEditedValue !== task[key]) {
         isDataEdited = true;
-        // break;
       }
     });
 
@@ -228,41 +215,16 @@ export default class PopupEdit extends React.Component {
   };
 
   handleSaveAsNew = () => {
-    const realId = dataTable.map((task) => task.id).indexOf(this.props.id);
-    const task = dataTable[realId];
+    const task = dataTable[this.getRealId()];
 
-    const dataEdited = {};
-    Object.keys(metaData.dataTable).forEach((key) => {
-      if (key !== 'specificParameters' && key !== 'undefined') {
-        dataEdited[key] = this.state[key] ? this.state[key] : this[key]?.value || null;
-
-        if (key === 'mainTable') {
-          dataEdited[key] = task[key];
-        }
-
-        if (['datetime', 'date', 'time'].indexOf(metaData.dataTable[key].type) !== -1) {
-          // dataEdited[key] = dateTimeChange(metaData.dataTable[key].type, this.state[key]);
-          dataEdited[key] = DateW.toDateTimeStr(metaData.dataTable[key].type, this.state[key]);
-        }
-      }
-    });
-
-    if (dataEdited.week) {
-      dataEdited.week = parseFloat(new DateW(dataEdited.date).getYearWeekStr());
-    }
-
-    if (task.date === dataEdited.date && task.time === dataEdited.time) {
-      this.setOpenConfirm(true);
+    if (task.date === this.state.date && task.time === this.state.time) {
       this.setState({ confirmMessage: '(дата и время не были изменены!)' });
-    } else {
-      this.props.actionNew(dataEdited);
-      this.setOpen(false);
     }
+    this.setOpenConfirm(true);
   };
 
   confirmSaveAsNew = () => {
-    const realId = dataTable.map((task) => task.id).indexOf(this.props.id);
-    const task = dataTable[realId];
+    const task = dataTable[this.getRealId()];
 
     const dataEdited = {};
     Object.keys(metaData.dataTable).forEach((key) => {
@@ -273,8 +235,7 @@ export default class PopupEdit extends React.Component {
           dataEdited[key] = task[key];
         }
 
-        if (['datetime', 'date', 'time'].indexOf(metaData.dataTable[key].type) !== -1) {
-          // dataEdited[key] = dateTimeChange(metaData.dataTable[key].type, this.state[key]);
+        if (['datetime', 'date', 'time'].includes(metaData.dataTable[key].type)) {
           dataEdited[key] = DateW.toDateTimeStr(metaData.dataTable[key].type, this.state[key]);
         }
       }
@@ -283,6 +244,8 @@ export default class PopupEdit extends React.Component {
     if (dataEdited.week) {
       dataEdited.week = parseFloat(new DateW(dataEdited.date).getYearWeekStr());
     }
+
+    console.log(dataEdited);
 
     this.props.actionNew(dataEdited);
     this.setOpen(false);
@@ -479,52 +442,14 @@ export default class PopupEdit extends React.Component {
                           }
                         />
                       )}
-                    {propertyInfo.isEditable && propertyInfo.type === 'datetime' && (
-                      <MuiPickersUtilsProvider utils={MomentUtils}>
-                        <KeyboardDateTimePicker
-                          format="YYYY-MM-DD HH:mm"
-                          ampm={false}
-                          minutesStep={5}
-                          margin="normal"
-                          onChange={this.handleDateTimeChange(property)}
+                    {propertyInfo.isEditable &&
+                      ['datetime', 'date', 'time'].includes(propertyInfo.type) && (
+                        <CustomDateTimePicker
+                          type={propertyInfo.type}
                           value={this.state[property]}
-                          inputRef={(el) => {
-                            this[property] = el;
-                          }}
-                          fullWidth
-                        />
-                      </MuiPickersUtilsProvider>
-                    )}
-                    {propertyInfo.isEditable && propertyInfo.type === 'date' && (
-                      <MuiPickersUtilsProvider utils={MomentUtils}>
-                        <KeyboardDatePicker
-                          format="YYYY-MM-DD"
-                          margin="normal"
                           onChange={this.handleDateTimeChange(property)}
-                          value={this.state[property]}
-                          inputRef={(el) => {
-                            this[property] = el;
-                          }}
-                          fullWidth
                         />
-                      </MuiPickersUtilsProvider>
-                    )}
-                    {propertyInfo.isEditable && propertyInfo.type === 'time' && (
-                      <MuiPickersUtilsProvider utils={MomentUtils}>
-                        <KeyboardTimePicker
-                          format="HH:mm"
-                          ampm={false}
-                          minutesStep={5}
-                          margin="normal"
-                          onChange={this.handleDateTimeChange(property)}
-                          value={this.state[property]}
-                          inputRef={(el) => {
-                            this[property] = el;
-                          }}
-                          fullWidth
-                        />
-                      </MuiPickersUtilsProvider>
-                    )}
+                      )}
                     {!propertyInfo.isEditable && (
                       <TextField
                         defaultValue={value}

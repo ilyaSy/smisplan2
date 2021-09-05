@@ -4,43 +4,14 @@ import { Dialog, DialogTitle, DialogActions, TextField, DialogContent } from '@m
 import Button from '@material-ui/core/Button';
 import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
-import {
-  MuiPickersUtilsProvider,
-  KeyboardDatePicker,
-  KeyboardTimePicker,
-  KeyboardDateTimePicker,
-} from '@material-ui/pickers';
-import MomentUtils from '@date-io/moment';
 import 'moment/locale/ru';
 
 import CustomSelect from '../../SharedComponents/CustomSelect';
+import CustomDateTimePicker from '../../SharedComponents/CustomDateTimePicker';
 import { metaData, dataTable } from '../../config/data';
 import DateW from '../../utils/date';
 import getDefaultValues from '../../utils/defaultData';
 import './PopupAddLinkedInfo.css';
-
-const dateTimeChange = (mode, value) => {
-  let date;
-  if (typeof value === 'string') {
-    date = value;
-    if (mode === 'time') date = value.split('T')[1];
-  } else if (typeof value === 'object' && value && value._isAMomentObject) {
-    switch (mode) {
-      case 'date':
-        date = value.format('YYYY-MM-DD');
-        break;
-      case 'time':
-        date = value.format('HH:mm:00');
-        break;
-      case 'datetime':
-        date = value.format('YYYY-MM-DD HH:mm:00');
-        break;
-      default:
-        date = undefined;
-    }
-  }
-  return date;
-};
 
 // Standart dialog:
 export default class PopupAddLinkedInfo extends React.Component {
@@ -73,9 +44,7 @@ export default class PopupAddLinkedInfo extends React.Component {
         }
 
         if (['select', 'multi-select'].includes(metaTable.dataTable[prop].type)) {
-          fields[prop].list = metaTable.dataTable[prop].vocabulary
-            ? metaTable.dataTable[prop].vocabulary
-            : prop;
+          fields[prop].list = metaTable.dataTable[prop].vocabulary || prop;
         }
       }
     });
@@ -92,9 +61,7 @@ export default class PopupAddLinkedInfo extends React.Component {
     });
   }
 
-  handleDateTimeChange = (property) => (value) => {
-    this.setState({ [property]: value });
-  };
+  handleDateTimeChange = (property) => (value) => this.setState({ [property]: value });
 
   handleOk = () => {
     const editData = {};
@@ -108,8 +75,8 @@ export default class PopupAddLinkedInfo extends React.Component {
     Object.keys(editData).forEach((key) => {
       editData[key] = this.state[key] ? this.state[key] : this[key]?.value || null;
 
-      if (['datetime', 'date', 'time'].indexOf(metaTable.dataTable[key].type) !== -1) {
-        editData[key] = dateTimeChange(metaTable.dataTable[key].type, this.state[key]);
+      if (['datetime', 'date', 'time'].includes(metaTable.dataTable[key].type)) {
+        editData[key] = DateW.toDateTimeStr(metaTable.dataTable[key].type, this.state[key]);
       }
 
       if (key !== 'week' && (!editData[key] || editData[key] === '')) emptyDataError++;
@@ -124,7 +91,6 @@ export default class PopupAddLinkedInfo extends React.Component {
     } else {
       this.setState({ emptyDataError: false });
       this.props.action(this.props.id, this.props.type, editData);
-      // this.setOpen(false);
       this.props.onClose();
     }
   };
@@ -169,25 +135,22 @@ export default class PopupAddLinkedInfo extends React.Component {
             .map((property) => {
               const propertyInfo = editData[property];
               const listInfo = metaData[`${propertyInfo.list}List`];
+              const { initialValue } = propertyInfo;
 
               return (
                 <div key={property} className="popup-add-linked-info__row">
                   <div className="popup-add-linked-info__value">{propertyInfo.value}</div>
-                  {(propertyInfo.type === 'select' || propertyInfo.type === 'multi-select') && (
+                  {['select', 'multi-select'].includes(propertyInfo.type) && (
                     <CustomSelect
                       style={{ width: '100%', minHeight: '30px', marginTop: '5px' }}
                       options={Object.keys(listInfo)
                         .sort((a, b) => (listInfo[a].value >= listInfo[b].value ? 1 : -1))
-                        .map((propertyKey) => ({
-                          value: propertyKey,
-                          label: listInfo[propertyKey].value,
-                        }))}
+                        .map((k) => ({ value: k, label: listInfo[k].value }))}
                       defaultValue={
-                        editData[property].initialValue
-                          ? editData[property].initialValue.split(',').map((v) => ({
-                              value: v,
-                              label: listInfo[v].value,
-                            }))
+                        initialValue
+                          ? initialValue
+                              .split(',')
+                              .map((v) => ({ value: v, label: listInfo[v].value }))
                           : null
                       }
                       ref={property}
@@ -202,58 +165,16 @@ export default class PopupAddLinkedInfo extends React.Component {
                   {['fulltext', 'string', 'id'].includes(propertyInfo.type) && (
                     <TextField
                       fullWidth
-                      defaultValue={editData[property].initialValue}
-                      inputRef={(el) => {
-                        this[property] = el;
-                      }}
+                      value={initialValue}
+                      onChange={this.handleDateTimeChange(property)}
                       multiline={propertyInfo.type === 'fulltext'}
                     />
                   )}
-                  {propertyInfo.type === 'date' && (
-                    <MuiPickersUtilsProvider utils={MomentUtils}>
-                      <KeyboardDatePicker
-                        format="YYYY-MM-DD"
-                        fullWidth
-                        margin="normal"
-                        onChange={this.handleDateTimeChange(property, propertyInfo.type)}
-                        value={this.state[property]}
-                        inputRef={(el) => {
-                          this[property] = el;
-                        }}
-                      />
-                    </MuiPickersUtilsProvider>
-                  )}
-                  {propertyInfo.type === 'time' && (
-                    <MuiPickersUtilsProvider utils={MomentUtils}>
-                      <KeyboardTimePicker
-                        format="HH:mm"
-                        fullWidth
-                        margin="normal"
-                        ampm={false}
-                        minutesStep={5}
-                        onChange={this.handleDateTimeChange(property)}
-                        value={this.state[property]}
-                        inputRef={(el) => {
-                          this[property] = el;
-                        }}
-                      />
-                    </MuiPickersUtilsProvider>
-                  )}
-                  {propertyInfo.type === 'datetime' && (
-                    <MuiPickersUtilsProvider utils={MomentUtils}>
-                      <KeyboardDateTimePicker
-                        format="YYYY-MM-DD HH:mm"
-                        fullWidth
-                        ampm={false}
-                        minutesStep={5}
-                        margin="normal"
-                        onChange={this.handleDateTimeChange(property, propertyInfo.type)}
-                        value={this.state[property]}
-                        inputRef={(el) => {
-                          this[property] = el;
-                        }}
-                      />
-                    </MuiPickersUtilsProvider>
+                  {['datetime', 'date', 'time'].includes(propertyInfo.type) && (
+                    <CustomDateTimePicker
+                      type={propertyInfo.type}
+                      onChange={this.handleDateTimeChange(property)}
+                    />
                   )}
                 </div>
               );
