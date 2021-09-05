@@ -1,13 +1,14 @@
 import React, { Fragment } from 'react';
 import { TextField, Tooltip, Button } from '@material-ui/core';
 import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
-import MomentUtils from '@date-io/moment';
+// import MomentUtils from '@date-io/moment';
 import moment from 'moment';
-import {
-  MuiPickersUtilsProvider,
-  KeyboardDatePicker,
-  KeyboardTimePicker,
-} from '@material-ui/pickers';
+// import {
+//   MuiPickersUtilsProvider,
+//   KeyboardDatePicker,
+//   KeyboardTimePicker,
+// } from '@material-ui/pickers';
+import CustomDateTimePicker from '../../SharedComponents/CustomDateTimePicker';
 
 import { dataTable, metaData } from '../../config/data';
 import { doData } from '../../utils/api';
@@ -55,9 +56,7 @@ export default class DataAdd extends React.PureComponent {
     });
   }
 
-  componentWillUnmount() {
-    this.unsubscribe();
-  }
+  componentWillUnmount = () => this.unsubscribe();
 
   addTask = () => {
     storage.alert.dispatch({
@@ -191,9 +190,7 @@ export default class DataAdd extends React.PureComponent {
     this.setState({ developer: value });
   };
 
-  handleDateClick = (field) => (value) => {
-    this.setState({ [field]: value });
-  };
+  handleDateClick = (field) => (value) => this.setState({ [field]: value });
 
   render() {
     const { developers, addMenuTitle, hasAddMenu } = this.state;
@@ -238,33 +235,14 @@ export default class DataAdd extends React.PureComponent {
                     />
                   </div>
                 )}
-
-                {field.type === 'date' && (
-                  <MuiPickersUtilsProvider utils={MomentUtils}>
-                    <KeyboardDatePicker
-                      format="YYYY-MM-DD"
-                      margin="normal"
-                      value={this.state[field.id] || new Date()}
-                      onChange={this.handleDateClick(field.id)}
-                      style={{ width: '140px', margin: '0 0 9px 0' }}
-                      className="tbl-header-btn-menu__datepicker"
-                    />
-                  </MuiPickersUtilsProvider>
-                )}
-
-                {field.type === 'time' && (
-                  <MuiPickersUtilsProvider utils={MomentUtils}>
-                    <KeyboardTimePicker
-                      format="HH:mm:ss"
-                      ampm={false}
-                      minutesStep={5}
-                      margin="normal"
-                      value={this.state[field.id] || new Date()}
-                      onChange={this.handleDateClick(field.id)}
-                      style={{ width: '97px', margin: '0 0 9px 0' }}
-                      className="tbl-header-btn-menu__datepicker"
-                    />
-                  </MuiPickersUtilsProvider>
+                {['datetime', 'date', 'time'].includes(field.type) && (
+                  <CustomDateTimePicker
+                    type={field.type}
+                    onChange={this.handleDateClick(field.id)}
+                    fullWidth="no"
+                    style={{ width: field.type === 'date' ? '140px' : '97px', margin: '0 0 9px 0' }}
+                    className="tbl-header-btn-menu__datepicker"
+                  />
                 )}
               </Fragment>
             ))}

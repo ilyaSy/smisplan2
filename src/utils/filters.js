@@ -63,9 +63,6 @@ class Filters {
     const filterData = {};
 
     this.getKeys('data').forEach((key) => {
-      // if (Array.isArray(filterData[key])) {
-      //   return filterData[key].includes(this.data[key]);
-      // }
       filterData[key] = this.data[key];
     });
     this.getKeys('perm').forEach((key) => {

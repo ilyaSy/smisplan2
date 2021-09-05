@@ -65,7 +65,14 @@ function TblActionMenu(props) {
     if (event) event.stopPropagation();
   };
 
-  const handleClickItem = (item, id) => {
+  const closeEl = () => {
+    hideBasicElement();
+    setMenuEl(null);
+  };
+
+  const closeElSub = () => setMenuElSub(null);
+
+  const handleClickItem = (item, id) => () => {
     setMenuEl(null);
     if (item.id === 'tasks_edit') {
       handleOpenPopupEdit();
@@ -88,11 +95,8 @@ function TblActionMenu(props) {
         <Menu
           keepMounted
           anchorEl={menuEl}
-          open={Boolean(menuEl)}
-          onClose={() => {
-            hideBasicElement();
-            setMenuEl(null);
-          }}
+          open={!!menuEl}
+          onClose={closeEl}
           className="tbl-action-menu"
         >
           {menuList.map((item, index) => (
@@ -102,9 +106,7 @@ function TblActionMenu(props) {
               {item.id !== 'divider' && !item.isListOfItems && (
                 <MenuItem
                   key={`menu-${item.id}-menuItem`}
-                  onClick={() => {
-                    handleClickItem(item, props.id);
-                  }}
+                  onClick={handleClickItem(item, props.id)}
                 >
                   <ListItemIcon>
                     {item.id === 'tasks_edit' && (
@@ -114,9 +116,7 @@ function TblActionMenu(props) {
                           isOpened={isPopupEditOpened}
                           onClose={handleClosePopups}
                           id={props.id}
-                          action={(...args) => {
-                            action(item, args);
-                          }}
+                          action={(...args) => action(item, args)}
                           actionNew={item.actionNew}
                           task={props.task}
                         />
@@ -177,10 +177,8 @@ function TblActionMenu(props) {
                   anchorEl={menuElSub}
                   ref={_menuElSub}
                   key={`menu${item.id}-menuItem-sub`}
-                  open={Boolean(menuElSub)}
-                  onClose={() => {
-                    setMenuElSub(null);
-                  }}
+                  open={!!menuElSub}
+                  onClose={closeElSub}
                 >
                   {Object.keys(item.listItems).map((listItem) => (
                     <MenuItem

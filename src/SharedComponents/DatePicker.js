@@ -5,9 +5,8 @@ import 'moment/locale/ru';
 
 export default function DateTimePicker(props) {
   const [value, setValue] = React.useState(props?.value);
+  const fullWidth = !props.fullWidth === 'no';
   const onChange = (e) => {
-    // console.log(e);
-    // setValue(e.target.value);
     setValue(e._d);
     props.onChange(e._d);
   };
@@ -16,13 +15,11 @@ export default function DateTimePicker(props) {
     <MuiPickersUtilsProvider utils={MomentUtils}>
       <KeyboardDatePicker
         format="YYYY-MM-DD"
-        fullWidth
+        fullWidth={fullWidth}
         margin="normal"
         onChange={onChange}
         value={value}
-        // inputRef={(el) => {
-        //   this[property] = el;
-        // }}
+        style={props.style}
       />
     </MuiPickersUtilsProvider>
   );

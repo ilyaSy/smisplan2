@@ -401,10 +401,7 @@ export default class PopupEdit extends React.Component {
                           defaultValue={this.task[property]}
                           fullWidth
                           multiline
-                          onKeyDown={(e) => {
-                            //  need this to fix bug: home/end/arrow keys did not work
-                            e.stopPropagation();
-                          }}
+                          onKeyDown={(e) => e.stopPropagation()}
                           inputRef={(el) => {
                             this[property] = el;
                           }}
@@ -423,7 +420,6 @@ export default class PopupEdit extends React.Component {
                                 <InputAdornment position="end">
                                   <input
                                     id="editDialog-fileUploader"
-                                    // accept="image/*"
                                     type="file"
                                     style={{ display: 'none' }}
                                     multiple
@@ -535,9 +531,7 @@ export default class PopupEdit extends React.Component {
                 </Button>
                 <Button
                   variant="outlined"
-                  onClick={() => {
-                    this.setOpenConfirm(false);
-                  }}
+                  onClick={() => this.setOpenConfirm(false)}
                   color="secondary"
                   startIcon={<CloseIcon />}
                 >
