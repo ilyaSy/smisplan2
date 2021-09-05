@@ -4,11 +4,11 @@ import HeaderModes from './HeaderModes';
 import HeaderProjects from './HeaderProjects';
 import './Header.css';
 
-function Header({ reloadDataTable }) {
+function Header({ dataTable, projectList, reloadDataTable }) {
   return (
     <div className="header-modes-projects">
       <HeaderModes reloadDataTable={reloadDataTable} />
-      <HeaderProjects class="divProjectList" />
+      <HeaderProjects className="divProjectList" dataTable={dataTable} projectList={projectList} />
     </div>
   );
 }

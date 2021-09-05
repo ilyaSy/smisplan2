@@ -1,6 +1,6 @@
 import React, { Suspense, lazy } from 'react';
 
-import { metaData } from './config/data';
+import { metaData, dataTable } from './config/data';
 import { mainModes } from './config/constants';
 import { filters } from './utils/filters';
 import { getData } from './utils/api';
@@ -64,8 +64,8 @@ export default function App() {
   }
 
   React.useEffect(() => {
-    getData('developer').then(() => {
-      setDevelopers(metaData.developerList);
+    getData('developer').then((developersList) => {
+      setDevelopers(developersList);
       Promise.all([
         ...mainModes.map((mode) => getData(`${mode}_meta`)),
         getData(metaData.dataTableName),
@@ -80,12 +80,26 @@ export default function App() {
       <header style={{ display: 'flex' }}>
         <HeaderLogin reloadDataTable={reloadDataTable} dataRef={_divDataTable} />
         <div className="divSpacingUp" />
-        <Header reloadDataTable={reloadDataTable} />
+        <Header
+          reloadDataTable={reloadDataTable}
+          projectList={metaData.projectList}
+          dataTable={dataTable}
+        />
       </header>
 
       <main style={{ display: 'flex' }} className="divBottom">
-        <MainLeftSide developer={inputFilter.developer} developers={developers} />
-        <Content dataRef={_divDataTable} reloadDataTable={reloadDataTable} />
+        <MainLeftSide
+          developer={inputFilter.developer}
+          developers={developers}
+          metaData={metaData}
+          dataTable={dataTable}
+        />
+        <Content
+          dataRef={_divDataTable}
+          reloadDataTable={reloadDataTable}
+          dataTable={dataTable}
+          dataTableName={metaData.dataTableName}
+        />
 
         <Suspense fallback={<p>...</p>}>
           <Hint />

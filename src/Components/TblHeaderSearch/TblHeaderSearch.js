@@ -3,7 +3,7 @@ import { Input } from '@material-ui/core';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import CustomIcon from '../../SharedComponents/CustomIcon';
 
-export default function TblHeaderSearch(props) {
+function TblHeaderSearch(props) {
   const [search, setSearch] = React.useState('');
 
   const clearSearch = () => {
@@ -40,3 +40,5 @@ export default function TblHeaderSearch(props) {
     />
   );
 }
+
+export default React.memo(TblHeaderSearch);

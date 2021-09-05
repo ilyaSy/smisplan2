@@ -102,6 +102,8 @@ export const getData = async (mode, type = 'initialize') => {
       result.forEach((info) => {
         metaData[`${mode}List`][info.id] = { id: info.id, value: info.value };
       });
+
+      return metaData[`${mode}List`];
     }
 
     if (!metaData[`${mode}List`] || Object.keys(metaData[`${mode}List`]).length === 0) {

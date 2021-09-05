@@ -9,78 +9,61 @@ import {
 } from '@material-ui/core';
 import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
-
-import { metaData } from '../../config/data';
 import CustomIcon from '../../SharedComponents/CustomIcon';
 
-// Standart dialog: edit single property in modal popup
-export default class PopupEditFullText extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { open: false, fullText: this.props.text };
-  }
+function PopupEditFullText({ id, property, text, action, class: className, value, metaData }) {
+  const [open, setOpen] = React.useState(false);
+  const [fullText, setFullText] = React.useState(text);
 
-  handleOk = () => {
-    if (this.props.text !== this.fullText.value) {
-      this.props.action(this.props.id, this.props.property, this.fullText.value);
+  const handleOk = () => {
+    if (text !== fullText) {
+      action(id, property, fullText);
     } else {
       console.log('Изменений внесено не было');
     }
 
-    this.setState({ open: false });
+    setOpen(false);
   };
 
-  handleOpen = () => this.setState({ open: true });
+  const handleOpen = () => setOpen(true);
 
-  handleClose = () => this.setState({ open: false });
+  const handleClose = () => setOpen(false);
 
-  render() {
-    return (
-      <>
-        <CustomIcon class={this.props.class} tip="Изменить" action={this.handleOpen} />
+  const handleChange = (e) => setFullText(e.target.value);
 
-        <Dialog
-          open={this.state.open}
-          onClose={this.handleClose}
-          aria-labelledby="dialog-title"
-          fullWidth
+  return (
+    <>
+      <CustomIcon class={className} tip="Изменить" action={handleOpen} />
+
+      <Dialog open={open} onClose={handleClose} aria-labelledby="dialog-title" fullWidth>
+        <DialogTitle id="dialog-title">{value || metaData.dataTable[property].value}</DialogTitle>
+        <DialogContent>
+          <TextField value={fullText} onChange={handleChange} fullWidth multiline />
+        </DialogContent>
+        <DialogActions
+          style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-between' }}
         >
-          <DialogTitle id="dialog-title">
-            {this.props.value ? this.props.value : metaData.dataTable[this.props.property].value}
-          </DialogTitle>
-          <DialogContent>
-            <TextField
-              defaultValue={this.state.fullText}
-              inputRef={(el) => {
-                this.fullText = el;
-              }}
-              fullWidth
-              multiline
-            />
-          </DialogContent>
-          <DialogActions
-            style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-between' }}
+          <Button
+            variant="outlined"
+            onClick={handleOk}
+            color="primary"
+            className="MuiButton-outlinedOk"
+            startIcon={<CheckIcon />}
           >
-            <Button
-              variant="outlined"
-              onClick={this.handleOk}
-              color="primary"
-              className="MuiButton-outlinedOk"
-              startIcon={<CheckIcon />}
-            >
-              Принять изменения
-            </Button>
-            <Button
-              variant="contained"
-              onClick={this.handleClose}
-              color="secondary"
-              startIcon={<CloseIcon />}
-            >
-              Закрыть
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </>
-    );
-  }
+            Принять изменения
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleClose}
+            color="secondary"
+            startIcon={<CloseIcon />}
+          >
+            Закрыть
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
+  );
 }
+
+export default React.memo(PopupEditFullText);

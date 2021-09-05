@@ -19,6 +19,12 @@ class Filters {
     });
   };
 
+  // clear all data
+  clearAll = () => {
+    this.clear();
+    this.perm = {};
+  };
+
   setKeys = (tbl) => {
     Object.values(tbl)
       .filter((a) => a.isFilter)

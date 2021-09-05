@@ -11,61 +11,48 @@ import MenuItemChief from '../MenuItemChief/MenuItemChief';
 import storage from '../../storages/commonStorage';
 import './HeaderLogin.css';
 
-/* *************************  Login info  ******************************* */
-export default class HeaderLogin extends React.PureComponent {
-  constructor(props) {
-    super(props);
-    this.state = { username: '' };
-    this._columnsList = React.createRef();
-  }
+function HeaderLogin({ reloadDataTable, dataRef }) {
+  const [username, setUsername] = React.useState('');
+  const _columnsListRef = React.useRef(null);
 
-  componentDidMount() {
-    getData('user').then((user) => this.setState({ username: user.username }));
-  }
+  React.useEffect(() => {
+    getData('user').then((user) => setUsername(user.username));
+  }, []);
 
-  reloadDataTable = (mode) => {
-    this.filtersOff();
-    this.props.reloadDataTable(mode);
-  };
-
-  filtersOff = () => {
+  const filtersOff = () => {
     filters.clear();
     storage.data.dispatch({ type: 'REDRAW', redraw: true });
   };
 
-  render() {
-    return (
-      <div className="header-login">
-        <div className="header-login__menu">
-          <ReactToPrint
-            trigger={() => (
-              <Tooltip title="Распечатать">
-                <IconButton className="icn" style={{ padding: '0px' }}>
-                  <PrintIcon fontSize="large" />
-                </IconButton>
-              </Tooltip>
-            )}
-            content={() => this.props.dataRef.current}
-          />
+  return (
+    <div className="header-login">
+      <div className="header-login__menu">
+        <ReactToPrint
+          trigger={() => (
+            <Tooltip title="Распечатать">
+              <IconButton className="icn" style={{ padding: '0px' }}>
+                <PrintIcon fontSize="large" />
+              </IconButton>
+            </Tooltip>
+          )}
+          content={() => dataRef.current}
+        />
 
-          <MenuItemSettings ref={this._columnsList} class="icn_filter" name="MenuSettings" />
+        <MenuItemSettings ref={_columnsListRef} class="icn_filter" name="MenuSettings" />
 
-          <MenuItemChief
-            class="icn_chief"
-            name="MenuChief"
-            reloadDataTable={this.props.reloadDataTable}
-          />
+        <MenuItemChief class="icn_chief" name="MenuChief" reloadDataTable={reloadDataTable} />
 
-          <Tooltip title="Сбросить фильтры">
-            <IconButton className="icn" style={{ padding: '0px' }} onClick={this.filtersOff}>
-              <VisibilityIcon fontSize="large" />
-            </IconButton>
-          </Tooltip>
-        </div>
-        <div className="header-login__login">
-          <b>Логин</b>: {this.state.username}
-        </div>
+        <Tooltip title="Сбросить фильтры">
+          <IconButton className="icn" style={{ padding: '0px' }} onClick={filtersOff}>
+            <VisibilityIcon fontSize="large" />
+          </IconButton>
+        </Tooltip>
       </div>
-    );
-  }
+      <div className="header-login__login">
+        <b>Логин</b>: {username}
+      </div>
+    </div>
+  );
 }
+
+export default React.memo(HeaderLogin);

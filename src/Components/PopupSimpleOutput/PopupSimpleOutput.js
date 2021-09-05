@@ -1,21 +1,22 @@
+import React from 'react';
 import { Dialog, DialogTitle, DialogActions, DialogContent } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import CloseIcon from '@material-ui/icons/Close';
 import './PopupSimpleOutput.css';
 
 // Standart dialog: just modal popup with text
-export default function PopupSimpleOutput(props) {
+function PopupSimpleOutput({ isOpened, onClose, title, format, text }) {
   return (
-    <Dialog open={props.isOpened} onClose={props.onClose} aria-labelledby="dialog-title" fullWidth>
-      <DialogTitle id="dialog-title">{props.title}</DialogTitle>
+    <Dialog open={isOpened} onClose={onClose} aria-labelledby="dialog-title" fullWidth>
+      <DialogTitle id="dialog-title">{title}</DialogTitle>
       <DialogContent>
-        {props.format &&
-          props.format === 'listOfData' &&
-          props.text.split('\n').map((rowData, index) => {
+        {format &&
+          format === 'listOfData' &&
+          text.split('\n').map((rowData) => {
             const [dataTitle, dataValue] = rowData.split(';');
             return (
               <div
-                key={`simpleOutputDialog-field-${index}`}
+                key={`simpleOutputDialog-field-${dataTitle}`}
                 className="popup-simple-output__content"
               >
                 <div className="popup-simple-output__title">{dataTitle}:</div>
@@ -23,18 +24,15 @@ export default function PopupSimpleOutput(props) {
               </div>
             );
           })}
-        {!props.format && <span className="popup-simple-output__text">{props.text}</span>}
+        {!format && <span className="popup-simple-output__text">{text}</span>}
       </DialogContent>
       <DialogActions className="popup-simple-output__actions">
-        <Button
-          variant="outlined"
-          onClick={props.onClose}
-          color="secondary"
-          startIcon={<CloseIcon />}
-        >
+        <Button variant="outlined" onClick={onClose} color="secondary" startIcon={<CloseIcon />}>
           Закрыть
         </Button>
       </DialogActions>
     </Dialog>
   );
 }
+
+export default React.memo(PopupSimpleOutput);

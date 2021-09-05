@@ -8,16 +8,16 @@ import CustomIcon from '../../SharedComponents/CustomIcon';
 import DateW from '../../utils/date';
 import './MenuItemChief.css';
 
-export default class MenuItemChief extends React.PureComponent {
-  constructor(props) {
-    super(props);
-    this.state = { menuEl: null };
-  }
+function MenuItemChief(props) {
+  const [menuEl, setMenuEl] = React.useState(null);
 
-  senNotification = () => {
-    const currentDate = new DateW();
-    const currentWeek = currentDate.getWeek();
+  const currentDate = new DateW();
+  const currentWeek = currentDate.getWeek();
 
+  const handleOpenMenuEl = (e) => setMenuEl(e.currentTarget);
+  const handleCloseMenuEl = () => setMenuEl(null);
+
+  const sendNotification = () => {
     storage.alert.dispatch({
       type: 'SHOW_ALERT',
       status: 'warn',
@@ -45,76 +45,65 @@ export default class MenuItemChief extends React.PureComponent {
     });
   };
 
-  goToCurrentWeekDiscussion = () => {
+  const goToCurrentWeekDiscussion = () => {
     const loadTableName = 'discussion';
-    const currentDate = new DateW();
-    const currentWeek = currentDate.getWeek();
 
-    this.props.reloadDataTable(loadTableName, () => {
+    props.reloadDataTable(loadTableName, () => {
       filters.data.week = `${currentDate.getFullYear()}.${
         currentWeek + (currentDate.getDay() >= 5 ? 1 : 0)
       }`;
     });
   };
 
-  handleClickItem = (menuItem) => () => {
-    switch (menuItem) {
-      case 'discussionNotification':
-        this.senNotification();
-        break;
-      default:
-        this.goToCurrentWeekDiscussion();
-        break;
+  const handleClickItem = (menuItem) => () => {
+    if (menuItem === 'notification') {
+      sendNotification();
+    } else if (menuItem === 'discussion') {
+      goToCurrentWeekDiscussion();
     }
-    this.setState({ menuEl: null });
+    setMenuEl(null);
   };
 
-  render() {
-    return (
-      <div>
-        <CustomIcon
-          class={this.props.class}
-          tip="Для начальника"
-          fontSize="large"
-          action={(e) => this.setState({ menuEl: e.currentTarget })}
-        />
+  return (
+    <div>
+      <CustomIcon
+        class={props.class}
+        tip="Для начальника"
+        fontSize="large"
+        action={handleOpenMenuEl}
+      />
 
-        <Menu
-          id={`filter-menu-id-${this.props.name}`}
-          anchorEl={this.state.menuEl}
-          keepMounted
-          open={Boolean(this.state.menuEl)}
-          onClose={() => this.setState({ menuEl: null })}
-          className="menu-item-chief"
-        >
-          <MenuItem
-            key={`menu-${this.props.name}-discussion`}
-            onClick={this.handleClickItem('discussion')}
-          >
-            <ListItemIcon>
-              <CustomIcon class="icn_discussionList" tip="Перейти к списку расписаний на неделю" />
-            </ListItemIcon>
-            <Typography variant="inherit" noWrap>
-              Расписание обсуждений
-            </Typography>
-          </MenuItem>
+      <Menu
+        id={`filter-menu-id-${props.name}`}
+        anchorEl={menuEl}
+        keepMounted
+        open={Boolean(menuEl)}
+        onClose={handleCloseMenuEl}
+        className="menu-item-chief"
+      >
+        <MenuItem key={`menu-${props.name}-discussion`} onClick={handleClickItem('discussion')}>
+          <ListItemIcon>
+            <CustomIcon class="icn_discussionList" tip="Перейти к списку расписаний на неделю" />
+          </ListItemIcon>
+          <Typography variant="inherit" noWrap>
+            Расписание обсуждений
+          </Typography>
+        </MenuItem>
 
-          <MenuItem
-            key={`menu-${this.props.name}-discussionNotification`}
-            onClick={this.handleClickItem('discussionNotification')}
-          >
-            <ListItemIcon>
-              <CustomIcon
-                class="icn_notification"
-                tip="Отправить оповещения об обсуждениях на текущей неделе"
-              />
-            </ListItemIcon>
-            <Typography variant="inherit" noWrap>
-              Уведомление об обсуждениях
-            </Typography>
-          </MenuItem>
-        </Menu>
-      </div>
-    );
-  }
+        <MenuItem key={`menu-${props.name}-notification`} onClick={handleClickItem('notification')}>
+          <ListItemIcon>
+            <CustomIcon
+              class="icn_notification"
+              tip="Отправить оповещения об обсуждениях на текущей неделе"
+            />
+          </ListItemIcon>
+          <Typography variant="inherit" noWrap>
+            Уведомление об обсуждениях
+          </Typography>
+        </MenuItem>
+      </Menu>
+    </div>
+  );
 }
+
+export default React.memo(MenuItemChief);

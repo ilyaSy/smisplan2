@@ -33,7 +33,7 @@ function HeaderModes({ reloadDataTable }) {
     setValue(newValue);
     const mode = getMode(newValue);
 
-    filters.perm = [];
+    filters.clearAll();
     reloadDataTable(mode);
   };
 
@@ -55,7 +55,6 @@ function HeaderModes({ reloadDataTable }) {
     <AppBar position="static" className="header-modes-projects__bar" color="default">
       <Route
         path="/"
-        // render={({ location }) => (
         render={() => (
           <>
             <Tabs

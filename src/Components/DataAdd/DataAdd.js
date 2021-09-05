@@ -26,7 +26,6 @@ export default class DataAdd extends React.PureComponent {
       developers: '',
       selectDialogOptions: [],
     };
-    this._dialogSelect = React.createRef();
 
     Object.keys(metaData.dataTable).forEach((key) => {
       const field = metaData.dataTable[key];
@@ -61,8 +60,6 @@ export default class DataAdd extends React.PureComponent {
   }
 
   addTask = () => {
-    console.log(this.state);
-
     storage.alert.dispatch({
       type: 'SHOW_ALERT',
       status: 'warn',
@@ -91,12 +88,9 @@ export default class DataAdd extends React.PureComponent {
           }
         } else if (!state || state === '') {
           this.setState({ [`${key}Err`]: true });
-          // this.refs[objName].setState({ valueErr: true });
-          // this.refs[objName].setFocus();
           emptyDataError = true;
         } else {
           this.setState({ [`${key}Err`]: false });
-          // this.refs[objName].setState({ valueErr: false });
           task[key] = state;
         }
       }
@@ -176,9 +170,6 @@ export default class DataAdd extends React.PureComponent {
               // clear fields
               if (this[objName]) {
                 this[objName].value = '';
-              } else if (this.refs[objName]) {
-                // this.refs[objName].setState({ valueErr: false });
-                // this.refs[objName].setState({ value: null });
               }
             }
           });

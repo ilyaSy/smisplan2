@@ -3,13 +3,11 @@ import { Drawer } from '@material-ui/core';
 
 import CustomIcon from '../../SharedComponents/CustomIcon';
 import storage from '../../storages/commonStorage';
-import { metaData } from '../../config/data';
 import DevelopersFilter from '../DevelopersFilter/DevelopersFilter';
 import './MainLeftSide.css';
 
-function MainLeftSide(props) {
+function MainLeftSide({ developers, developer, metaData, dataTable }) {
   const [open, setOpen] = React.useState(true);
-  const { developers, developer } = props;
 
   const handleOpen = (isOpened) => {
     const root = document.documentElement;
@@ -37,7 +35,7 @@ function MainLeftSide(props) {
 
   const handleToggle = () => handleOpen(!open);
 
-  const list = Object.values(developers).map((d) => ({ id: d.id, value: d.value }));
+  const developersList = Object.values(developers).map((d) => ({ id: d.id, value: d.value }));
 
   return [
     <Drawer
@@ -47,7 +45,12 @@ function MainLeftSide(props) {
       open={open}
       classes={{ paper: 'left-side-bar' }}
     >
-      <DevelopersFilter developer={developer} list={list} />
+      <DevelopersFilter
+        inputFilter={developer}
+        developersList={developersList}
+        metaData={metaData}
+        dataTable={dataTable}
+      />
     </Drawer>,
     <div key="showHideButton" className="divSpacingBottom">
       <CustomIcon

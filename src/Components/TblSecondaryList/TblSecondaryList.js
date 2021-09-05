@@ -1,7 +1,8 @@
+import React from 'react';
 import { MenuItem, ListItemIcon, Typography, TableRow, TableCell } from '@material-ui/core';
 import CustomIcon from '../../SharedComponents/CustomIcon';
 
-export default function TblSecondaryList(props) {
+function TblSecondaryList(props) {
   const { secDataList, fullColsNum, loadSecondaryList } = props;
   return (
     <>
@@ -20,7 +21,7 @@ export default function TblSecondaryList(props) {
           </TableCell>
         </TableRow>
       )}
-      {/* collapse drop down secondary list */}
+
       <TableRow>
         <TableCell colSpan={fullColsNum} className="data-table__row-secondarylist-hide">
           <MenuItem style={{ paddingTop: '2px', paddingBottom: '2px' }} onClick={loadSecondaryList}>
@@ -37,3 +38,5 @@ export default function TblSecondaryList(props) {
     </>
   );
 }
+
+export default React.memo(TblSecondaryList);

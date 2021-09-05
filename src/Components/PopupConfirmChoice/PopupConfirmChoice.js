@@ -11,22 +11,24 @@ import CustomIcon from '../../SharedComponents/CustomIcon';
 import './PopupConfirmChoice.css';
 
 // Standart dialog: confirm with choice
-export default function PopupConfirmChoice(props) {
+function PopupConfirmChoice(props) {
   const { id, action, actionName, class: className } = props;
   const [open, setOpen] = React.useState(false);
   const [choice, setChoice] = React.useState(0);
   const [options, setOptions] = React.useState([]);
 
   React.useEffect(() => {
-    if (open) {
-      setOptions(props.options());
-    }
+    if (open) setOptions(props.options());
   }, [open, props]);
 
   const handleOk = () => {
     action(id, choice);
     setOpen(false);
   };
+
+  const handleOpen = () => setOpen(true);
+
+  const handleClose = () => setOpen(false);
 
   const handleChange = (event) => {
     const value = /^\d+$/.test(event.target.value)
@@ -37,7 +39,7 @@ export default function PopupConfirmChoice(props) {
 
   return (
     <>
-      <CustomIcon class={className} tip={actionName} action={() => setOpen(true)} />
+      <CustomIcon class={className} tip={actionName} action={handleOpen} />
 
       <Dialog open={open} onClose={() => setOpen(false)} aria-labelledby="dialog-title" fullWidth>
         <DialogTitle id="dialog-title">Вы подтверждаете действие: {actionName} ?</DialogTitle>
@@ -73,7 +75,7 @@ export default function PopupConfirmChoice(props) {
           </Button>
           <Button
             variant="outlined"
-            onClick={() => setOpen(false)}
+            onClick={handleClose}
             color="secondary"
             startIcon={<CloseIcon />}
           >
@@ -84,3 +86,5 @@ export default function PopupConfirmChoice(props) {
     </>
   );
 }
+
+export default React.memo(PopupConfirmChoice);

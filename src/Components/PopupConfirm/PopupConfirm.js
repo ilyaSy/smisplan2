@@ -1,11 +1,11 @@
+import React from 'react';
 import { Dialog, DialogTitle, DialogActions, DialogContent } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
 import './PopupConfirm.css';
 
-export default function PopupConfirm(props) {
-  const { id, action, actionName, actionText, isOpened, onClose } = props;
+function PopupConfirm({ id, action, actionName, actionText, isOpened, onClose }) {
   const handleOk = () => {
     action(id);
     onClose();
@@ -35,3 +35,5 @@ export default function PopupConfirm(props) {
     </Dialog>
   );
 }
+
+export default React.memo(PopupConfirm);

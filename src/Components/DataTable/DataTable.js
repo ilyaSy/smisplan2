@@ -18,7 +18,6 @@ import getDefaultValues from '../../utils/defaultData';
 import './DataTable.css';
 
 const TblActionMenu = lazy(() => import('../TblActionMenu/TblActionMenu'));
-const PopupEditFullText = lazy(() => import('../PopupEditFullText/PopupEditFullText'));
 const TblSecondaryList = lazy(() => import('../TblSecondaryList/TblSecondaryList'));
 const TblFullTextRow = lazy(() => import('../TblFullTextRow/TblFullTextRow'));
 
@@ -128,6 +127,11 @@ export default class DataTable extends React.Component {
           groupBy,
           editID: -1,
           data: filterTasks(true),
+          loadData: true,
+        });
+      } else if (dataLoading && dataLoading === 'meta') {
+        this.setState({
+          headCells: metaData.dataTable,
           loadData: true,
         });
       }
@@ -1061,7 +1065,6 @@ ${date.format('DD MMMM')}`;
                           const property = headCell.id;
                           let value =
                             groupBy &&
-                            groupBy !== '' &&
                             (headCell.id === groupBy ||
                               (headCell.id === 'date' && groupBy === 'week'))
                               ? dayName
@@ -1072,7 +1075,7 @@ ${date.format('DD MMMM')}`;
                             value = metaData.tables[`${value}_meta`].specificParameters.tableName;
                           const { id } = row;
                           let whiteSpace = '';
-                          if (['datetime', 'date', 'time'].indexOf(headCell.type) !== -1) {
+                          if (['datetime', 'date', 'time'].includes(headCell.type)) {
                             whiteSpace = 'nowrap';
                           }
                           if (
@@ -1169,21 +1172,6 @@ ${date.format('DD MMMM')}`;
                                         )}
                                       {value}
                                     </div>
-
-                                    {/* dialog to edit */}
-                                    {this.state.hoverID === id &&
-                                      (this.state.editID !== id ||
-                                        this.state.editItem !== property) && (
-                                        <Suspense fallback={<p>...</p>}>
-                                          <PopupEditFullText
-                                            class="icn_tasks_edit"
-                                            id={row.id}
-                                            property={property}
-                                            text={value}
-                                            action={this.dialogEditOk}
-                                          />
-                                        </Suspense>
-                                      )}
                                   </div>
                                 )}
 

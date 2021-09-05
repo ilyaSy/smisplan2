@@ -1,6 +1,5 @@
 import React from 'react';
 import { Menu, MenuItem, ListItemIcon, Typography, Divider } from '@material-ui/core';
-
 import ArrowLeft from '@material-ui/icons/ArrowLeft';
 
 import CustomIcon from '../../SharedComponents/CustomIcon';
@@ -51,17 +50,11 @@ function TblActionMenu(props) {
     item.action(...args);
   };
 
-  const handleOpenPopupEdit = () => {
-    setIsPopupEditOpened(true);
-  };
+  const handleOpenPopupEdit = () => setIsPopupEditOpened(true);
 
-  const handleOpenPopupLinked = (type) => {
-    setIsPopupLinkedOpened({ [type]: true });
-  };
+  const handleOpenPopupLinked = (type) => setIsPopupLinkedOpened({ [type]: true });
 
-  const handleOpenPopupConfirm = () => {
-    setIsPopupConfirmOpened(true);
-  };
+  const handleOpenPopupConfirm = () => setIsPopupConfirmOpened(true);
 
   const handleClosePopups = (event) => {
     setIsPopupLinkedOpened({});
@@ -74,22 +67,16 @@ function TblActionMenu(props) {
 
   const handleClickItem = (item, id) => {
     setMenuEl(null);
-    switch (item.id) {
-      case 'tasks_edit':
-        handleOpenPopupEdit();
-        break;
-      case 'tasks_delete':
-        handleOpenPopupConfirm();
-        break;
-      case 'discussion':
-        handleOpenPopupLinked(item.id);
-        break;
-      case 'question':
-        handleOpenPopupLinked(item.id);
-        break;
-      default:
-        item.action(id);
-        break;
+    if (item.id === 'tasks_edit') {
+      handleOpenPopupEdit();
+    } else if (item.id === 'tasks_delete') {
+      handleOpenPopupConfirm();
+    } else if (item.id === 'discussion') {
+      handleOpenPopupLinked(item.id);
+    } else if (item.id === 'question') {
+      handleOpenPopupLinked(item.id);
+    } else {
+      item.action(id);
     }
   };
 

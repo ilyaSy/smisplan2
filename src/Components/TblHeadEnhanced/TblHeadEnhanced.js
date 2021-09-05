@@ -203,7 +203,7 @@ export default class TblHeadEnhanced extends React.PureComponent {
                         name={headCell.id}
                         action={this.props.onFilter}
                         all
-                        noClose
+                        noClosed
                         type="filter"
                         itemList={filterList}
                       />

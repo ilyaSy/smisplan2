@@ -1,12 +1,11 @@
 import React from 'react';
 import CheckboxListFilter from '../../SharedComponents/CheckboxListFilter/CheckboxListFilter';
 
-import { metaData, dataTable } from '../../config/data';
 import { filters } from '../../utils/filters';
 import storage from '../../storages/commonStorage';
 
-export default function DevelopersFilter(props) {
-  const [developers, setDevelopers] = React.useState(Object.keys(metaData.developerList));
+export default function DevelopersFilter({ inputFilter, developersList, metaData, dataTable }) {
+  const [developers, setDevelopers] = React.useState(developersList);
 
   const resortActive = (developerList) => {
     const activeDevsList = [];
@@ -68,8 +67,8 @@ export default function DevelopersFilter(props) {
         setDevelopers(resortDevelopers());
       }
 
-      if (props.inputFilter) {
-        filters.setValue('data', 'developer', [props.inputFilter]);
+      if (inputFilter) {
+        filters.setValue('data', 'developer', [inputFilter]);
         storage.data.dispatch({ type: 'REDRAW', redraw: true });
       }
     });
@@ -90,7 +89,7 @@ export default function DevelopersFilter(props) {
     <CheckboxListFilter
       options={developers}
       optionsMap={metaData.developerList}
-      inputFilter={props.inputFilter}
+      inputFilter={inputFilter}
       filterType="developer"
     />
   );
