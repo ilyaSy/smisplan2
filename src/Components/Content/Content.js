@@ -2,6 +2,7 @@ import React from 'react';
 import LoadingComponent from '../LoadingComponent/LoadingComponent';
 
 import storage from '../../storages/commonStorage';
+// import { dataTable } from '../../config/data';
 import DataTable from '../DataTable/DataTable';
 import './Content.css';
 

@@ -51,7 +51,6 @@ export default class MainCalendar extends React.Component {
       popupTitle: '',
       popupIsOpened: false,
     };
-
     this.handleClosePopup = this.handleClosePopup.bind(this);
   }
 
@@ -59,44 +58,28 @@ export default class MainCalendar extends React.Component {
     this.unsubscribe = storage.state.subscribe(() => {
       const { dataLoading } = storage.state.getState().STATE;
       const { tableName } = storage.state.getState().STATE;
-      if (tableName && !dataLoading) {
-        this.setState({ dates: [] });
-      }
-      if (dataLoading && dataLoading === 'data') {
-        this.setState({ dates: dataTable });
-      }
+      if (tableName && !dataLoading) this.setState({ dates: [] });
+      if (dataLoading && dataLoading === 'data') this.setState({ dates: dataTable });
     });
   }
 
-  componentWillUnmount() {
-    this.unsubscribe();
-  }
+  componentWillUnmount = () => this.unsubscribe();
 
   handleClosePopup = () => this.setState({ popupIsOpened: false });
 
-  handleDayClick = (day) => {
-    const dates = this.state.dates
+  dayEventsInfo = (day) => {
+    const datesShown = this.state.dates
       .filter((date) => date.date === day.dateStr)
       .sort((a, b) => (a.time > b.time ? 1 : -1));
 
-    const text =
-      dates.length > 0
-        ? dates
-            .map(
-              (date) => `${date.time.replace(/(\d+):(\d+):(\d+)/, '$1:$2')}\n${date.description}`
-            )
-            .join('\n\n')
-        : 'Нет назначенных совещаний';
-
-    this.setState({
-      popupText: text,
-      popupFormat: undefined,
-      popupTitle: `Совещания за день`,
-      popupIsOpened: true,
-    });
+    return datesShown.length > 0
+      ? datesShown
+          .map((d) => `${d.time.replace(/(\d+):(\d+):(\d+)/, '$1:$2')}\n${d.description}`)
+          .join('\n\n')
+      : 'Нет назначенных совещаний';
   };
 
-  handleEventClick = (event) => {
+  detailedEventInfo = (event) => {
     const info = {
       title: event.event.title,
       date: event.event.start.toLocaleDateString().replace(/(\d+).(\d+).(\d+)/, '$3-$2-$1'),
@@ -104,8 +87,7 @@ export default class MainCalendar extends React.Component {
       fullDate: event.event.start,
     };
     const dateEvent = this.state.dates.filter(
-      (date) =>
-        date.date === info.date && date.time === info.time && date.description === info.title
+      (d) => d.date === info.date && d.time === info.time && d.description === info.title
     )[0];
 
     let text = '';
@@ -119,11 +101,23 @@ export default class MainCalendar extends React.Component {
       weekDays[info.fullDate.getDay() - 1]
     }`;
     text += `\nВремя;${info.time.replace(/(\d+):(\d+):(\d+)/, '$1:$2')}`;
+    return text;
+  };
 
+  handleDayClick = (day) => {
     this.setState({
-      popupText: text,
+      popupText: this.dayEventsInfo(day),
+      popupFormat: undefined,
+      popupTitle: 'Совещания за день',
+      popupIsOpened: true,
+    });
+  };
+
+  handleEventClick = (event) => {
+    this.setState({
+      popupText: this.detailedEventInfo(event),
       popupFormat: 'listOfData',
-      popupTitle: `Совещаниe`,
+      popupTitle: 'Совещаниe',
       popupIsOpened: true,
     });
   };

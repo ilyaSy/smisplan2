@@ -49,41 +49,28 @@ export default function TblGroupRow(props) {
   };
 
   const { fullColsNum, getDateGroup, row, groupBy, groupValue, groupHide } = props;
-
+  const showGrouped = groupHide[getDateGroup(row[groupBy])];
+  console.log(fullColsNum);
   return (
     <TableRow>
       <TableCell
-        colSpan={props.tableName === 'discussion' ? fullColsNum - 4 : fullColsNum}
+        colSpan={props.tableName === 'discussion' ? fullColsNum - 4 : fullColsNum - 1}
         className="data-table__row-title"
       >
         <MenuItem
           colSpan={fullColsNum}
           style={{ paddingTop: '0px', paddingBottom: '0px' }}
           onClick={() => {
-            groupHide[getDateGroup(row[groupBy])] = !groupHide[getDateGroup(row[groupBy])];
+            groupHide[getDateGroup(row[groupBy])] = !showGrouped;
             return props.setGroup(groupHide);
           }}
         >
           <ListItemIcon>
-            {groupHide[getDateGroup(row[groupBy])] ? (
-              <CustomIcon
-                class="icn_arrow_right"
-                tip="Показать"
-                action={() => {
-                  groupHide[getDateGroup(row[groupBy])] = true;
-                  return props.setGroup(groupHide);
-                }}
-              />
-            ) : (
-              <CustomIcon
-                class="icn_arrow_down"
-                tip="Свернуть"
-                action={() => {
-                  groupHide[getDateGroup(row[groupBy])] = false;
-                  return props.setGroup(groupHide);
-                }}
-              />
-            )}
+            <CustomIcon
+              class={`${showGrouped ? 'icn_arrow_right' : 'icn_arrow_down'}`}
+              tip={`${showGrouped ? 'Показать' : 'Свернуть'}`}
+              action={() => props.setGroup(groupHide)}
+            />
           </ListItemIcon>
 
           <Typography variant="inherit" noWrap style={{ fontSize: 'var(--font-size-table)' }}>
