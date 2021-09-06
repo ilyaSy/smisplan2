@@ -14,7 +14,7 @@ function a11yProps(index) {
 }
 
 function HeaderModes({ reloadDataTable }) {
-  const hostpath = window.location.href.search(/localhost:3000/) !== -1 ? '' : 'smisplan';
+  const hostpath = window.location.href.search(/localhost:3000/) !== -1 ? '' : 'smisplan2';
 
   const getMode = (pathname) => {
     const pathArray = pathname.split('/').slice(1);

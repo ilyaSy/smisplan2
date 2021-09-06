@@ -34,7 +34,7 @@ export default function App() {
   };
 
   const { pathname } = document.location;
-  const hostpath = window.location.href.search(/localhost:3000/) !== -1 ? '' : 'smisplan';
+  const hostpath = window.location.href.search(/localhost:3000/) !== -1 ? '' : 'smisplan2';
   const pathArray = pathname.split('/').slice(1);
   if (pathArray[0] === hostpath) {
     pathArray.shift();
