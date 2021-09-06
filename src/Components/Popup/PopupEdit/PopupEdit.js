@@ -195,7 +195,7 @@ export default class PopupEdit extends React.Component {
 
     if (metaData.dataTableName === 'discussion') {
       if (!dataEdited.participants.split(',').includes(dataEdited.responsible)) {
-        dataEdited.participants = `{dataEdited.responsible},${dataEdited.participants}`;
+        dataEdited.participants = `${dataEdited.responsible},${dataEdited.participants}`;
       }
     }
 
@@ -238,8 +238,6 @@ export default class PopupEdit extends React.Component {
       dataEdited.week = parseFloat(new DateW(dataEdited.date).getYearWeekStr());
     }
 
-    console.log(dataEdited);
-
     this.props.actionNew(dataEdited);
     this.setOpen(false);
   };
@@ -277,6 +275,25 @@ export default class PopupEdit extends React.Component {
 
   sortValidKeys = (a, b) =>
     metaData.dataTable[a].tableIndex >= metaData.dataTable[b].tableIndex ? 1 : -1;
+
+  getDefaultValue = (property) => {
+    const propertyInfo = metaData.dataTable[property];
+    const listName = metaData.dataTable[property].vocabulary || property;
+    const listInfo = metaData[`${listName}List`] || this.state[`${listName}List`];
+
+    let defaultValue = this.task[property];
+    if (propertyInfo.type === 'multi-select' || propertyInfo.type === 'select') {
+      defaultValue = this.task[property]
+        ? this.task[property].split(',').map((v) => ({ value: v, label: listInfo[v]?.value || v }))
+        : null;
+    }
+
+    if (property === 'mainTable' && metaData.tables[`${defaultValue}_meta`].specificParameters) {
+      defaultValue = metaData.tables[`${defaultValue}_meta`].specificParameters.tableName;
+    }
+
+    return defaultValue;
+  };
 
   render() {
     const properties = [].concat(
@@ -346,13 +363,7 @@ export default class PopupEdit extends React.Component {
               return (
                 <div key={`dialogEdit-${property}-main`}>
                   <div key={`dialogEdit-${property}-subMain`} className="popup-edit__row">
-                    <div
-                      style={{
-                        width: '200px',
-                        fontSize: '14px',
-                        color: !propertyInfo.isEditable ? 'var(--font-color-disabled)' : '',
-                      }}
-                    >
+                    <div style={{ color: !propertyInfo.isEditable ? 'var(--font-color-disabled)' : '' }}>
                       {propertyInfo.value}
                     </div>
                     {propertyInfo.isEditable &&
@@ -369,17 +380,7 @@ export default class PopupEdit extends React.Component {
                             this[property] = el;
                           }}
                           refName={property}
-                          defaultValue={
-                            this.task[property]
-                              ? this.task[property]
-                                  .split(',')
-                                  .map((v) =>
-                                    listInfo[v]
-                                      ? { value: v, label: listInfo[v].value }
-                                      : { value: v, label: v }
-                                  )
-                              : null
-                          }
+                          defaultValue={this.getDefaultValue(property)}
                           setValue={(v) => {
                             this.setState({ [property]: v });
                           }}
@@ -391,7 +392,7 @@ export default class PopupEdit extends React.Component {
                     {propertyInfo.isEditable &&
                       ['string', 'int', 'fulltext'].includes(propertyInfo.type) && (
                         <Input
-                          defaultValue={this.task[property]}
+                          defaultValue={this.getDefaultValue(property)}
                           fullWidth
                           multiline
                           onKeyDown={(e) => e.stopPropagation()}
@@ -400,8 +401,6 @@ export default class PopupEdit extends React.Component {
                           }}
                           inputProps={{
                             style: {
-                              fontSize: '14px',
-                              fontFamily: 'var(--font-main)',
                               maxHeight: this.state.printPDF ? '2000px' : '200px',
                               overflow: 'unset !important',
                             },
@@ -441,10 +440,7 @@ export default class PopupEdit extends React.Component {
                       )}
                     {!propertyInfo.isEditable && (
                       <TextField
-                        defaultValue={value}
-                        inputProps={{
-                          style: { fontSize: '14px', fontFamily: 'var(--font-main)' },
-                        }}
+                        defaultValue={this.getDefaultValue(property)}
                         inputRef={(el) => {
                           this[property] = el;
                         }}

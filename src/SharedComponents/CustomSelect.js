@@ -68,6 +68,7 @@ export default class CustomSelect extends React.Component {
   };
 
   render() {
+    const Component = this.props.isCreatable ? CreatableSelect : Select;
     const selectStyles = {
       input: (base) => ({
         ...base,
@@ -146,57 +147,29 @@ export default class CustomSelect extends React.Component {
 
     return (
       <div style={this.props.style}>
-        {!this.props.isCreatable && (
-          <Select
-            allowCreate={this.props.allowCreate}
-            ref={this.selectRef}
-            // ref={this.props.refName}
-            options={this.props.options}
-            styles={selectStyles}
-            // menuPlacement={this.state.offsetTop < 250 ? "bottom" : "top"}
-            menuPlacement={this.props.bottom ? 'bottom' : this.state.offsetTop < 250 ? 'bottom' : 'top'}
-            value={this.state.value}
-            placeholder={this.props.label}
-            defaultValue={this.props.defaultValue}
-            defaultInputValue={this.props.defaultInputValue}
-            onChange={this.handleChange}
-            onMenuOpen={() => {
-              this.optionsCounter = 0;
-            }}
-            noOptionsMessage={() => 'Нет подходящих вариантов'}
-            isClearable
-            isSearchable
-            required
-            isMulti={!!this.props.isMulti}
-            style={{ width: '200px' }}
-            filterOption={this.filterValues}
-          />
-        )}
-        {this.props.isCreatable && (
-          <CreatableSelect
-            allowCreate={this.props.allowCreate}
-            ref={this.selectRef}
-            // ref={this.props.refName}
-            options={this.props.options}
-            styles={selectStyles}
-            menuPlacement={this.props.bottom ? 'bottom' : this.state.offsetTop < 250 ? 'bottom' : 'top'}
-            value={this.state.value}
-            placeholder={this.props.label}
-            defaultValue={this.props.defaultValue}
-            defaultInputValue={this.props.defaultInputValue}
-            onChange={this.handleChange}
-            onMenuOpen={() => {
-              this.optionsCounter = 0;
-            }}
-            noOptionsMessage={() => 'Нет подходящих вариантов'}
-            isClearable
-            isSearchable
-            required
-            isMulti={!!this.props.isMulti}
-            style={{ width: '200px' }}
-            filterOption={this.filterValues}
-          />
-        )}
+        <Component
+          allowCreate={this.props.allowCreate}
+          ref={this.selectRef}
+          options={this.props.options}
+          styles={selectStyles}
+          // menuPlacement={this.state.offsetTop < 250 ? "bottom" : "top"}
+          menuPlacement={this.props.bottom ? 'bottom' : this.state.offsetTop < 250 ? 'bottom' : 'top'}
+          value={this.state.value}
+          placeholder={this.props.label}
+          defaultValue={this.props.defaultValue}
+          defaultInputValue={this.props.defaultInputValue}
+          onChange={this.handleChange}
+          onMenuOpen={() => {
+            this.optionsCounter = 0;
+          }}
+          noOptionsMessage={() => 'Нет подходящих вариантов'}
+          isClearable
+          isSearchable
+          required
+          isMulti={!!this.props.isMulti}
+          style={{ width: '200px' }}
+          filterOption={this.filterValues}
+        />
       </div>
     );
   }

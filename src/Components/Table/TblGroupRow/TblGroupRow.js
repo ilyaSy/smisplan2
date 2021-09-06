@@ -51,7 +51,6 @@ export default function TblGroupRow(props) {
 
   const { fullColsNum, getDateGroup, row, groupBy, groupValue, groupHide } = props;
   const showGrouped = groupHide[getDateGroup(row[groupBy])];
-  console.log(fullColsNum);
   return (
     <TableRow>
       <TableCell

@@ -1,6 +1,5 @@
 import React, { Fragment, Suspense, lazy } from 'react';
 import { Table, TableHead, TableBody, TableRow, TableCell } from '@material-ui/core';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import moment from 'moment';
 import 'moment/locale/ru';
 
@@ -14,9 +13,10 @@ import CustomSuspenseFallback from '../../SharedComponents/CustomSuspenseFallbac
 import TblCell from '../Table/TblCell/TblCell';
 import TblCellInput from '../Table/TblCellInput/TblCellInput';
 import TblCellIcon from '../Table/TblCellIcon/TblCellIcon';
-import TblHeaderSearch from '../Table/TblHeaderSearch/TblHeaderSearch';
-import TblHeaderPagination from '../Table/TblHeaderPagination/TblHeaderPagination';
+import TblHeader from '../Table/TblHeader/TblHeader';
 import TblGroupRow from '../Table/TblGroupRow/TblGroupRow';
+import TblRowText from '../Table/TblRowText/TblRowText';
+import TblLoading from '../Table/TblLoading/TblLoading';
 import getDefaultValues from '../../utils/defaultData';
 import './DataTable.css';
 
@@ -67,8 +67,8 @@ const stableSort = (array, cmp) => {
 
 const getSorting = (sort) => (a, b) => descSort(a, b, sort);
 
-const getAdditionalCellProps = () => {
-  let hasAdditionalCell = false;
+const getHasMenuCell = () => {
+  let hasMenuCell = false;
   if (
     metaData.specificParameters &&
     (metaData.specificParameters.hasSpecAction ||
@@ -77,10 +77,10 @@ const getAdditionalCellProps = () => {
       metaData.specificParameters.hasDeleteButton ||
       metaData.specificParameters.hasDoneButton)
   ) {
-    hasAdditionalCell = true;
+    hasMenuCell = true;
   }
 
-  return hasAdditionalCell;
+  return hasMenuCell;
 };
 
 export default class DataTable extends React.Component {
@@ -992,10 +992,9 @@ ${date.format('DD MMMM')}`;
       rowsPerPage = data.length;
     }
 
-    const hasAdditionalCell = getAdditionalCellProps();
+    const hasMenuCell = getHasMenuCell();
     const fullColsNum =
-      Object.values(metaData.dataTable).filter((a) => a.showInTable).length +
-      (hasAdditionalCell ? 1 : 0);
+      Object.values(headCells).filter((a) => a.showInTable).length + (hasMenuCell ? 1 : 0);
 
     return this.state.loadData ? (
       <Table size="small" stickyHeader className="data-table__table">
@@ -1016,36 +1015,27 @@ ${date.format('DD MMMM')}`;
             headCells={headCells}
           />
           {/* Search & pagination options row */}
-          {!this.props.noPagination && (
-            <TableRow>
-              <TableCell
-                colSpan={hasAdditionalCell ? fullColsNum + 1 : fullColsNum}
-                className="data-table__pagination-cell"
-              >
-                <TblHeaderSearch setSearch={this.setSearch} />
-
-                <TblHeaderPagination
-                  count={data.length}
-                  page={page}
-                  rowsPerPage={rowsPerPage}
-                  onChangePage={this.handleChangePage}
-                  onChangeRowsPerPage={this.handleChangeRowsPerPage}
-                />
-              </TableCell>
-            </TableRow>
-          )}
+          <TblHeader
+            showCondition={!this.props.noPagination}
+            colSpan={hasMenuCell ? fullColsNum + 1 : fullColsNum}
+            count={data.length}
+            onSearch={this.setSearch}
+            page={page}
+            rowsPerPage={rowsPerPage}
+            onChangePage={this.handleChangePage}
+            onChangeRowsPerPage={this.handleChangeRowsPerPage}
+          />
           {/* Title row (for questions mode) */}
-          {metaData.specificParameters?.hasTitleRow && this.state.titleRow !== '' && (
-            <TableRow>
-              <TableCell colSpan={fullColsNum} className="data-table__row-title">
-                {this.state.titleRow}
-              </TableCell>
-            </TableRow>
-          )}
+          <TblRowText
+            showCondition={metaData.specificParameters?.hasTitleRow && this.state.titleRow !== ''}
+            className="data-table__row-title"
+            colSpan={fullColsNum}
+            text={this.state.titleRow}
+          />
         </TableHead>
 
         <TableBody>
-          {data.length > 0 ? (
+          {data.length > 0 &&
             stableSort(data, getSorting(sort))
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((row) => {
@@ -1070,7 +1060,7 @@ ${date.format('DD MMMM')}`;
                     {groupBy && groupBy !== '' && showGroupByRow ? (
                       <TblGroupRow
                         tableName={metaData.dataTableName}
-                        fullColsNum={hasAdditionalCell ? fullColsNum + 2 : fullColsNum}
+                        fullColsNum={hasMenuCell ? fullColsNum + 2 : fullColsNum}
                         headCells={headCells}
                         groupBy={groupBy}
                         groupValue={groupValue}
@@ -1149,7 +1139,7 @@ ${date.format('DD MMMM')}`;
                           );
                         })}
                       <TblCellIcon
-                        showCell={hasAdditionalCell}
+                        showCell={hasMenuCell}
                         showInner
                         type="data-table__hover-icon"
                         action={this.handleInlineEditClose}
@@ -1180,20 +1170,16 @@ ${date.format('DD MMMM')}`;
                     )}
                   </Fragment>
                 );
-              })
-          ) : (
-            <TableRow>
-              <TableCell colSpan={fullColsNum}>
-                {tableName ? `${tableName}: отсутствуют` : 'Данные загружаются...'}
-              </TableCell>
-            </TableRow>
-          )}
+              })}
+          <TblRowText
+            showCondition={data.length === 0}
+            colSpan={fullColsNum}
+            text={tableName ? `${tableName}: отсутствуют` : 'Данные загружаются...'}
+          />
         </TableBody>
       </Table>
     ) : (
-      <div className="data-table__loading">
-        <CircularProgress style={{ width: '100px', height: '100px' }} />
-      </div>
+      <TblLoading />
     );
   }
 }
