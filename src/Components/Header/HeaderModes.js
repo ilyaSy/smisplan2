@@ -14,17 +14,17 @@ function a11yProps(index) {
 }
 
 function HeaderModes({ reloadDataTable }) {
-  // const hostpath = window.location.href.search(/localhost:3000/) !== -1 ? '' : 'smisplan2';
-  const hostpath = '';
+  const hostpath = window.location.href.search(/localhost:3000/) !== -1 ? '' : 'smisplan2';
 
   const getMode = (pathname) => {
     const pathArray = pathname.split('/').slice(1);
     if (pathArray[0] === hostpath) pathArray.shift();
 
-    return pathArray[0];
+    return mainModes.includes(pathArray[0]) ? pathArray[0] : 'task';
   };
 
   const tableName = getMode(document.location.pathname);
+  console.log(tableName);
 
   const [value, setValue] = React.useState(
     `${hostpath && `/${hostpath}`}/${mainModes.includes(tableName) ? tableName : 'task'}`
