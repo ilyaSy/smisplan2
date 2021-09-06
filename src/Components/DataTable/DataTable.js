@@ -926,7 +926,7 @@ ${date.format('DD MMMM')}`;
       value = value.replace(/(\d\d:\d\d):\d\d/, '$1');
     } else if (headCell.id === 'mainTable') {
       value = metaData.tables[`${value}_meta`].specificParameters.tableName;
-    } else if (headCell.type === 'select') {
+    } else if (headCell.type === 'select' && metaData[`${headCell.id}List`]) {
       ({ value } = metaData[`${headCell.id}List`][value]);
     } else if (headCell.type === 'multi-select') {
       value = value

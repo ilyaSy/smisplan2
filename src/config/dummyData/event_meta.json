@@ -22,7 +22,7 @@
         "value": "Статус новый",
         "isFilter": "true",
         "hasFullTextLink": "false",
-        "tableIndex": 8,
+        "tableIndex": 10,
         "id": "status_new",
         "type": "select",
         "defaultValue": "new"
@@ -37,7 +37,7 @@
         "value": "Время изменений",
         "isFilter": "true",
         "hasFullTextLink": "false",
-        "tableIndex": 7,
+        "tableIndex": 11,
         "id": "dt",
         "type": "datetime",
         "defaultValue": ""
@@ -67,7 +67,7 @@
         "value": "Ответственный",
         "isFilter": "false",
         "hasFullTextLink": "false",
-        "tableIndex": 5,
+        "tableIndex": 6,
         "id": "developer",
         "type": "select",
         "defaultValue": ""
@@ -82,7 +82,7 @@
         "value": "ID задачи",
         "isFilter": "false",
         "hasFullTextLink": "false",
-        "tableIndex": 4,
+        "tableIndex": 3,
         "id": "task_id",
         "type": "int",
         "defaultValue": ""
@@ -106,7 +106,7 @@
         "value": "Таблица",
         "isFilter": "true",
         "hasFullTextLink": "false",
-        "tableIndex": 3,
+        "tableIndex": 4,
         "id": "mainTable",
         "type": "select",
         "defaultValue": "task"
@@ -121,7 +121,7 @@
         "value": "Тема",
         "isFilter": "false",
         "hasFullTextLink": "true",
-        "tableIndex": 6,
+        "tableIndex": 7,
         "id": "theme",
         "type": "string",
         "defaultValue": ""

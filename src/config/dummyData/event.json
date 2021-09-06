@@ -1,7 +1,7 @@
 {
   "data": [
     {
-      "project": null,
+      "project": "project1",
       "dt": "2021-08-29 19:26:30",
       "event": "put",
       "task_id": "1",
